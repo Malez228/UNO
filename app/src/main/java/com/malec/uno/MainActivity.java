@@ -241,7 +241,10 @@ public class MainActivity extends AppCompatActivity
 									{
 										database.child("Card").setValue(HandCards.get(CardNum + 4));
 										HandCards.remove(CardNum + 4);
-										database.child("CurrentPlayer").setValue(Player + 1);
+										Integer i = 1;
+										if (CurrentCardV.split(" ")[1].contains("@"))
+											i = 2;
+										database.child("CurrentPlayer").setValue(Player + i);
 									}
 								}
 								if (Card.getId() == LeftCard1.getId())
@@ -250,7 +253,10 @@ public class MainActivity extends AppCompatActivity
 									{
 										database.child("Card").setValue(HandCards.get(CardNum + 3));
 										HandCards.remove(CardNum + 3);
-										database.child("CurrentPlayer").setValue(Player + 1);
+										Integer i = 1;
+										if (CurrentCardV.split(" ")[1].contains("@"))
+											i = 2;
+										database.child("CurrentPlayer").setValue(Player + i);
 									}
 								}
 								if (Card.getId() == CenterCard.getId())
@@ -259,7 +265,10 @@ public class MainActivity extends AppCompatActivity
 									{
 										database.child("Card").setValue(HandCards.get(CardNum + 2));
 										HandCards.remove(CardNum + 2);
-										database.child("CurrentPlayer").setValue(Player + 1);
+										Integer i = 1;
+										if (CurrentCardV.split(" ")[1].contains("@"))
+											i = 2;
+										database.child("CurrentPlayer").setValue(Player + i);
 									}
 								}
 								if (Card.getId() == RightCard1.getId())
@@ -268,7 +277,10 @@ public class MainActivity extends AppCompatActivity
 									{
 										database.child("Card").setValue(HandCards.get(CardNum + 1));
 										HandCards.remove(CardNum + 1);
-										database.child("CurrentPlayer").setValue(Player + 1);
+										Integer i = 1;
+										if (CurrentCardV.split(" ")[1].contains("@"))
+											i = 2;
+										database.child("CurrentPlayer").setValue(Player + i);
 									}
 								}
 								if (Card.getId() == RightCard0.getId())
@@ -277,7 +289,10 @@ public class MainActivity extends AppCompatActivity
 									{
 										database.child("Card").setValue(HandCards.get(CardNum + 0));
 										HandCards.remove(CardNum + 0);
-										database.child("CurrentPlayer").setValue(Player + 1);
+										Integer i = 1;
+										if (CurrentCardV.split(" ")[1].contains("@"))
+											i = 2;
+										database.child("CurrentPlayer").setValue(Player + i);
 									}
 								}
 
@@ -391,7 +406,6 @@ public class MainActivity extends AppCompatActivity
 						card = Cards.get(rnd.nextInt(Cards.size()));
 						database.child("Card").setValue(card);
 						Cards.remove(card);
-
 
 						database.child("NewCard").addValueEventListener(new ValueEventListener()
 						{
@@ -586,7 +600,7 @@ public class MainActivity extends AppCompatActivity
 
 		GetCurrentCard();
 
-		Toast.makeText(this, Player.toString() + " " + Server.toString(), Toast.LENGTH_SHORT).show();
+
 
 		DrawHand();
 
@@ -641,3 +655,19 @@ public class MainActivity extends AppCompatActivity
 		//endregion
 	}
 }
+/*TODO
+Правила для игры
+  Если вытащенная из колоды карта подходит для разыгрывания ее можно играть
+
+Правила для карт
+  1) Смена направления хода
+      1. Создать переменную в базе для определения направления хода
+      2. Считывать ее каждый раз перед тем как завершить свой ход и увеличивать или
+        уменьшать переменную хода
+  2) Пропуск хода
+      Просто увеличить/уменьшить переменную хода на 2
+  3) Возьми две (Дикая возьми четыре)
+      Хз как сделать это при текущей выдаче карт
+  4) Дикая
+      Подумать над интерфейсом выбора цвета + отображать заказанный цвет сбоку от сброса
+*/
