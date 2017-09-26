@@ -240,11 +240,11 @@ public class MainActivity extends AppCompatActivity
 									if (HandCards.get(CardNum + 4).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 4).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
 									{
 										database.child("Card").setValue(HandCards.get(CardNum + 4));
-										HandCards.remove(CardNum + 4);
 										Integer i = 1;
-										if (CurrentCardV.split(" ")[1].contains("@"))
+										if (HandCards.get(CardNum + 0).split(" ")[1].contains("@"))
 											i = 2;
 										database.child("CurrentPlayer").setValue(Player + i);
+										HandCards.remove(CardNum + 4);
 									}
 								}
 								if (Card.getId() == LeftCard1.getId())
@@ -252,11 +252,11 @@ public class MainActivity extends AppCompatActivity
 									if (HandCards.get(CardNum + 3).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 3).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
 									{
 										database.child("Card").setValue(HandCards.get(CardNum + 3));
-										HandCards.remove(CardNum + 3);
 										Integer i = 1;
-										if (CurrentCardV.split(" ")[1].contains("@"))
+										if (HandCards.get(CardNum + 0).split(" ")[1].contains("@"))
 											i = 2;
 										database.child("CurrentPlayer").setValue(Player + i);
+										HandCards.remove(CardNum + 3);
 									}
 								}
 								if (Card.getId() == CenterCard.getId())
@@ -264,11 +264,11 @@ public class MainActivity extends AppCompatActivity
 									if (HandCards.get(CardNum + 2).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 2).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
 									{
 										database.child("Card").setValue(HandCards.get(CardNum + 2));
-										HandCards.remove(CardNum + 2);
 										Integer i = 1;
-										if (CurrentCardV.split(" ")[1].contains("@"))
+										if (HandCards.get(CardNum + 0).split(" ")[1].contains("@"))
 											i = 2;
 										database.child("CurrentPlayer").setValue(Player + i);
+										HandCards.remove(CardNum + 2);
 									}
 								}
 								if (Card.getId() == RightCard1.getId())
@@ -276,11 +276,11 @@ public class MainActivity extends AppCompatActivity
 									if (HandCards.get(CardNum + 1).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 1).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
 									{
 										database.child("Card").setValue(HandCards.get(CardNum + 1));
-										HandCards.remove(CardNum + 1);
 										Integer i = 1;
-										if (CurrentCardV.split(" ")[1].contains("@"))
+										if (HandCards.get(CardNum + 0).split(" ")[1].contains("@"))
 											i = 2;
 										database.child("CurrentPlayer").setValue(Player + i);
+										HandCards.remove(CardNum + 1);
 									}
 								}
 								if (Card.getId() == RightCard0.getId())
@@ -288,11 +288,11 @@ public class MainActivity extends AppCompatActivity
 									if (HandCards.get(CardNum + 0).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 0).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
 									{
 										database.child("Card").setValue(HandCards.get(CardNum + 0));
-										HandCards.remove(CardNum + 0);
 										Integer i = 1;
-										if (CurrentCardV.split(" ")[1].contains("@"))
+										if (HandCards.get(CardNum + 0).split(" ")[1].contains("@"))
 											i = 2;
 										database.child("CurrentPlayer").setValue(Player + i);
+										HandCards.remove(CardNum + 0);
 									}
 								}
 
@@ -458,7 +458,7 @@ public class MainActivity extends AppCompatActivity
 
 								if (curPlayer > Cpl[0])
 								{
-									database.child("CurrentPlayer").setValue(1);
+									database.child("CurrentPlayer").setValue(curPlayer - Cpl[0]);
 								}
 							}
 
