@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -22,13 +23,14 @@ public class MainActivity extends AppCompatActivity
 {
 	ImageView LeftCard0, LeftCard1, CenterCard, RightCard1, RightCard0;
 	ImageView Deck, CurrentCard;
+	TextView PlayerTurn;
 
 	List<String> HandCards = new ArrayList();
 	List<String> Cards = new ArrayList();
 
 	Integer CardNum = 0;
 
-	Boolean Logined = false, Turn = false;
+	Boolean Logined = false, Turn = false, TurnShow = false;
 
 	Integer StartPosX, StartPosY;
 
@@ -204,75 +206,86 @@ public class MainActivity extends AppCompatActivity
 		{
 			try
 			{
-				int x = (int) motionEvent.getX();
-				int y = (int) motionEvent.getY();
-
-				switch (motionEvent.getAction())
+				if (Turn)
 				{
-					case MotionEvent.ACTION_DOWN:
-						StartPosX = x;
-						StartPosY = y;
-						break;
-					case MotionEvent.ACTION_MOVE:
-						Log.i("TAG", "Moving: (" + x + ", " + y + ")" + " Start: (" + StartPosX + ", " + StartPosY + ")");
-						break;
-					case MotionEvent.ACTION_UP:
-						if (y + StartPosY <= -400)
-						{
-							ImageView Card = (ImageView) view;
+					int x = (int) motionEvent.getX();
+					int y = (int) motionEvent.getY();
 
-							if (Card.getId() == LeftCard0.getId())
+					switch (motionEvent.getAction())
+					{
+						case MotionEvent.ACTION_DOWN:
+							StartPosX = x;
+							StartPosY = y;
+							break;
+						case MotionEvent.ACTION_MOVE:
+							Log.i("TAG", "Moving: (" + x + ", " + y + ")" + " Start: (" + StartPosX + ", " + StartPosY + ")");
+							break;
+						case MotionEvent.ACTION_UP:
+							if (y + StartPosY <= -400)
 							{
-								if (HandCards.get(CardNum + 4).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 4).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
-								{
-									database.child("Card").setValue(HandCards.get(CardNum + 4));
-									HandCards.remove(CardNum + 4);
-									database.child("CurrentPlayer").setValue(Player + 1);
-								}
-							}
-							if (Card.getId() == LeftCard1.getId())
-							{
-								if (HandCards.get(CardNum + 3).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 3).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
-								{
-									database.child("Card").setValue(HandCards.get(CardNum + 3));
-									HandCards.remove(CardNum + 3);
-									database.child("CurrentPlayer").setValue(Player + 1);
-								}
-							}
-							if (Card.getId() == CenterCard.getId())
-							{
-								if (HandCards.get(CardNum + 2).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 2).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
-								{
-									database.child("Card").setValue(HandCards.get(CardNum + 2));
-									HandCards.remove(CardNum + 2);
-									database.child("CurrentPlayer").setValue(Player + 1);
-								}
-							}
-							if (Card.getId() == RightCard1.getId())
-							{
-								if (HandCards.get(CardNum + 1).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 1).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
-								{
-									database.child("Card").setValue(HandCards.get(CardNum + 1));
-									HandCards.remove(CardNum + 1);
-									database.child("CurrentPlayer").setValue(Player + 1);
-								}
-							}
-							if (Card.getId() == RightCard0.getId())
-							{
-								if (HandCards.get(CardNum + 0).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 0).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
-								{
-									database.child("Card").setValue(HandCards.get(CardNum + 0));
-									HandCards.remove(CardNum + 0);
-									database.child("CurrentPlayer").setValue(Player + 1);
-								}
-							}
+								ImageView Card = (ImageView) view;
 
-							//TODO проверку если на столе нет карты
-							if (CardNum > 0) CardNum--;
+								if (Card.getId() == LeftCard0.getId())
+								{
+									if (HandCards.get(CardNum + 4).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 4).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
+									{
+										database.child("Card").setValue(HandCards.get(CardNum + 4));
+										HandCards.remove(CardNum + 4);
+										database.child("CurrentPlayer").setValue(Player + 1);
+									}
+								}
+								if (Card.getId() == LeftCard1.getId())
+								{
+									if (HandCards.get(CardNum + 3).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 3).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
+									{
+										database.child("Card").setValue(HandCards.get(CardNum + 3));
+										HandCards.remove(CardNum + 3);
+										database.child("CurrentPlayer").setValue(Player + 1);
+									}
+								}
+								if (Card.getId() == CenterCard.getId())
+								{
+									if (HandCards.get(CardNum + 2).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 2).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
+									{
+										database.child("Card").setValue(HandCards.get(CardNum + 2));
+										HandCards.remove(CardNum + 2);
+										database.child("CurrentPlayer").setValue(Player + 1);
+									}
+								}
+								if (Card.getId() == RightCard1.getId())
+								{
+									if (HandCards.get(CardNum + 1).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 1).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
+									{
+										database.child("Card").setValue(HandCards.get(CardNum + 1));
+										HandCards.remove(CardNum + 1);
+										database.child("CurrentPlayer").setValue(Player + 1);
+									}
+								}
+								if (Card.getId() == RightCard0.getId())
+								{
+									if (HandCards.get(CardNum + 0).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 0).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
+									{
+										database.child("Card").setValue(HandCards.get(CardNum + 0));
+										HandCards.remove(CardNum + 0);
+										database.child("CurrentPlayer").setValue(Player + 1);
+									}
+								}
 
-							DrawHand();
-						}
-						break;
+								//TODO проверку если на столе нет карты
+								if (CardNum > 0) CardNum--;
+
+								DrawHand();
+							}
+							break;
+					}
+				}
+				else
+				{
+					if (TurnShow)
+					{
+						Toast.makeText(MainActivity.this, "Сейчас не ваш ход", Toast.LENGTH_SHORT).show();
+						TurnShow = false;
+					}
 				}
 			} catch (Exception e)
 			{
@@ -396,10 +409,18 @@ public class MainActivity extends AppCompatActivity
 				String CplayerS = dataSnapshot.toString().split(" value = ")[1];
 				Integer Cplayer = Integer.valueOf(CplayerS.substring(0, CplayerS.length() - 2));
 
+
 				if (Player == Cplayer)
+				{
 					Turn = true;
+					TurnShow = true;
+					PlayerTurn.setText("Ваш ход");
+				}
 				else
+				{
 					Turn = false;
+					PlayerTurn.setText("Ход игрока " + Cplayer.toString());
+				}
 			}
 
 			@Override
@@ -449,6 +470,7 @@ public class MainActivity extends AppCompatActivity
 		RightCard0 = (ImageView) findViewById(R.id.RightCard0);
 		Deck = (ImageView) findViewById(R.id.Deck);
 		CurrentCard = (ImageView) findViewById(R.id.CurrentCard);
+		PlayerTurn = (TextView) findViewById(R.id.PlayerTurn);
 		//endregion
 
 		PlayerInitialization();
