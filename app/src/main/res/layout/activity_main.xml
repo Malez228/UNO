@@ -9,16 +9,26 @@
     tools:context="com.malec.uno.MainActivity">
 
     <TextView
+        android:id="@+id/HandCardsCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginRight="8dp"
+        android:text="Карт в руке 10"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/PlayerTurn"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <TextView
         android:id="@+id/PlayerTurn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Ход игрока 1"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="18sp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="7dp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"/>
 

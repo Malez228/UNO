@@ -23,22 +23,24 @@ public class MainActivity extends AppCompatActivity
 {
 	ImageView LeftCard0, LeftCard1, CenterCard, RightCard1, RightCard0;
 	ImageView Deck, CurrentCard;
-	TextView PlayerTurn;
+	TextView PlayerTurn, HandCardsCount;
 
 	List<String> HandCards = new ArrayList();
 	List<String> Cards = new ArrayList();
 
 	Integer CardNum = 0;
 
-	Boolean Logined = false, Turn = false, TurnShow = false;
+	Boolean Logined = false, Turn = false, TurnShow = false, Server = false;
 
 	Integer StartPosX, StartPosY;
 
 	Random rnd = new Random();
 
-	Integer Player = 0;
+	static Integer Player = 0;
 
 	public static String CurrentCardV;
+
+	final Integer[] Cpl = {0};
 
 	DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
@@ -196,6 +198,14 @@ public class MainActivity extends AppCompatActivity
 		{
 			CurrentCard.setImageResource(GetCardImage("EmptyCard"));
 		}
+
+		try
+		{
+			HandCardsCount.setText("Карт в руке " + HandCards.size());
+		} catch (Exception e)
+		{
+			HandCardsCount.setText("Карт в руке 0");
+		}
 	}
 
 	//region OnTochListener
@@ -278,12 +288,10 @@ public class MainActivity extends AppCompatActivity
 							}
 							break;
 					}
-				}
-				else
+				} else
 				{
 					if (TurnShow)
 					{
-						Toast.makeText(MainActivity.this, "Сейчас не ваш ход", Toast.LENGTH_SHORT).show();
 						TurnShow = false;
 					}
 				}
@@ -371,6 +379,80 @@ public class MainActivity extends AppCompatActivity
 					database.child("ConnectedPlayers").setValue(ConnectedPlayers + 1);
 
 					Logined = true;
+
+					if (ConnectedPlayers == 0)
+					{
+						database.child("CurrentPlayer").setValue(1);
+
+						GenerateCards();
+						String card = Cards.get(rnd.nextInt(Cards.size()));
+						database.child("NewCard").setValue(card);
+						Cards.remove(card);
+						card = Cards.get(rnd.nextInt(Cards.size()));
+						database.child("Card").setValue(card);
+						Cards.remove(card);
+
+
+						database.child("NewCard").addValueEventListener(new ValueEventListener()
+						{
+							@Override
+							public void onDataChange(DataSnapshot dataSnapshot)
+							{
+								String s = dataSnapshot.toString().split(" value = ")[1];
+								try
+								{
+									Integer cardNOW = Integer.valueOf(s.substring(0, s.length() - 2));
+
+									if (cardNOW == 0)
+									{
+										String card = Cards.get(rnd.nextInt(Cards.size()));
+										database.child("NewCard").setValue(card);
+										Cards.remove(card);
+									}
+								} catch (Exception e)
+								{
+									//значит все норм
+								}
+							}
+
+							@Override
+							public void onCancelled(DatabaseError error)
+							{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
+						});
+
+						database.child("ConnectedPlayers").addValueEventListener(new ValueEventListener()
+						{
+							@Override
+							public void onDataChange(DataSnapshot dataSnapshot)
+							{
+								String CplayerS = dataSnapshot.toString().split(" value = ")[1];
+								Cpl[0] = Integer.valueOf(CplayerS.substring(0, CplayerS.length() - 2));
+							}
+
+							@Override
+							public void onCancelled(DatabaseError error)
+							{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
+						});
+
+						database.child("CurrentPlayer").addValueEventListener(new ValueEventListener()
+						{
+							@Override
+							public void onDataChange(DataSnapshot dataSnapshot)
+							{
+								String s = dataSnapshot.toString().split(" value = ")[1];
+								Integer curPlayer = Integer.valueOf(s.substring(0, s.length() - 2));
+
+								if (curPlayer > Cpl[0])
+								{
+									database.child("CurrentPlayer").setValue(1);
+								}
+							}
+
+							@Override
+							public void onCancelled(DatabaseError error)
+							{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
+						});
+					}
 				}
 			}
 
@@ -415,8 +497,7 @@ public class MainActivity extends AppCompatActivity
 					Turn = true;
 					TurnShow = true;
 					PlayerTurn.setText("Ваш ход");
-				}
-				else
+				} else
 				{
 					Turn = false;
 					PlayerTurn.setText("Ход игрока " + Cplayer.toString());
@@ -436,23 +517,50 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				database.child("NewCard").addListenerForSingleValueEvent(new ValueEventListener()
+				if (Turn)
 				{
-					@Override
-					public void onDataChange(DataSnapshot dataSnapshot)
+					database.child("NewCard").addListenerForSingleValueEvent(new ValueEventListener()
 					{
-						String NewCard = dataSnapshot.toString().split(" value = ")[1];
-						NewCard = NewCard.substring(0, NewCard.length() - 2);
-						HandCards.add(NewCard);
-						DrawHand();
-						database.child("NewCard").setValue(0);
-					}
+						@Override
+						public void onDataChange(DataSnapshot dataSnapshot)
+						{
+							String NewCard = dataSnapshot.toString().split(" value = ")[1];
+							NewCard = NewCard.substring(0, NewCard.length() - 2);
+							HandCards.add(NewCard);
+							if (HandCards.size() > CardNum + 5) CardNum++;
+							DrawHand();
+							database.child("NewCard").setValue(0);
+							database.child("CurrentPlayer").setValue(Player + 1);
+						}
 
-					@Override
-					public void onCancelled(DatabaseError error)
-					{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
-				});
+						@Override
+						public void onCancelled(DatabaseError error)
+						{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
+					});
+				}
 			}
+		});
+	}
+
+	@Override
+	protected void onStop()
+	{
+		super.onStop();
+
+		database.child("ConnectedPlayers").addListenerForSingleValueEvent(new ValueEventListener()
+		{
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot)
+			{
+				String s = dataSnapshot.toString().split(" value = ")[1];
+				Integer cPlayer = Integer.valueOf(s.substring(0, s.length() - 2));
+
+				database.child("ConnectedPlayers").setValue(cPlayer - 1);
+			}
+
+			@Override
+			public void onCancelled(DatabaseError error)
+			{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
 		});
 	}
 
@@ -471,11 +579,14 @@ public class MainActivity extends AppCompatActivity
 		Deck = (ImageView) findViewById(R.id.Deck);
 		CurrentCard = (ImageView) findViewById(R.id.CurrentCard);
 		PlayerTurn = (TextView) findViewById(R.id.PlayerTurn);
+		HandCardsCount = (TextView) findViewById(R.id.HandCardsCount);
 		//endregion
 
 		PlayerInitialization();
 
 		GetCurrentCard();
+
+		Toast.makeText(this, Player.toString() + " " + Server.toString(), Toast.LENGTH_SHORT).show();
 
 		DrawHand();
 
