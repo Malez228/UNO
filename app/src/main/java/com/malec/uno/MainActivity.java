@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity
 
 	Integer CardNum = 0;
 
-	Boolean gadwa = false;
+	Boolean Logined = false, Turn = false;
 
 	Integer StartPosX, StartPosY;
 
@@ -196,6 +196,7 @@ public class MainActivity extends AppCompatActivity
 		}
 	}
 
+	//region OnTochListener
 	private View.OnTouchListener myListener = new View.OnTouchListener()
 	{
 		@Override
@@ -226,6 +227,7 @@ public class MainActivity extends AppCompatActivity
 								{
 									database.child("Card").setValue(HandCards.get(CardNum + 4));
 									HandCards.remove(CardNum + 4);
+									database.child("CurrentPlayer").setValue(Player + 1);
 								}
 							}
 							if (Card.getId() == LeftCard1.getId())
@@ -234,6 +236,7 @@ public class MainActivity extends AppCompatActivity
 								{
 									database.child("Card").setValue(HandCards.get(CardNum + 3));
 									HandCards.remove(CardNum + 3);
+									database.child("CurrentPlayer").setValue(Player + 1);
 								}
 							}
 							if (Card.getId() == CenterCard.getId())
@@ -242,6 +245,7 @@ public class MainActivity extends AppCompatActivity
 								{
 									database.child("Card").setValue(HandCards.get(CardNum + 2));
 									HandCards.remove(CardNum + 2);
+									database.child("CurrentPlayer").setValue(Player + 1);
 								}
 							}
 							if (Card.getId() == RightCard1.getId())
@@ -250,6 +254,7 @@ public class MainActivity extends AppCompatActivity
 								{
 									database.child("Card").setValue(HandCards.get(CardNum + 1));
 									HandCards.remove(CardNum + 1);
+									database.child("CurrentPlayer").setValue(Player + 1);
 								}
 							}
 							if (Card.getId() == RightCard0.getId())
@@ -258,6 +263,7 @@ public class MainActivity extends AppCompatActivity
 								{
 									database.child("Card").setValue(HandCards.get(CardNum + 0));
 									HandCards.remove(CardNum + 0);
+									database.child("CurrentPlayer").setValue(Player + 1);
 								}
 							}
 
@@ -276,6 +282,7 @@ public class MainActivity extends AppCompatActivity
 			return false;
 		}
 	};
+	//endregion
 
 	void GenerateCards()
 	{
@@ -339,37 +346,18 @@ public class MainActivity extends AppCompatActivity
 
 	void PlayerInitialization()
 	{
-
-	}
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-
-		//Инициализация
-		LeftCard0 = (ImageView) findViewById(R.id.LeftCard0);
-		LeftCard1 = (ImageView) findViewById(R.id.LeftCard1);
-		CenterCard = (ImageView) findViewById(R.id.CenterCard);
-		RightCard1 = (ImageView) findViewById(R.id.RightCard1);
-		RightCard0 = (ImageView) findViewById(R.id.RightCard0);
-		Deck = (ImageView) findViewById(R.id.Deck);
-		CurrentCard = (ImageView) findViewById(R.id.CurrentCard);
-
-		//PlayerInitialization();
 		database.child("ConnectedPlayers").addListenerForSingleValueEvent(new ValueEventListener()
 		{
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot)
 			{
-				if (!gadwa)
+				if (!Logined)
 				{
 					Integer ConnectedPlayers = Integer.valueOf(dataSnapshot.toString().split(" value = ")[1].split(" ")[0]);
 					Player = ConnectedPlayers + 1;
 					database.child("ConnectedPlayers").setValue(ConnectedPlayers + 1);
 
-					gadwa = true;
+					Logined = true;
 				}
 			}
 
@@ -377,65 +365,17 @@ public class MainActivity extends AppCompatActivity
 			public void onCancelled(DatabaseError error)
 			{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
 		});
+	}
 
-		if (Player == 1)
-		{
-			Toast.makeText(this, "Player = 1", Toast.LENGTH_SHORT).show();
-			GenerateCards();
-/*
-			for (int i = 0; i < 4; i++)
-			{
-				String c = Cards.get(rnd.nextInt(Cards.size()));
-				HandCards.add(c);
-				Cards.remove(c);
-			}*/
-		} else
-		{/*
-			Toast.makeText(this, "Player != 1", Toast.LENGTH_SHORT).show();
-
-			DrawHand();*/
-		}
-
-			database.child("NewCard").addValueEventListener(new ValueEventListener()
-			{
-				@Override
-				public void onDataChange(DataSnapshot dataSnapshot)
-				{
-					String CardNew = dataSnapshot.toString().split(" value = ")[1];
-					CardNew = CardNew.substring(0, CardNew.length() - 2);
-					//Toast.makeText(MainActivity.this, Cards.size(), Toast.LENGTH_SHORT).show();
-					if (Player == 1)
-					{
-						if (CardNew.compareTo("0") == 0)
-						{
-							try
-							{
-
-								String c = Cards.get(2);//rnd.nextInt(Cards.size())
-								database.child("NewCard").setValue(c);
-								Cards.remove(c);
-							}catch (Exception e)
-							{
-								Log.i("TAG", e.toString());
-							}
-
-							/**/
-						}
-					}
-				}
-
-				@Override
-				public void onCancelled(DatabaseError error)
-				{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
-			});
-
+	void GetCurrentCard()
+	{
 		database.child("Card").addValueEventListener(new ValueEventListener()
 		{
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot)
 			{
-				CurrentCardV = dataSnapshot.toString().split(" value = ")[1];
-				CurrentCardV = CurrentCardV.substring(0, CurrentCardV.length() - 2);
+				String s = dataSnapshot.toString().split(" value = ")[1];
+				CurrentCardV = s.substring(0, s.length() - 2);
 
 				DrawHand();
 			}
@@ -444,11 +384,32 @@ public class MainActivity extends AppCompatActivity
 			public void onCancelled(DatabaseError error)
 			{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
 		});
+	}
 
-		DrawHand();
+	void SetTurnListener()
+	{
+		database.child("CurrentPlayer").addValueEventListener(new ValueEventListener()
+		{
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot)
+			{
+				String CplayerS = dataSnapshot.toString().split(" value = ")[1];
+				Integer Cplayer = Integer.valueOf(CplayerS.substring(0, CplayerS.length() - 2));
 
-		//TODO обновления хода
+				if (Player == Cplayer)
+					Turn = true;
+				else
+					Turn = false;
+			}
 
+			@Override
+			public void onCancelled(DatabaseError error)
+			{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
+		});
+	}
+
+	void SetTopDeckListener()
+	{
 		Deck.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -472,7 +433,35 @@ public class MainActivity extends AppCompatActivity
 				});
 			}
 		});
+	}
 
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+
+		//region Инициализация
+		LeftCard0 = (ImageView) findViewById(R.id.LeftCard0);
+		LeftCard1 = (ImageView) findViewById(R.id.LeftCard1);
+		CenterCard = (ImageView) findViewById(R.id.CenterCard);
+		RightCard1 = (ImageView) findViewById(R.id.RightCard1);
+		RightCard0 = (ImageView) findViewById(R.id.RightCard0);
+		Deck = (ImageView) findViewById(R.id.Deck);
+		CurrentCard = (ImageView) findViewById(R.id.CurrentCard);
+		//endregion
+
+		PlayerInitialization();
+
+		GetCurrentCard();
+
+		DrawHand();
+
+		SetTurnListener();
+
+		SetTopDeckListener();
+
+		//region Listeners
 		LeftCard0.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -516,5 +505,6 @@ public class MainActivity extends AppCompatActivity
 		CenterCard.setOnTouchListener(myListener);
 		RightCard1.setOnTouchListener(myListener);
 		RightCard0.setOnTouchListener(myListener);
+		//endregion
 	}
 }
