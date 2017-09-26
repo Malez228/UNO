@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "961229934127",
+    "firebase_url": "https://uno-project-e34e3.firebaseio.com",
+    "project_id": "uno-project-e34e3",
+    "storage_bucket": "uno-project-e34e3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:961229934127:android:16e08c1d6ac0de31",
+        "android_client_info": {
+          "package_name": "com.malec.uno"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "961229934127-7vvvj6b53nvjii0tg63fe8ujfn0v5809.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.malec.uno",
+            "certificate_hash": "f1d15fa922c6a74fd17095c38f628601e7d3bc1b"
+          }
+        },
+        {
+          "client_id": "961229934127-voapg14h77c2vdtvise7bcuqnr750tgo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWELNDrz12qg_q8MPvH7GVpQIqEM2c_gI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "961229934127-voapg14h77c2vdtvise7bcuqnr750tgo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
