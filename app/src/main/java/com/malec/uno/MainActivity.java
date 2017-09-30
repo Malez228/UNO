@@ -1,14 +1,18 @@
 package com.malec.uno;
 
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,24 +27,26 @@ public class MainActivity extends AppCompatActivity
 {
 	ImageView LeftCard0, LeftCard1, CenterCard, RightCard1, RightCard0;
 	ImageView Deck, CurrentCard;
-	TextView PlayerTurn, HandCardsCount;
+	TextView PlayerTurn, HandCardsCount, ColorView;
+
+	ConstraintLayout WildChoice;
+
+	RadioButton RadioRed, RadioYellow, RadioGreen, RadioBlue;
+
+	Button SubmitRadio, GiveTurn;
 
 	List<String> HandCards = new ArrayList();
 	List<String> Cards = new ArrayList();
 
-	Integer CardNum = 0;
+	String BaseCard, BaseColor, BaseConnectedPlayers, BaseCurrentPlayer, BaseMaxDraw, BaseNewCard, BaseTurnDir;
 
-	Boolean Logined = false, Turn = false, TurnShow = false, Server = false;
+	Integer CardOffset = 0;
 
 	Integer StartPosX, StartPosY;
 
 	Random rnd = new Random();
 
 	static Integer Player = 0;
-
-	public static String CurrentCardV;
-
-	final Integer[] Cpl = {0};
 
 	DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
@@ -170,31 +176,31 @@ public class MainActivity extends AppCompatActivity
 	{
 		try
 		{
-			LeftCard0.setImageResource(GetCardImage(HandCards.get(CardNum + 4)));
+			LeftCard0.setImageResource(GetCardImage(HandCards.get(CardOffset + 4)));
 		} catch (Exception e) { LeftCard0.setImageResource(GetCardImage("EmptyCard")); }
 
 		try
 		{
-			LeftCard1.setImageResource(GetCardImage(HandCards.get(CardNum + 3)));
+			LeftCard1.setImageResource(GetCardImage(HandCards.get(CardOffset + 3)));
 		} catch (Exception e) { LeftCard1.setImageResource(GetCardImage("EmptyCard")); }
 
 		try
 		{
-			CenterCard.setImageResource(GetCardImage(HandCards.get(CardNum + 2)));
+			CenterCard.setImageResource(GetCardImage(HandCards.get(CardOffset + 2)));
 		} catch (Exception e) { CenterCard.setImageResource(GetCardImage("EmptyCard")); }
 
 		try
 		{
-			RightCard1.setImageResource(GetCardImage(HandCards.get(CardNum + 1)));
+			RightCard1.setImageResource(GetCardImage(HandCards.get(CardOffset + 1)));
 		} catch (Exception e) { RightCard1.setImageResource(GetCardImage("EmptyCard")); }
 
 		try
 		{
-			RightCard0.setImageResource(GetCardImage(HandCards.get(CardNum)));
+			RightCard0.setImageResource(GetCardImage(HandCards.get(CardOffset)));
 		} catch (Exception e) { RightCard0.setImageResource(GetCardImage("EmptyCard")); }
 
 
-		try { CurrentCard.setImageResource(GetCardImage(CurrentCardV)); } catch (Exception e)
+		try { CurrentCard.setImageResource(GetCardImage(BaseCard)); } catch (Exception e)
 		{
 			CurrentCard.setImageResource(GetCardImage("EmptyCard"));
 		}
@@ -207,118 +213,6 @@ public class MainActivity extends AppCompatActivity
 			HandCardsCount.setText("Карт в руке 0");
 		}
 	}
-
-	//region OnTochListener
-	private View.OnTouchListener myListener = new View.OnTouchListener()
-	{
-		@Override
-		public boolean onTouch(View view, MotionEvent motionEvent)
-		{
-			try
-			{
-				if (Turn)
-				{
-					int x = (int) motionEvent.getX();
-					int y = (int) motionEvent.getY();
-
-					switch (motionEvent.getAction())
-					{
-						case MotionEvent.ACTION_DOWN:
-							StartPosX = x;
-							StartPosY = y;
-							break;
-						case MotionEvent.ACTION_MOVE:
-							Log.i("TAG", "Moving: (" + x + ", " + y + ")" + " Start: (" + StartPosX + ", " + StartPosY + ")");
-							break;
-						case MotionEvent.ACTION_UP:
-							if (y + StartPosY <= -400)
-							{
-								ImageView Card = (ImageView) view;
-
-								if (Card.getId() == LeftCard0.getId())
-								{
-									if (HandCards.get(CardNum + 4).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 4).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
-									{
-										database.child("Card").setValue(HandCards.get(CardNum + 4));
-										Integer i = 1;
-										if (HandCards.get(CardNum + 0).split(" ")[1].contains("@"))
-											i = 2;
-										database.child("CurrentPlayer").setValue(Player + i);
-										HandCards.remove(CardNum + 4);
-									}
-								}
-								if (Card.getId() == LeftCard1.getId())
-								{
-									if (HandCards.get(CardNum + 3).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 3).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
-									{
-										database.child("Card").setValue(HandCards.get(CardNum + 3));
-										Integer i = 1;
-										if (HandCards.get(CardNum + 0).split(" ")[1].contains("@"))
-											i = 2;
-										database.child("CurrentPlayer").setValue(Player + i);
-										HandCards.remove(CardNum + 3);
-									}
-								}
-								if (Card.getId() == CenterCard.getId())
-								{
-									if (HandCards.get(CardNum + 2).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 2).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
-									{
-										database.child("Card").setValue(HandCards.get(CardNum + 2));
-										Integer i = 1;
-										if (HandCards.get(CardNum + 0).split(" ")[1].contains("@"))
-											i = 2;
-										database.child("CurrentPlayer").setValue(Player + i);
-										HandCards.remove(CardNum + 2);
-									}
-								}
-								if (Card.getId() == RightCard1.getId())
-								{
-									if (HandCards.get(CardNum + 1).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 1).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
-									{
-										database.child("Card").setValue(HandCards.get(CardNum + 1));
-										Integer i = 1;
-										if (HandCards.get(CardNum + 0).split(" ")[1].contains("@"))
-											i = 2;
-										database.child("CurrentPlayer").setValue(Player + i);
-										HandCards.remove(CardNum + 1);
-									}
-								}
-								if (Card.getId() == RightCard0.getId())
-								{
-									if (HandCards.get(CardNum + 0).split(" ")[0].contains(CurrentCardV.split(" ")[0]) || HandCards.get(CardNum + 0).split(" ")[1].contains(CurrentCardV.split(" ")[1]))
-									{
-										database.child("Card").setValue(HandCards.get(CardNum + 0));
-										Integer i = 1;
-										if (HandCards.get(CardNum + 0).split(" ")[1].contains("@"))
-											i = 2;
-										database.child("CurrentPlayer").setValue(Player + i);
-										HandCards.remove(CardNum + 0);
-									}
-								}
-
-								//TODO проверку если на столе нет карты
-								if (CardNum > 0) CardNum--;
-
-								DrawHand();
-							}
-							break;
-					}
-				} else
-				{
-					if (TurnShow)
-					{
-						TurnShow = false;
-					}
-				}
-			} catch (Exception e)
-			{
-				Log.i("TAG", e.toString());
-			}
-
-			return false;
-		}
-	};
-	//endregion
 
 	void GenerateCards()
 	{
@@ -380,202 +274,93 @@ public class MainActivity extends AppCompatActivity
 			Cards.add("BLACK +");
 	}
 
-	void PlayerInitialization()
+	//region OnTouchListener
+	private View.OnTouchListener myListener = new View.OnTouchListener()
 	{
-		database.child("ConnectedPlayers").addListenerForSingleValueEvent(new ValueEventListener()
+		@Override
+		public boolean onTouch(View view, MotionEvent motionEvent)
 		{
-			@Override
-			public void onDataChange(DataSnapshot dataSnapshot)
+			if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
 			{
-				if (!Logined)
+				int x = (int) motionEvent.getX();
+				int y = (int) motionEvent.getY();
+
+				switch (motionEvent.getAction())
 				{
-					Integer ConnectedPlayers = Integer.valueOf(dataSnapshot.toString().split(" value = ")[1].split(" ")[0]);
-					Player = ConnectedPlayers + 1;
-					database.child("ConnectedPlayers").setValue(ConnectedPlayers + 1);
-
-					Logined = true;
-
-					if (ConnectedPlayers == 0)
-					{
-						database.child("CurrentPlayer").setValue(1);
-
-						GenerateCards();
-						String card = Cards.get(rnd.nextInt(Cards.size()));
-						database.child("NewCard").setValue(card);
-						Cards.remove(card);
-						card = Cards.get(rnd.nextInt(Cards.size()));
-						database.child("Card").setValue(card);
-						Cards.remove(card);
-
-						database.child("NewCard").addValueEventListener(new ValueEventListener()
+					case MotionEvent.ACTION_DOWN:
+						StartPosX = x;
+						StartPosY = y;
+						break;
+					case MotionEvent.ACTION_MOVE:
+						Log.i("MotionEvent.ACTION_MOVE", "Moving: (" + x + ", " + y + ")" + " Start: (" + StartPosX + ", " + StartPosY + ")");
+						break;
+					case MotionEvent.ACTION_UP:
+						if (y + StartPosY <= -400)
 						{
-							@Override
-							public void onDataChange(DataSnapshot dataSnapshot)
-							{
-								String s = dataSnapshot.toString().split(" value = ")[1];
-								try
-								{
-									Integer cardNOW = Integer.valueOf(s.substring(0, s.length() - 2));
+							ImageView Card = (ImageView) view;
 
-									if (cardNOW == 0)
+							Integer Offset = 0;
+							if (Card.getId() == LeftCard0.getId()) Offset = 4;
+							if (Card.getId() == LeftCard1.getId()) Offset = 3;
+							if (Card.getId() == CenterCard.getId()) Offset = 2;
+							if (Card.getId() == RightCard1.getId()) Offset = 1;
+
+							String HandColor = HandCards.get(CardOffset + Offset).split(" ")[0];
+							String BoardColor = BaseCard.split(" ")[0];
+							String HandType = HandCards.get(CardOffset + Offset).split(" ")[1];
+							String BoardType = BaseCard.split(" ")[1];
+
+							if (HandColor.compareTo(BoardColor) == 0 || HandType.compareTo(BoardType) == 0 || HandColor.compareTo(BaseColor) == 0 || HandColor.compareTo("BLACK") == 0)
+							{
+								if (HandColor.compareTo("BLACK") == 0)
+								{
+									WildChoice.setVisibility(View.VISIBLE);
+								} else
+								{
+									Integer SkipTurn = 1;
+									if (HandType.compareTo("@") == 0) SkipTurn = 2;
+									if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) > Integer.valueOf(BaseConnectedPlayers))
+										database.child("Room1").child("CurrentPlayer").setValue(1);
+									else database.child("Room1").child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
+
+									if (HandType.compareTo("$") == 0) database.child("Room1").child("MaxDraw").setValue(3);
+
+									if (HandType.compareTo("^") == 0)
 									{
-										String card = Cards.get(rnd.nextInt(Cards.size()));
-										database.child("NewCard").setValue(card);
-										Cards.remove(card);
+										if (BaseTurnDir.compareTo("1") == 0)
+											database.child("Room1").child("TurnDir").setValue(-1);
+										else database.child("Room1").child("TurnDir").setValue(1);
 									}
-								} catch (Exception e)
-								{
-									//значит все норм
+
+									if (HandColor.compareTo(BaseColor) == 0)
+										database.child("Room1").child("Color").setValue(0);
 								}
+
+								if (HandType.compareTo("+") == 0) database.child("Room1").child("MaxDraw").setValue(5);
+
+								database.child("Room1").child("Card").setValue(HandCards.get(CardOffset + Offset));
+								HandCards.remove(CardOffset + Offset);
 							}
 
-							@Override
-							public void onCancelled(DatabaseError error)
-							{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
-						});
+							//TODO проверку если на столе нет карты
+							if (CardOffset > 0) CardOffset--;
 
-						database.child("ConnectedPlayers").addValueEventListener(new ValueEventListener()
-						{
-							@Override
-							public void onDataChange(DataSnapshot dataSnapshot)
-							{
-								String CplayerS = dataSnapshot.toString().split(" value = ")[1];
-								Cpl[0] = Integer.valueOf(CplayerS.substring(0, CplayerS.length() - 2));
-							}
-
-							@Override
-							public void onCancelled(DatabaseError error)
-							{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
-						});
-
-						database.child("CurrentPlayer").addValueEventListener(new ValueEventListener()
-						{
-							@Override
-							public void onDataChange(DataSnapshot dataSnapshot)
-							{
-								String s = dataSnapshot.toString().split(" value = ")[1];
-								Integer curPlayer = Integer.valueOf(s.substring(0, s.length() - 2));
-
-								if (curPlayer > Cpl[0])
-								{
-									database.child("CurrentPlayer").setValue(curPlayer - Cpl[0]);
-								}
-							}
-
-							@Override
-							public void onCancelled(DatabaseError error)
-							{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
-						});
-					}
-				}
-			}
-
-			@Override
-			public void onCancelled(DatabaseError error)
-			{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
-		});
-	}
-
-	void GetCurrentCard()
-	{
-		database.child("Card").addValueEventListener(new ValueEventListener()
-		{
-			@Override
-			public void onDataChange(DataSnapshot dataSnapshot)
-			{
-				String s = dataSnapshot.toString().split(" value = ")[1];
-				CurrentCardV = s.substring(0, s.length() - 2);
-
-				DrawHand();
-			}
-
-			@Override
-			public void onCancelled(DatabaseError error)
-			{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
-		});
-	}
-
-	void SetTurnListener()
-	{
-		database.child("CurrentPlayer").addValueEventListener(new ValueEventListener()
-		{
-			@Override
-			public void onDataChange(DataSnapshot dataSnapshot)
-			{
-				String CplayerS = dataSnapshot.toString().split(" value = ")[1];
-				Integer Cplayer = Integer.valueOf(CplayerS.substring(0, CplayerS.length() - 2));
-
-
-				if (Player == Cplayer)
-				{
-					Turn = true;
-					TurnShow = true;
-					PlayerTurn.setText("Ваш ход");
-				} else
-				{
-					Turn = false;
-					PlayerTurn.setText("Ход игрока " + Cplayer.toString());
-				}
-			}
-
-			@Override
-			public void onCancelled(DatabaseError error)
-			{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
-		});
-	}
-
-	void SetTopDeckListener()
-	{
-		Deck.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				if (Turn)
-				{
-					database.child("NewCard").addListenerForSingleValueEvent(new ValueEventListener()
-					{
-						@Override
-						public void onDataChange(DataSnapshot dataSnapshot)
-						{
-							String NewCard = dataSnapshot.toString().split(" value = ")[1];
-							NewCard = NewCard.substring(0, NewCard.length() - 2);
-							HandCards.add(NewCard);
-							if (HandCards.size() > CardNum + 5) CardNum++;
 							DrawHand();
-							database.child("NewCard").setValue(0);
-							database.child("CurrentPlayer").setValue(Player + 1);
 						}
-
-						@Override
-						public void onCancelled(DatabaseError error)
-						{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
-					});
+						break;
 				}
 			}
-		});
-	}
+			return false;
+		}
+	};
+	//endregion
 
 	@Override
 	protected void onStop()
 	{
 		super.onStop();
 
-		database.child("ConnectedPlayers").addListenerForSingleValueEvent(new ValueEventListener()
-		{
-			@Override
-			public void onDataChange(DataSnapshot dataSnapshot)
-			{
-				String s = dataSnapshot.toString().split(" value = ")[1];
-				Integer cPlayer = Integer.valueOf(s.substring(0, s.length() - 2));
-
-				database.child("ConnectedPlayers").setValue(cPlayer - 1);
-			}
-
-			@Override
-			public void onCancelled(DatabaseError error)
-			{ Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show(); }
-		});
+		database.child("Room1").child("ConnectedPlayers").setValue(Integer.valueOf(BaseConnectedPlayers) - 1);
 	}
 
 	@Override
@@ -594,25 +379,228 @@ public class MainActivity extends AppCompatActivity
 		CurrentCard = (ImageView) findViewById(R.id.CurrentCard);
 		PlayerTurn = (TextView) findViewById(R.id.PlayerTurn);
 		HandCardsCount = (TextView) findViewById(R.id.HandCardsCount);
+		WildChoice = (ConstraintLayout) findViewById(R.id.WildChoice);
+		SubmitRadio = (Button) findViewById(R.id.SubmitRadio);
+		RadioRed = (RadioButton) findViewById(R.id.RadioRed);
+		RadioYellow = (RadioButton) findViewById(R.id.RadioYellow);
+		RadioGreen = (RadioButton) findViewById(R.id.RadioGreen);
+		RadioBlue = (RadioButton) findViewById(R.id.RadioBlue);
+		ColorView = (TextView) findViewById(R.id.ColorView);
+		GiveTurn = (Button) findViewById(R.id.GiveTurn);
 		//endregion
 
-		PlayerInitialization();
+		//Получим начальные значения и делаем свои штуки
+		database.child("Room1").addListenerForSingleValueEvent(new ValueEventListener()
+		{
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot)
+			{
+				for (DataSnapshot child : dataSnapshot.getChildren())
+				{
+					switch (child.getKey())
+					{
+						case "Card":
+							BaseCard = child.getValue().toString();
+							break;
+						case "Color":
+							BaseColor = child.getValue().toString();
+							break;
+						case "ConnectedPlayers":
+							BaseConnectedPlayers = child.getValue().toString();
+							break;
+						case "CurrentPlayer":
+							BaseCurrentPlayer = child.getValue().toString();
+							break;
+						case "MaxDraw":
+							BaseMaxDraw = child.getValue().toString();
+							break;
+						case "NewCard":
+							BaseNewCard = child.getValue().toString();
+							break;
+						case "TurnDir":
+							BaseTurnDir = child.getValue().toString();
+							break;
+					}
 
-		GetCurrentCard();
+					DrawHand();
+				}
 
-		DrawHand();
+				Player = Integer.valueOf(BaseConnectedPlayers) + 1;
+				database.child("Room1").child("ConnectedPlayers").setValue(Player);
 
-		SetTurnListener();
+				if (Player - 1 == 0)
+				{
+					//Создаем карты на сервере
+					GenerateCards();
 
-		SetTopDeckListener();
+					//Готовим базу к началу игры
+					String card = Cards.get(rnd.nextInt(Cards.size()));
+					database.child("Room1").child("NewCard").setValue(card);
+					Cards.remove(card);
+					card = Cards.get(rnd.nextInt(Cards.size()));
+					database.child("Room1").child("Card").setValue(card);
+					Cards.remove(card);
+					database.child("Room1").child("Color").setValue(0);
+					database.child("Room1").child("CurrentPlayer").setValue(1);
+					database.child("Room1").child("MaxDraw").setValue(1);
+					database.child("Room1").child("TurnDir").setValue(1);
+				}
+			}
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) { }
+		});
+
+		//Обновляем значения каждый раз при изминении и делаем свои штуки
+		database.child("Room1").addChildEventListener(new ChildEventListener()
+		{
+			@Override
+			public void onChildChanged(DataSnapshot dataSnapshot, String s)
+			{
+				switch (dataSnapshot.getKey())
+				{
+					case "Card":
+						BaseCard = dataSnapshot.getValue().toString();
+						break;
+					case "Color":
+						BaseColor = dataSnapshot.getValue().toString();
+						if (BaseColor.compareTo("0") != 0) ColorView.setVisibility(View.VISIBLE);
+						else ColorView.setVisibility(View.INVISIBLE);
+						ColorView.setText(BaseColor);
+						break;
+					case "ConnectedPlayers":
+						BaseConnectedPlayers = dataSnapshot.getValue().toString();
+						break;
+					case "CurrentPlayer":
+						BaseCurrentPlayer = dataSnapshot.getValue().toString();
+						break;
+					case "MaxDraw":
+						BaseMaxDraw = dataSnapshot.getValue().toString();
+						break;
+					case "NewCard":
+						BaseNewCard = dataSnapshot.getValue().toString();
+						break;
+					case "TurnDir":
+						BaseTurnDir = dataSnapshot.getValue().toString();
+						break;
+
+					default:
+						Toast.makeText(MainActivity.this, "database.child(\"Room1\").addChildEventListener сломался", Toast.LENGTH_SHORT).show();
+				}
+
+				if (Player - 1 == 0)
+				{
+					if (BaseNewCard.compareTo("0") == 0)
+					{
+						String card = Cards.get(rnd.nextInt(Cards.size()));
+						database.child("Room1").child("NewCard").setValue(card);
+						Cards.remove(card);
+					}
+
+					if (Integer.valueOf(BaseCurrentPlayer) > Integer.valueOf(BaseConnectedPlayers))
+						database.child("Room1").child("CurrentPlayer").setValue(1);
+					else
+					{
+						if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
+							PlayerTurn.setText("Ваш ход");
+						else PlayerTurn.setText("Ход игрока " + BaseCurrentPlayer);
+					}
+
+					if (Integer.valueOf(BaseCurrentPlayer) < 1)
+						database.child("Room1").child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
+				}
+
+				if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
+					PlayerTurn.setText("Ваш ход");
+				else PlayerTurn.setText("Ход игрока " + BaseCurrentPlayer);
+
+				DrawHand();
+			}
+
+			@Override
+			public void onChildAdded(DataSnapshot dataSnapshot, String s) { }
+
+			@Override
+			public void onChildRemoved(DataSnapshot dataSnapshot) { }
+
+			@Override
+			public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) { }
+		});
 
 		//region Listeners
+		Deck.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
+				{
+					if (Integer.valueOf(BaseMaxDraw) >= 1)
+					{
+						HandCards.add(BaseNewCard);
+						if (HandCards.size() > CardOffset + 5) CardOffset++;
+						DrawHand();
+						database.child("Room1").child("NewCard").setValue(0);
+						if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
+							database.child("Room1").child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+						else
+							database.child("Room1").child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+					}
+				}
+			}
+		});
+
+		SubmitRadio.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				WildChoice.setVisibility(View.INVISIBLE);
+
+				if (RadioRed.isChecked())
+				{
+					database.child("Room1").child("Color").setValue("RED");
+					ColorView.setText("Заказан красный");
+				}
+				if (RadioYellow.isChecked())
+				{
+					database.child("Room1").child("Color").setValue("YELLOW");
+					ColorView.setText("Заказан желтый");
+				}
+				if (RadioGreen.isChecked())
+				{
+					database.child("Room1").child("Color").setValue("GREEN");
+					ColorView.setText("Заказан зеленый");
+				}
+				if (RadioBlue.isChecked())
+				{
+					database.child("Room1").child("Color").setValue("BLUE");
+					ColorView.setText("Заказан синий");
+				}
+
+				database.child("Room1").child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+			}
+		});
+
+		GiveTurn.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				database.child("Room1").child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+				GiveTurn.setVisibility(View.INVISIBLE);
+			}
+		});
+
 		LeftCard0.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View view)
 			{
-				if (CardNum + 1 <= HandCards.size() - 5) CardNum++;
+				if (CardOffset + 1 <= HandCards.size() - 5) CardOffset++;
 				DrawHand();
 			}
 		});
@@ -622,7 +610,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				if (CardNum - 1 >= 0) CardNum--;
+				if (CardOffset - 1 >= 0) CardOffset--;
 				DrawHand();
 			}
 		});
@@ -650,22 +638,7 @@ public class MainActivity extends AppCompatActivity
 		CenterCard.setOnTouchListener(myListener);
 		RightCard1.setOnTouchListener(myListener);
 		RightCard0.setOnTouchListener(myListener);
+
 		//endregion
 	}
 }
-/*TODO
-Правила для игры
-  Если вытащенная из колоды карта подходит для разыгрывания ее можно играть
-
-Правила для карт
-  1) Смена направления хода
-      1. Создать переменную в базе для определения направления хода
-      2. Считывать ее каждый раз перед тем как завершить свой ход и увеличивать или
-        уменьшать переменную хода
-  2) Пропуск хода - готово
-      Просто увеличить/уменьшить переменную хода на 2
-  3) Возьми две (Дикая возьми четыре)
-      Хз как сделать это при текущей выдаче карт
-  4) Дикая
-      Подумать над интерфейсом выбора цвета + отображать заказанный цвет сбоку от сброса
-*/
