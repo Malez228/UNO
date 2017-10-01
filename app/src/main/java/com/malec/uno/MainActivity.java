@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,12 +13,13 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
@@ -30,7 +32,7 @@ public class MainActivity extends AppCompatActivity
 {
 	ImageView LeftCard0, LeftCard1, CenterCard, RightCard1, RightCard0;
 	ImageView Deck, CurrentCard;
-	TextView PlayerTurn, HandCardsCount, ColorView;
+	TextView PlayerTurn, HandCardsCount, ColorView, ConnectedPlayersText;
 
 	ConstraintLayout WildChoice;
 
@@ -323,30 +325,30 @@ public class MainActivity extends AppCompatActivity
 									Integer SkipTurn = 1;
 									if (HandType.compareTo("@") == 0) SkipTurn = 2;
 									if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) > Integer.valueOf(BaseConnectedPlayers))
-										database.child(Menu.RoomName).child("CurrentPlayer").setValue(1);
-									else database.child(Menu.RoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
+										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
+									else database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
 
-									if (HandType.compareTo("$") == 0) database.child(Menu.RoomName).child("MaxDraw").setValue(3);
+									if (HandType.compareTo("$") == 0) database.child(MenuActivity.RoomName).child("MaxDraw").setValue(3);
 
 									if (HandType.compareTo("^") == 0)
 									{
 										if (BaseTurnDir.compareTo("1") == 0)
-											database.child(Menu.RoomName).child("TurnDir").setValue(-1);
-										else database.child(Menu.RoomName).child("TurnDir").setValue(1);
+											database.child(MenuActivity.RoomName).child("TurnDir").setValue(-1);
+										else database.child(MenuActivity.RoomName).child("TurnDir").setValue(1);
 									}
 
 									if (HandColor.compareTo(BaseColor) == 0)
-										database.child(Menu.RoomName).child("Color").setValue(0);
+										database.child(MenuActivity.RoomName).child("Color").setValue(0);
 								}
 
-								if (HandType.compareTo("+") == 0) database.child(Menu.RoomName).child("MaxDraw").setValue(5);
+								if (HandType.compareTo("+") == 0) database.child(MenuActivity.RoomName).child("MaxDraw").setValue(5);
 
-								database.child(Menu.RoomName).child("Card").setValue(HandCards.get(CardOffset + Offset));
+								database.child(MenuActivity.RoomName).child("Card").setValue(HandCards.get(CardOffset + Offset));
 								HandCards.remove(CardOffset + Offset);
 
 								if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
 								{
-									database.child(Menu.RoomName).child("Winner").setValue(Player);
+									database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
 								}
 
 							}
@@ -371,25 +373,40 @@ public class MainActivity extends AppCompatActivity
 
 		//Готовим базу к началу игры
 		String card = Cards.get(rnd.nextInt(Cards.size()));
-		database.child(Menu.RoomName).child("NewCard").setValue(card);
+		database.child(MenuActivity.RoomName).child("NewCard").setValue(card);
 		Cards.remove(card);
 		card = Cards.get(rnd.nextInt(Cards.size()));
-		database.child(Menu.RoomName).child("Card").setValue(card);
+		//это если на стол положилась черная мы задаем случайный цвет
+		if (card.split(" ")[0].compareTo("BLACK") == 0)
+		{
+			Integer r = rnd.nextInt(4);
+			switch (r)
+			{
+				case 0: database.child(MenuActivity.RoomName).child("Color").setValue("RED"); break;
+				case 1: database.child(MenuActivity.RoomName).child("Color").setValue("BLUE"); break;
+				case 2: database.child(MenuActivity.RoomName).child("Color").setValue("GREEN"); break;
+				case 3: database.child(MenuActivity.RoomName).child("Color").setValue("YELLOW"); break;
+			}
+		}else
+			database.child(MenuActivity.RoomName).child("Color").setValue(0);
+		database.child(MenuActivity.RoomName).child("Card").setValue(card);
 		Cards.remove(card);
-		database.child(Menu.RoomName).child("Color").setValue(0);
-		database.child(Menu.RoomName).child("CurrentPlayer").setValue(1);
-		database.child(Menu.RoomName).child("MaxDraw").setValue(1);
-		database.child(Menu.RoomName).child("TurnDir").setValue(1);
-		database.child(Menu.RoomName).child("Winner").setValue(0);
+		database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
+		database.child(MenuActivity.RoomName).child("MaxDraw").setValue(1);
+		database.child(MenuActivity.RoomName).child("TurnDir").setValue(1);
+		database.child(MenuActivity.RoomName).child("Winner").setValue(0);
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		//чтото не так
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //Влад
-		this.setTitle("UNO - " + Menu.RoomName);
+		Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+		setSupportActionBar(myToolbar);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		this.setTitle("UNO - " + MenuActivity.RoomName);
 
 		//region Инициализация
 		LeftCard0 = (ImageView) findViewById(R.id.LeftCard0);
@@ -411,11 +428,11 @@ public class MainActivity extends AppCompatActivity
 		GiveTurn = (Button) findViewById(R.id.GiveTurn);
 		Quit = (Button) findViewById(R.id.Quit);
 		CloseRoom = (Button) findViewById(R.id.CloseRoom);
+		ConnectedPlayersText = (TextView) findViewById(R.id.ConnectedPlayersText);
 		//endregion
 
-
 		//Получим начальные значения и делаем свои штуки
-		database.child(Menu.RoomName).addListenerForSingleValueEvent(new ValueEventListener()
+		database.child(MenuActivity.RoomName).addListenerForSingleValueEvent(new ValueEventListener()
 		{
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot)
@@ -451,12 +468,14 @@ public class MainActivity extends AppCompatActivity
 				}
 
 				Player = Integer.valueOf(BaseConnectedPlayers) + 1;
-				database.child(Menu.RoomName).child("ConnectedPlayers").setValue(Player);
+				database.child(MenuActivity.RoomName).child("ConnectedPlayers").setValue(Player);
 
 				if (Player - 1 == 0)
 				{
 					ServerThing();
 					CloseRoom.setVisibility(View.VISIBLE);
+
+					PlayerTurn.setText("Ваш ход");
 				}
 			}
 
@@ -465,7 +484,7 @@ public class MainActivity extends AppCompatActivity
 		});
 
 		//Обновляем значения каждый раз при изминении и делаем свои штуки
-		database.child(Menu.RoomName).addChildEventListener(new ChildEventListener()
+		database.child(MenuActivity.RoomName).addChildEventListener(new ChildEventListener()
 		{
 			@Override
 			public void onChildChanged(DataSnapshot dataSnapshot, String s)
@@ -499,6 +518,7 @@ public class MainActivity extends AppCompatActivity
 							break;
 						case "ConnectedPlayers":
 							BaseConnectedPlayers = dataSnapshot.getValue().toString();
+							ConnectedPlayersText.setText("Всего игроков " + BaseConnectedPlayers);
 							break;
 						case "CurrentPlayer":
 							BaseCurrentPlayer = dataSnapshot.getValue().toString();
@@ -520,8 +540,8 @@ public class MainActivity extends AppCompatActivity
 							if (dataSnapshot.getValue().toString().compareTo("0") != 0)
 							{
 								Toast.makeText(MainActivity.this, "Игрок " + dataSnapshot.getValue().toString() + " победил!", Toast.LENGTH_LONG).show();
-								database.child(Menu.RoomName).removeValue();
-								startActivity(new Intent(MainActivity.this, Menu.class));
+								database.child(MenuActivity.RoomName).removeValue();
+								finish();
 							}
 							break;
 
@@ -534,14 +554,14 @@ public class MainActivity extends AppCompatActivity
 						if (BaseNewCard.compareTo("0") == 0)
 						{
 							String card = Cards.get(rnd.nextInt(Cards.size()));
-							database.child(Menu.RoomName).child("NewCard").setValue(card);
+							database.child(MenuActivity.RoomName).child("NewCard").setValue(card);
 							Cards.remove(card);
 						}
 
 						if (Integer.valueOf(BaseCurrentPlayer) > Integer.valueOf(BaseConnectedPlayers))
-							database.child(Menu.RoomName).child("CurrentPlayer").setValue(1);
+							database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
 
-						if (Integer.valueOf(BaseCurrentPlayer) < 1) database.child(Menu.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
+						if (Integer.valueOf(BaseCurrentPlayer) < 1) database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
 					}
 
 					DrawHand();
@@ -579,11 +599,11 @@ public class MainActivity extends AppCompatActivity
 						HandCards.add(BaseNewCard);
 						if (HandCards.size() > CardOffset + 5) CardOffset++;
 						DrawHand();
-						database.child(Menu.RoomName).child("NewCard").setValue(0);
+						database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
 						if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
-							database.child(Menu.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+							database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
 						else
-							database.child(Menu.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+							database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
 					}
 				}
 			}
@@ -598,26 +618,26 @@ public class MainActivity extends AppCompatActivity
 
 				if (RadioRed.isChecked())
 				{
-					database.child(Menu.RoomName).child("Color").setValue("RED");
+					database.child(MenuActivity.RoomName).child("Color").setValue("RED");
 					ColorView.setText("Заказан красный");
 				}
 				if (RadioYellow.isChecked())
 				{
-					database.child(Menu.RoomName).child("Color").setValue("YELLOW");
+					database.child(MenuActivity.RoomName).child("Color").setValue("YELLOW");
 					ColorView.setText("Заказан желтый");
 				}
 				if (RadioGreen.isChecked())
 				{
-					database.child(Menu.RoomName).child("Color").setValue("GREEN");
+					database.child(MenuActivity.RoomName).child("Color").setValue("GREEN");
 					ColorView.setText("Заказан зеленый");
 				}
 				if (RadioBlue.isChecked())
 				{
-					database.child(Menu.RoomName).child("Color").setValue("BLUE");
+					database.child(MenuActivity.RoomName).child("Color").setValue("BLUE");
 					ColorView.setText("Заказан синий");
 				}
 
-				database.child(Menu.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+				database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
 			}
 		});
 
@@ -626,9 +646,9 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				database.child(Menu.RoomName).removeValue();
-				Toast.makeText(MainActivity.this, "Комната " + Menu.RoomName + " удалена", Toast.LENGTH_LONG).show();
-				startActivity(new Intent(MainActivity.this, Menu.class));
+				database.child(MenuActivity.RoomName).removeValue();
+				Toast.makeText(MainActivity.this, "Комната " + MenuActivity.RoomName + " удалена", Toast.LENGTH_LONG).show();
+				finish();
 			}
 		});
 
@@ -637,8 +657,8 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				database.child(Menu.RoomName).child("ConnectedPlayers").setValue(Integer.valueOf(BaseConnectedPlayers) - 1);
-				startActivity(new Intent(MainActivity.this, Menu.class));
+				database.child(MenuActivity.RoomName).child("ConnectedPlayers").setValue(Integer.valueOf(BaseConnectedPlayers) - 1);
+				finish();
 			}
 		});
 
@@ -647,7 +667,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				database.child(Menu.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+				database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
 				GiveTurn.setVisibility(View.INVISIBLE);
 			}
 		});
@@ -697,5 +717,28 @@ public class MainActivity extends AppCompatActivity
 		RightCard0.setOnTouchListener(myListener);
 
 		//endregion
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(final Menu menu)
+	{
+		getMenuInflater().inflate(R.menu.my_menu, menu);
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+			case R.id.bug_report:
+				startActivity(new Intent(MainActivity.this, BugReportActivity.class));
+				return true;
+
+			default:
+				return super.onOptionsItemSelected(item);
+
+		}
 	}
 }

@@ -8,34 +8,57 @@
     android:background="@color/back"
     tools:context="com.malec.uno.MainActivity">
 
+    <TextView
+        android:id="@+id/ConnectedPlayersText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="Всего игроков 1"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/PlayerTurn"
+        app:layout_constraintLeft_toLeftOf="@+id/PlayerTurn" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="@android:color/holo_orange_dark"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:titleTextColor="@android:color/white"
+        tools:layout_editor_absoluteY="4dp" />
+
     <Button
         android:id="@+id/CloseRoom"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginTop="4dp"
         android:text="Закрыть комнату"
         android:visibility="invisible"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar" />
 
     <Button
         android:id="@+id/Quit"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
+        android:layout_height="48dp"
         android:layout_marginLeft="4dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
         android:text="Покинуть игру"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar" />
 
     <Button
         android:id="@+id/GiveTurn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="0dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
         android:text="Закончить ход"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/CurrentCard"
@@ -174,8 +197,8 @@
         android:layout_marginRight="32dp"
         android:layout_marginTop="64dp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/deck"/>
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
+        app:srcCompat="@drawable/deck" />
 
     <LinearLayout
         android:layout_width="0dp"
