@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import android.content.pm.ActivityInfo;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -387,7 +388,7 @@ public class MainActivity extends AppCompatActivity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		this.setTitle("UNO - " + Menu.RoomName);
 
 		//region Инициализация
