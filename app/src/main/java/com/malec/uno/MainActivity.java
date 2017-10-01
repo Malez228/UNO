@@ -1,5 +1,6 @@
 package com.malec.uno;
 
+import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
@@ -33,7 +35,7 @@ public class MainActivity extends AppCompatActivity
 
 	RadioButton RadioRed, RadioYellow, RadioGreen, RadioBlue;
 
-	Button SubmitRadio, GiveTurn;
+	Button SubmitRadio, GiveTurn, Quit, CloseRoom;
 
 	List<String> HandCards = new ArrayList();
 	List<String> Cards = new ArrayList();
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity
 
 	Random rnd = new Random();
 
-	static Integer Player = 0;
+	Integer Player = 0;
 
 	DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
@@ -320,26 +322,32 @@ public class MainActivity extends AppCompatActivity
 									Integer SkipTurn = 1;
 									if (HandType.compareTo("@") == 0) SkipTurn = 2;
 									if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) > Integer.valueOf(BaseConnectedPlayers))
-										database.child("Room1").child("CurrentPlayer").setValue(1);
-									else database.child("Room1").child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
+										database.child(Menu.RoomName).child("CurrentPlayer").setValue(1);
+									else database.child(Menu.RoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
 
-									if (HandType.compareTo("$") == 0) database.child("Room1").child("MaxDraw").setValue(3);
+									if (HandType.compareTo("$") == 0) database.child(Menu.RoomName).child("MaxDraw").setValue(3);
 
 									if (HandType.compareTo("^") == 0)
 									{
 										if (BaseTurnDir.compareTo("1") == 0)
-											database.child("Room1").child("TurnDir").setValue(-1);
-										else database.child("Room1").child("TurnDir").setValue(1);
+											database.child(Menu.RoomName).child("TurnDir").setValue(-1);
+										else database.child(Menu.RoomName).child("TurnDir").setValue(1);
 									}
 
 									if (HandColor.compareTo(BaseColor) == 0)
-										database.child("Room1").child("Color").setValue(0);
+										database.child(Menu.RoomName).child("Color").setValue(0);
 								}
 
-								if (HandType.compareTo("+") == 0) database.child("Room1").child("MaxDraw").setValue(5);
+								if (HandType.compareTo("+") == 0) database.child(Menu.RoomName).child("MaxDraw").setValue(5);
 
-								database.child("Room1").child("Card").setValue(HandCards.get(CardOffset + Offset));
+								database.child(Menu.RoomName).child("Card").setValue(HandCards.get(CardOffset + Offset));
 								HandCards.remove(CardOffset + Offset);
+
+								if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
+								{
+									database.child(Menu.RoomName).child("Winner").setValue(Player);
+								}
+
 							}
 
 							//TODO проверку если на столе нет карты
@@ -355,12 +363,23 @@ public class MainActivity extends AppCompatActivity
 	};
 	//endregion
 
-	@Override
-	protected void onStop()
+	void ServerThing()
 	{
-		super.onStop();
+		//Создаем карты на сервере
+		GenerateCards();
 
-		database.child("Room1").child("ConnectedPlayers").setValue(Integer.valueOf(BaseConnectedPlayers) - 1);
+		//Готовим базу к началу игры
+		String card = Cards.get(rnd.nextInt(Cards.size()));
+		database.child(Menu.RoomName).child("NewCard").setValue(card);
+		Cards.remove(card);
+		card = Cards.get(rnd.nextInt(Cards.size()));
+		database.child(Menu.RoomName).child("Card").setValue(card);
+		Cards.remove(card);
+		database.child(Menu.RoomName).child("Color").setValue(0);
+		database.child(Menu.RoomName).child("CurrentPlayer").setValue(1);
+		database.child(Menu.RoomName).child("MaxDraw").setValue(1);
+		database.child(Menu.RoomName).child("TurnDir").setValue(1);
+		database.child(Menu.RoomName).child("Winner").setValue(0);
 	}
 
 	@Override
@@ -368,6 +387,8 @@ public class MainActivity extends AppCompatActivity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		this.setTitle("UNO - " + Menu.RoomName);
 
 		//region Инициализация
 		LeftCard0 = (ImageView) findViewById(R.id.LeftCard0);
@@ -387,10 +408,13 @@ public class MainActivity extends AppCompatActivity
 		RadioBlue = (RadioButton) findViewById(R.id.RadioBlue);
 		ColorView = (TextView) findViewById(R.id.ColorView);
 		GiveTurn = (Button) findViewById(R.id.GiveTurn);
+		Quit = (Button) findViewById(R.id.Quit);
+		CloseRoom = (Button) findViewById(R.id.CloseRoom);
 		//endregion
 
+
 		//Получим начальные значения и делаем свои штуки
-		database.child("Room1").addListenerForSingleValueEvent(new ValueEventListener()
+		database.child(Menu.RoomName).addListenerForSingleValueEvent(new ValueEventListener()
 		{
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot)
@@ -426,24 +450,12 @@ public class MainActivity extends AppCompatActivity
 				}
 
 				Player = Integer.valueOf(BaseConnectedPlayers) + 1;
-				database.child("Room1").child("ConnectedPlayers").setValue(Player);
+				database.child(Menu.RoomName).child("ConnectedPlayers").setValue(Player);
 
 				if (Player - 1 == 0)
 				{
-					//Создаем карты на сервере
-					GenerateCards();
-
-					//Готовим базу к началу игры
-					String card = Cards.get(rnd.nextInt(Cards.size()));
-					database.child("Room1").child("NewCard").setValue(card);
-					Cards.remove(card);
-					card = Cards.get(rnd.nextInt(Cards.size()));
-					database.child("Room1").child("Card").setValue(card);
-					Cards.remove(card);
-					database.child("Room1").child("Color").setValue(0);
-					database.child("Room1").child("CurrentPlayer").setValue(1);
-					database.child("Room1").child("MaxDraw").setValue(1);
-					database.child("Room1").child("TurnDir").setValue(1);
+					ServerThing();
+					CloseRoom.setVisibility(View.VISIBLE);
 				}
 			}
 
@@ -452,69 +464,92 @@ public class MainActivity extends AppCompatActivity
 		});
 
 		//Обновляем значения каждый раз при изминении и делаем свои штуки
-		database.child("Room1").addChildEventListener(new ChildEventListener()
+		database.child(Menu.RoomName).addChildEventListener(new ChildEventListener()
 		{
 			@Override
 			public void onChildChanged(DataSnapshot dataSnapshot, String s)
 			{
-				switch (dataSnapshot.getKey())
+				try
 				{
-					case "Card":
-						BaseCard = dataSnapshot.getValue().toString();
-						break;
-					case "Color":
-						BaseColor = dataSnapshot.getValue().toString();
-						if (BaseColor.compareTo("0") != 0) ColorView.setVisibility(View.VISIBLE);
-						else ColorView.setVisibility(View.INVISIBLE);
-						ColorView.setText(BaseColor);
-						break;
-					case "ConnectedPlayers":
-						BaseConnectedPlayers = dataSnapshot.getValue().toString();
-						break;
-					case "CurrentPlayer":
-						BaseCurrentPlayer = dataSnapshot.getValue().toString();
-						break;
-					case "MaxDraw":
-						BaseMaxDraw = dataSnapshot.getValue().toString();
-						break;
-					case "NewCard":
-						BaseNewCard = dataSnapshot.getValue().toString();
-						break;
-					case "TurnDir":
-						BaseTurnDir = dataSnapshot.getValue().toString();
-						break;
-
-					default:
-						Toast.makeText(MainActivity.this, "database.child(\"Room1\").addChildEventListener сломался", Toast.LENGTH_SHORT).show();
-				}
-
-				if (Player - 1 == 0)
-				{
-					if (BaseNewCard.compareTo("0") == 0)
+					switch (dataSnapshot.getKey())
 					{
-						String card = Cards.get(rnd.nextInt(Cards.size()));
-						database.child("Room1").child("NewCard").setValue(card);
-						Cards.remove(card);
+						case "Card":
+							BaseCard = dataSnapshot.getValue().toString();
+							break;
+						case "Color":
+							BaseColor = dataSnapshot.getValue().toString();
+							if (BaseColor.compareTo("0") != 0) ColorView.setVisibility(View.VISIBLE);
+							else ColorView.setVisibility(View.INVISIBLE);
+							switch (BaseColor)
+							{
+								case "RED":
+									ColorView.setText("Заказан красный");
+									break;
+								case "YELLOW":
+									ColorView.setText("Заказан желтый");
+									break;
+								case "GREEN":
+									ColorView.setText("Заказан зеленый");
+									break;
+								case "BLUE":
+									ColorView.setText("Заказан синий");
+									break;
+							}
+							break;
+						case "ConnectedPlayers":
+							BaseConnectedPlayers = dataSnapshot.getValue().toString();
+							break;
+						case "CurrentPlayer":
+							BaseCurrentPlayer = dataSnapshot.getValue().toString();
+
+							if (Integer.valueOf(BaseCurrentPlayer) <= Integer.valueOf(BaseConnectedPlayers) && Integer.valueOf(BaseCurrentPlayer) >= 1)
+								if (BaseCurrentPlayer.compareTo(Player.toString()) == 0) PlayerTurn.setText("Ваш ход");
+								else PlayerTurn.setText("Ход игрока " + BaseCurrentPlayer);
+							break;
+						case "MaxDraw":
+							BaseMaxDraw = dataSnapshot.getValue().toString();
+							break;
+						case "NewCard":
+							BaseNewCard = dataSnapshot.getValue().toString();
+							break;
+						case "TurnDir":
+							BaseTurnDir = dataSnapshot.getValue().toString();
+							break;
+						case "Winner":
+							if (dataSnapshot.getValue().toString().compareTo("0") != 0)
+							{
+								Toast.makeText(MainActivity.this, "Игрок " + dataSnapshot.getValue().toString() + " победил!", Toast.LENGTH_LONG).show();
+								database.child(Menu.RoomName).removeValue();
+								startActivity(new Intent(MainActivity.this, Menu.class));
+							}
+							break;
+
+						default:
+							Toast.makeText(MainActivity.this, "database.child(\"Room1\").addChildEventListener сломался", Toast.LENGTH_SHORT).show();
 					}
 
-					if (Integer.valueOf(BaseCurrentPlayer) > Integer.valueOf(BaseConnectedPlayers))
-						database.child("Room1").child("CurrentPlayer").setValue(1);
-					else
+					if (Player - 1 == 0)
 					{
-						if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
-							PlayerTurn.setText("Ваш ход");
-						else PlayerTurn.setText("Ход игрока " + BaseCurrentPlayer);
+						if (BaseNewCard.compareTo("0") == 0)
+						{
+							String card = Cards.get(rnd.nextInt(Cards.size()));
+							database.child(Menu.RoomName).child("NewCard").setValue(card);
+							Cards.remove(card);
+						}
+
+						if (Integer.valueOf(BaseCurrentPlayer) > Integer.valueOf(BaseConnectedPlayers))
+							database.child(Menu.RoomName).child("CurrentPlayer").setValue(1);
+
+						if (Integer.valueOf(BaseCurrentPlayer) < 1) database.child(Menu.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
 					}
 
-					if (Integer.valueOf(BaseCurrentPlayer) < 1)
-						database.child("Room1").child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
+					DrawHand();
 				}
-
-				if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
-					PlayerTurn.setText("Ваш ход");
-				else PlayerTurn.setText("Ход игрока " + BaseCurrentPlayer);
-
-				DrawHand();
+				catch (Exception e)
+				{
+					DrawHand();
+					Log.e("Exception", e.toString());
+				}
 			}
 
 			@Override
@@ -543,11 +578,11 @@ public class MainActivity extends AppCompatActivity
 						HandCards.add(BaseNewCard);
 						if (HandCards.size() > CardOffset + 5) CardOffset++;
 						DrawHand();
-						database.child("Room1").child("NewCard").setValue(0);
+						database.child(Menu.RoomName).child("NewCard").setValue(0);
 						if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
-							database.child("Room1").child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+							database.child(Menu.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
 						else
-							database.child("Room1").child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+							database.child(Menu.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
 					}
 				}
 			}
@@ -562,26 +597,47 @@ public class MainActivity extends AppCompatActivity
 
 				if (RadioRed.isChecked())
 				{
-					database.child("Room1").child("Color").setValue("RED");
+					database.child(Menu.RoomName).child("Color").setValue("RED");
 					ColorView.setText("Заказан красный");
 				}
 				if (RadioYellow.isChecked())
 				{
-					database.child("Room1").child("Color").setValue("YELLOW");
+					database.child(Menu.RoomName).child("Color").setValue("YELLOW");
 					ColorView.setText("Заказан желтый");
 				}
 				if (RadioGreen.isChecked())
 				{
-					database.child("Room1").child("Color").setValue("GREEN");
+					database.child(Menu.RoomName).child("Color").setValue("GREEN");
 					ColorView.setText("Заказан зеленый");
 				}
 				if (RadioBlue.isChecked())
 				{
-					database.child("Room1").child("Color").setValue("BLUE");
+					database.child(Menu.RoomName).child("Color").setValue("BLUE");
 					ColorView.setText("Заказан синий");
 				}
 
-				database.child("Room1").child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+				database.child(Menu.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+			}
+		});
+
+		CloseRoom.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				database.child(Menu.RoomName).removeValue();
+				Toast.makeText(MainActivity.this, "Комната " + Menu.RoomName + " удалена", Toast.LENGTH_LONG).show();
+				startActivity(new Intent(MainActivity.this, Menu.class));
+			}
+		});
+
+		Quit.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				database.child(Menu.RoomName).child("ConnectedPlayers").setValue(Integer.valueOf(BaseConnectedPlayers) - 1);
+				startActivity(new Intent(MainActivity.this, Menu.class));
 			}
 		});
 
@@ -590,7 +646,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				database.child("Room1").child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+				database.child(Menu.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
 				GiveTurn.setVisibility(View.INVISIBLE);
 			}
 		});
