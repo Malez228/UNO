@@ -1,6 +1,8 @@
 package com.malec.uno;
 
 import android.content.Intent;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -205,18 +208,9 @@ public class MainActivity extends AppCompatActivity
 			RightCard0.setImageResource(GetCardImage(HandCards.get(CardOffset)));
 		} catch (Exception e) { RightCard0.setImageResource(GetCardImage("EmptyCard")); }
 
-
 		try { CurrentCard.setImageResource(GetCardImage(BaseCard)); } catch (Exception e)
 		{
 			CurrentCard.setImageResource(GetCardImage("EmptyCard"));
-		}
-
-		try
-		{
-			HandCardsCount.setText("Карт в руке " + HandCards.size());
-		} catch (Exception e)
-		{
-			HandCardsCount.setText("Карт в руке 0");
 		}
 	}
 
@@ -306,10 +300,14 @@ public class MainActivity extends AppCompatActivity
 							ImageView Card = (ImageView) view;
 
 							Integer Offset = 0;
-							if (Card.getId() == LeftCard0.getId()) Offset = 4;
-							if (Card.getId() == LeftCard1.getId()) Offset = 3;
-							if (Card.getId() == CenterCard.getId()) Offset = 2;
-							if (Card.getId() == RightCard1.getId()) Offset = 1;
+							if (Card.getId() == LeftCard0.getId())
+								Offset = 4;
+							if (Card.getId() == LeftCard1.getId())
+								Offset = 3;
+							if (Card.getId() == CenterCard.getId())
+								Offset = 2;
+							if (Card.getId() == RightCard1.getId())
+								Offset = 1;
 
 							String HandColor = HandCards.get(CardOffset + Offset).split(" ")[0];
 							String BoardColor = BaseCard.split(" ")[0];
@@ -324,25 +322,30 @@ public class MainActivity extends AppCompatActivity
 								} else
 								{
 									Integer SkipTurn = 1;
-									if (HandType.compareTo("@") == 0) SkipTurn = 2;
+									if (HandType.compareTo("@") == 0)
+										SkipTurn = 2;
 									if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) > Integer.valueOf(BaseConnectedPlayers))
 										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
-									else database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
+									else
+										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
 
-									if (HandType.compareTo("$") == 0) database.child(MenuActivity.RoomName).child("MaxDraw").setValue(3);
+									if (HandType.compareTo("$") == 0)
+										database.child(MenuActivity.RoomName).child("MaxDraw").setValue(3);
 
 									if (HandType.compareTo("^") == 0)
 									{
 										if (BaseTurnDir.compareTo("1") == 0)
 											database.child(MenuActivity.RoomName).child("TurnDir").setValue(-1);
-										else database.child(MenuActivity.RoomName).child("TurnDir").setValue(1);
+										else
+											database.child(MenuActivity.RoomName).child("TurnDir").setValue(1);
 									}
 
 									if (HandColor.compareTo(BaseColor) == 0)
 										database.child(MenuActivity.RoomName).child("Color").setValue(0);
 								}
 
-								if (HandType.compareTo("+") == 0) database.child(MenuActivity.RoomName).child("MaxDraw").setValue(5);
+								if (HandType.compareTo("+") == 0)
+									database.child(MenuActivity.RoomName).child("MaxDraw").setValue(5);
 
 								database.child(MenuActivity.RoomName).child("Card").setValue(HandCards.get(CardOffset + Offset));
 								HandCards.remove(CardOffset + Offset);
@@ -355,7 +358,8 @@ public class MainActivity extends AppCompatActivity
 							}
 
 							//TODO проверку если на столе нет карты
-							if (CardOffset > 0) CardOffset--;
+							if (CardOffset > 0)
+								CardOffset--;
 
 							DrawHand();
 						}
@@ -383,17 +387,25 @@ public class MainActivity extends AppCompatActivity
 			Integer r = rnd.nextInt(4);
 			switch (r)
 			{
-				case 0: database.child(MenuActivity.RoomName).child("Color").setValue("RED"); break;
-				case 1: database.child(MenuActivity.RoomName).child("Color").setValue("BLUE"); break;
-				case 2: database.child(MenuActivity.RoomName).child("Color").setValue("GREEN"); break;
-				case 3: database.child(MenuActivity.RoomName).child("Color").setValue("YELLOW"); break;
+				case 0:
+					database.child(MenuActivity.RoomName).child("Color").setValue("RED");
+					break;
+				case 1:
+					database.child(MenuActivity.RoomName).child("Color").setValue("BLUE");
+					break;
+				case 2:
+					database.child(MenuActivity.RoomName).child("Color").setValue("GREEN");
+					break;
+				case 3:
+					database.child(MenuActivity.RoomName).child("Color").setValue("YELLOW");
+					break;
 			}
-		}else
+		} else
 			database.child(MenuActivity.RoomName).child("Color").setValue(0);
 		database.child(MenuActivity.RoomName).child("Card").setValue(card);
 		Cards.remove(card);
 		database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
-		database.child(MenuActivity.RoomName).child("MaxDraw").setValue(1);
+		database.child(MenuActivity.RoomName).child("MaxDraw").setValue(7);
 		database.child(MenuActivity.RoomName).child("TurnDir").setValue(1);
 		database.child(MenuActivity.RoomName).child("Winner").setValue(0);
 	}
@@ -476,6 +488,8 @@ public class MainActivity extends AppCompatActivity
 					ServerThing();
 					CloseRoom.setVisibility(View.VISIBLE);
 
+					database.child(MenuActivity.RoomName).child("Turns").setValue(0);
+
 					PlayerTurn.setText("Ваш ход");
 				}
 			}
@@ -499,8 +513,10 @@ public class MainActivity extends AppCompatActivity
 							break;
 						case "Color":
 							BaseColor = dataSnapshot.getValue().toString();
-							if (BaseColor.compareTo("0") != 0) ColorView.setVisibility(View.VISIBLE);
-							else ColorView.setVisibility(View.INVISIBLE);
+							if (BaseColor.compareTo("0") != 0)
+								ColorView.setVisibility(View.VISIBLE);
+							else
+								ColorView.setVisibility(View.INVISIBLE);
 							switch (BaseColor)
 							{
 								case "RED":
@@ -526,20 +542,33 @@ public class MainActivity extends AppCompatActivity
 
 							if (Player - 1 == 0)
 							{
-								BaseTurns++;
-								if (BaseTurns <= Integer.valueOf(BaseConnectedPlayers))
-									database.child(MenuActivity.RoomName).child("MaxDraw").setValue("7");
+								if (BaseTurns + 1 < Integer.valueOf(BaseConnectedPlayers))
+								{
+									database.child(MenuActivity.RoomName).child("MaxDraw").setValue(7);
+									database.child(MenuActivity.RoomName).child("Turns").setValue(BaseTurns + 1);
+								}
 							}
 
+							//TODO Сюда хреначиш уведомления
 							if (Integer.valueOf(BaseCurrentPlayer) <= Integer.valueOf(BaseConnectedPlayers) && Integer.valueOf(BaseCurrentPlayer) >= 1)
-								if (BaseCurrentPlayer.compareTo(Player.toString()) == 0) PlayerTurn.setText("Ваш ход");
-								else PlayerTurn.setText("Ход игрока " + BaseCurrentPlayer);
+								if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
+									PlayerTurn.setText("Ваш ход");
+								else
+									PlayerTurn.setText("Ход игрока " + BaseCurrentPlayer);
 							break;
 						case "MaxDraw":
 							BaseMaxDraw = dataSnapshot.getValue().toString();
 							break;
 						case "NewCard":
 							BaseNewCard = dataSnapshot.getValue().toString();
+
+							try
+							{
+								HandCardsCount.setText("Карт в руке " + HandCards.size());
+							} catch (Exception e)
+							{
+								HandCardsCount.setText("Карт в руке 0");
+							}
 							break;
 						case "TurnDir":
 							BaseTurnDir = dataSnapshot.getValue().toString();
@@ -572,12 +601,12 @@ public class MainActivity extends AppCompatActivity
 						if (Integer.valueOf(BaseCurrentPlayer) > Integer.valueOf(BaseConnectedPlayers))
 							database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
 
-						if (Integer.valueOf(BaseCurrentPlayer) < 1) database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
+						if (Integer.valueOf(BaseCurrentPlayer) < 1)
+							database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
 					}
 
 					DrawHand();
-				}
-				catch (Exception e)
+				} catch (Exception e)
 				{
 					DrawHand();
 					Log.e("Exception", e.toString());
@@ -605,16 +634,35 @@ public class MainActivity extends AppCompatActivity
 			{
 				if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
 				{
-					if (Integer.valueOf(BaseMaxDraw) >= 1)
+					if (Integer.valueOf(BaseMaxDraw) >= 1 && BaseNewCard.compareTo("0") != 0)
 					{
+						Deck.setClickable(false);
+						new Thread(new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								try
+								{
+									Thread.sleep(2500);
+									Deck.setClickable(true);
+								} catch (InterruptedException e)
+								{
+									e.printStackTrace();
+								}
+							}
+						}).start();
+
 						HandCards.add(BaseNewCard);
-						if (HandCards.size() > CardOffset + 5) CardOffset++;
+						if (HandCards.size() > CardOffset + 5)
+							CardOffset++;
 						DrawHand();
 						database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
 						if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
 							database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
 						else
 							database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+
 					}
 				}
 			}
@@ -688,7 +736,8 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				if (CardOffset + 1 <= HandCards.size() - 5) CardOffset++;
+				if (CardOffset + 1 <= HandCards.size() - 5)
+					CardOffset++;
 				DrawHand();
 			}
 		});
@@ -698,7 +747,8 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				if (CardOffset - 1 >= 0) CardOffset--;
+				if (CardOffset - 1 >= 0)
+					CardOffset--;
 				DrawHand();
 			}
 		});
