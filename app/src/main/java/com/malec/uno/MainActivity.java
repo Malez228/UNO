@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity
 	List<String> Cards = new ArrayList();
 
 	String BaseCard, BaseColor, BaseConnectedPlayers, BaseCurrentPlayer, BaseMaxDraw, BaseNewCard, BaseTurnDir;
+	Integer BaseTurns = 0;
 
 	Integer CardOffset = 0;
 
@@ -523,6 +524,13 @@ public class MainActivity extends AppCompatActivity
 						case "CurrentPlayer":
 							BaseCurrentPlayer = dataSnapshot.getValue().toString();
 
+							if (Player - 1 == 0)
+							{
+								BaseTurns++;
+								if (BaseTurns <= Integer.valueOf(BaseConnectedPlayers))
+									database.child(MenuActivity.RoomName).child("MaxDraw").setValue("7");
+							}
+
 							if (Integer.valueOf(BaseCurrentPlayer) <= Integer.valueOf(BaseConnectedPlayers) && Integer.valueOf(BaseCurrentPlayer) >= 1)
 								if (BaseCurrentPlayer.compareTo(Player.toString()) == 0) PlayerTurn.setText("Ваш ход");
 								else PlayerTurn.setText("Ход игрока " + BaseCurrentPlayer);
@@ -535,6 +543,9 @@ public class MainActivity extends AppCompatActivity
 							break;
 						case "TurnDir":
 							BaseTurnDir = dataSnapshot.getValue().toString();
+							break;
+						case "Turns":
+							BaseTurns = Integer.valueOf(dataSnapshot.getValue().toString());
 							break;
 						case "Winner":
 							if (dataSnapshot.getValue().toString().compareTo("0") != 0)
