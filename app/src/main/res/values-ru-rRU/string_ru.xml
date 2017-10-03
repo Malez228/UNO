@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Menu -->
+    <string name="CreateRoom">Создать комнату</string>
+    <string name="RoomCreate">Создать</string>
+    <string name="RoomName">Название</string>
+    <string name="FindRoom">Поиск комнаты</string>
+    <string name="RoomFind">Поиск</string>
+    <string name="FindRoomDialog">Комната по данному запросу не найдена\nВы можете создать новую комнату с этим названием</string>
+    <string name="FindRoomDialogCancel">Отмена</string>
+
+    <!-- Main -->
+    <string name="LeaveGame">Покинуть игру</string>
+    <string name="CloseRoom">Закрыть комнату</string>
+    <string name="ColorOrder">Заказан</string>
+    <string name="ColorRed">красный</string>
+    <string name="ColorGreen">зеленый</string>
+    <string name="ColorBlue">синий</string>
+    <string name="ColorYellow">желтый</string>
+    <string name="ColorSubmit">Принять</string>
+    <string name="ConnectedPlayers">Всего игроков</string>
+    <string name="CurrentPlayerY">Твой ход</string>
+    <string name="CurrentPlayer">Ход игрока</string>
+    <string name="HandSize">Карт в руке</string>
+
+    <string name="PlayerW">Игрок</string>
+    <string name="PlayerW2">победил!</string>
+
+    <string name="Room1">Комната</string>
+    <string name="Room2">удалена</string>
+
+    <!-- BugReport -->
+    <string name="BugReportTitle">Сообщение разработчику</string>
+    <string name="BugReportText">Помогите сделать наше приложение лучше\nОставьте отзыв или сообщение об ошибке</string>
+    <string name="BugReportSend">Отправить</string>
+</resources>

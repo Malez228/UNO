@@ -1,3 +1,37 @@
 <resources>
     <string name="app_name">UNO</string>
+
+    <!-- Menu -->
+    <string name="CreateRoom">Create room</string>
+    <string name="RoomCreate">Create</string>
+    <string name="RoomName">Name</string>
+    <string name="FindRoom">Find room</string>
+    <string name="RoomFind">Find</string>
+    <string name="FindRoomDialog">Room for this query not found\nYou can create a new room with this name</string>
+    <string name="FindRoomDialogCancel">Cancel</string>
+
+    <!-- Main -->
+    <string name="LeaveGame">Leave game</string>
+    <string name="CloseRoom">Close room</string>
+    <string name="ColorOrder">Ordered</string>
+    <string name="ColorRed">red</string>
+    <string name="ColorGreen">green</string>
+    <string name="ColorBlue">blue</string>
+    <string name="ColorYellow">yellow</string>
+    <string name="ColorSubmit">Submit</string>
+    <string name="ConnectedPlayers">Total players</string>
+    <string name="CurrentPlayerY">Your turn</string>
+    <string name="CurrentPlayer">Ход игрока</string>
+    <string name="HandSize">Cards ib hand</string>
+
+    <string name="PlayerW">Player</string>
+    <string name="PlayerW2">won!</string>
+
+    <string name="Room1">Room</string>
+    <string name="Room2">removed</string>
+
+    <!-- BugReport -->
+    <string name="BugReportTitle">Message to the developer</string>
+    <string name="BugReportText">Help make our application better\nLeave a review or bug report</string>
+    <string name="BugReportSend">Send</string>
 </resources>

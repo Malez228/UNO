@@ -7,7 +7,9 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -212,6 +214,14 @@ public class MainActivity extends AppCompatActivity
 		{
 			CurrentCard.setImageResource(GetCardImage("EmptyCard"));
 		}
+
+		try
+		{
+			HandCardsCount.setText("Карт в руке " + HandCards.size());
+		} catch (Exception e)
+		{
+			HandCardsCount.setText("Карт в руке 0");
+		}
 	}
 
 	void GenerateCards()
@@ -413,9 +423,9 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		//чтото не так
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
 		Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
 		setSupportActionBar(myToolbar);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -490,7 +500,7 @@ public class MainActivity extends AppCompatActivity
 
 					database.child(MenuActivity.RoomName).child("Turns").setValue(0);
 
-					PlayerTurn.setText("Ваш ход");
+					PlayerTurn.setText(R.string.CurrentPlayerY);
 				}
 			}
 
@@ -520,22 +530,22 @@ public class MainActivity extends AppCompatActivity
 							switch (BaseColor)
 							{
 								case "RED":
-									ColorView.setText("Заказан красный");
+									ColorView.setText(R.string.ColorOrder + " " + R.string.ColorRed);
 									break;
 								case "YELLOW":
-									ColorView.setText("Заказан желтый");
+									ColorView.setText(R.string.ColorOrder + " " + R.string.ColorYellow);
 									break;
 								case "GREEN":
-									ColorView.setText("Заказан зеленый");
+									ColorView.setText(R.string.ColorOrder + " " + R.string.ColorGreen);
 									break;
 								case "BLUE":
-									ColorView.setText("Заказан синий");
+									ColorView.setText(R.string.ColorOrder + " " + R.string.ColorBlue);
 									break;
 							}
 							break;
 						case "ConnectedPlayers":
 							BaseConnectedPlayers = dataSnapshot.getValue().toString();
-							ConnectedPlayersText.setText("Всего игроков " + BaseConnectedPlayers);
+							ConnectedPlayersText.setText(R.string.ConnectedPlayers + " " + BaseConnectedPlayers);
 							break;
 						case "CurrentPlayer":
 							BaseCurrentPlayer = dataSnapshot.getValue().toString();
@@ -552,23 +562,15 @@ public class MainActivity extends AppCompatActivity
 							//TODO Сюда хреначиш уведомления
 							if (Integer.valueOf(BaseCurrentPlayer) <= Integer.valueOf(BaseConnectedPlayers) && Integer.valueOf(BaseCurrentPlayer) >= 1)
 								if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
-									PlayerTurn.setText("Ваш ход");
+									PlayerTurn.setText(R.string.CurrentPlayerY);
 								else
-									PlayerTurn.setText("Ход игрока " + BaseCurrentPlayer);
+									PlayerTurn.setText(R.string.CurrentPlayer + " " + BaseCurrentPlayer);
 							break;
 						case "MaxDraw":
 							BaseMaxDraw = dataSnapshot.getValue().toString();
 							break;
 						case "NewCard":
 							BaseNewCard = dataSnapshot.getValue().toString();
-
-							try
-							{
-								HandCardsCount.setText("Карт в руке " + HandCards.size());
-							} catch (Exception e)
-							{
-								HandCardsCount.setText("Карт в руке 0");
-							}
 							break;
 						case "TurnDir":
 							BaseTurnDir = dataSnapshot.getValue().toString();
@@ -579,7 +581,7 @@ public class MainActivity extends AppCompatActivity
 						case "Winner":
 							if (dataSnapshot.getValue().toString().compareTo("0") != 0)
 							{
-								Toast.makeText(MainActivity.this, "Игрок " + dataSnapshot.getValue().toString() + " победил!", Toast.LENGTH_LONG).show();
+								Toast.makeText(MainActivity.this, R.string.PlayerW + " " + dataSnapshot.getValue().toString() + " " + R.string.PlayerW2, Toast.LENGTH_LONG).show();
 								database.child(MenuActivity.RoomName).removeValue();
 								finish();
 							}
@@ -644,7 +646,7 @@ public class MainActivity extends AppCompatActivity
 							{
 								try
 								{
-									Thread.sleep(2500);
+									Thread.sleep(1500);
 									Deck.setClickable(true);
 								} catch (InterruptedException e)
 								{
@@ -678,22 +680,22 @@ public class MainActivity extends AppCompatActivity
 				if (RadioRed.isChecked())
 				{
 					database.child(MenuActivity.RoomName).child("Color").setValue("RED");
-					ColorView.setText("Заказан красный");
+					ColorView.setText(R.string.ColorOrder + " " + R.string.ColorRed);
 				}
 				if (RadioYellow.isChecked())
 				{
 					database.child(MenuActivity.RoomName).child("Color").setValue("YELLOW");
-					ColorView.setText("Заказан желтый");
+					ColorView.setText(R.string.ColorOrder + " " + R.string.ColorYellow);
 				}
 				if (RadioGreen.isChecked())
 				{
 					database.child(MenuActivity.RoomName).child("Color").setValue("GREEN");
-					ColorView.setText("Заказан зеленый");
+					ColorView.setText(R.string.ColorOrder + " " + R.string.ColorGreen);
 				}
 				if (RadioBlue.isChecked())
 				{
 					database.child(MenuActivity.RoomName).child("Color").setValue("BLUE");
-					ColorView.setText("Заказан синий");
+					ColorView.setText(R.string.ColorOrder + " " + R.string.ColorBlue);
 				}
 
 				database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
@@ -706,7 +708,7 @@ public class MainActivity extends AppCompatActivity
 			public void onClick(View view)
 			{
 				database.child(MenuActivity.RoomName).removeValue();
-				Toast.makeText(MainActivity.this, "Комната " + MenuActivity.RoomName + " удалена", Toast.LENGTH_LONG).show();
+				Toast.makeText(MainActivity.this, R.string.Room1 + " " + MenuActivity.RoomName + " " + R.string.Room2, Toast.LENGTH_LONG).show();
 				finish();
 			}
 		});
