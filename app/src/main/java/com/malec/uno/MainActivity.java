@@ -305,7 +305,13 @@ public class MainActivity extends AppCompatActivity
 						Log.i("MotionEvent.ACTION_MOVE", "Moving: (" + x + ", " + y + ")" + " Start: (" + StartPosX + ", " + StartPosY + ")");
 						break;
 					case MotionEvent.ACTION_UP:
-						if (y + StartPosY <= -400)
+						DisplayMetrics displaymetrics = new DisplayMetrics();
+						getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+						int screenHeight = displaymetrics.heightPixels;
+
+						Log.e("dermo", String.valueOf((screenHeight / 3 * 2 - screenHeight) / 2));
+
+						if (y + StartPosY <= (screenHeight / 3 * 2 - screenHeight) / 2.5)
 						{
 							ImageView Card = (ImageView) view;
 
@@ -324,7 +330,7 @@ public class MainActivity extends AppCompatActivity
 							String HandType = HandCards.get(CardOffset + Offset).split(" ")[1];
 							String BoardType = BaseCard.split(" ")[1];
 
-							if (HandColor.compareTo(BoardColor) == 0 || HandType.compareTo(BoardType) == 0 || HandColor.compareTo(BaseColor) == 0 || HandColor.compareTo("BLACK") == 0)
+							if (HandColor.compareTo(BoardColor) == 0 || HandType.compareTo(BoardType) == 0 || HandColor.compareTo(BaseColor) == 0 || HandColor.compareTo("BLACK") == 0 || Integer.valueOf(BaseMaxDraw) <= 1)
 							{
 								if (HandColor.compareTo("BLACK") == 0)
 								{
