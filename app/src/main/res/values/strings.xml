@@ -5,9 +5,9 @@
     <string name="CreateRoom">Create room</string>
     <string name="RoomCreate">Create</string>
     <string name="RoomName">Name</string>
-    <string name="FindRoom">Find room</string>
-    <string name="RoomFind">Find</string>
-    <string name="FindRoomDialog">Room for this query not found\nYou can create a new room with this name</string>
+    <string name="FindRoom">Search room</string>
+    <string name="RoomFind">Search</string>
+    <string name="FindRoomDialog">Room not found\nYou can create a new room with this name</string>
     <string name="FindRoomDialogCancel">Cancel</string>
 
     <!-- Main -->
@@ -19,9 +19,9 @@
     <string name="ColorBlue">blue</string>
     <string name="ColorYellow">yellow</string>
     <string name="ColorSubmit">Submit</string>
-    <string name="ConnectedPlayers">Total players</string>
+    <string name="TotalPlayers">Total players</string>
     <string name="CurrentPlayerY">Your turn</string>
-    <string name="CurrentPlayer">Ход игрока</string>
+    <string name="CurrentPlayer">Player\as turn</string>
     <string name="HandSize">Cards in hand</string>
 
     <string name="PlayerW">Player</string>

@@ -18,7 +18,7 @@
     <string name="ColorBlue">синий</string>
     <string name="ColorYellow">желтый</string>
     <string name="ColorSubmit">Принять</string>
-    <string name="ConnectedPlayers">Всего игроков</string>
+    <string name="TotalPlayers">Всего игроков</string>
     <string name="CurrentPlayerY">Твой ход</string>
     <string name="CurrentPlayer">Ход игрока</string>
     <string name="HandSize">Карт в руке</string>

@@ -27,7 +27,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="24dp"
-        android:text="@string/BugReportText"
+        android:text="Помогите сделать наше приложение лучше\nОставьте отзыв или сообщение об ошибке"
         android:textAlignment="center"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="16sp"
@@ -55,7 +55,7 @@
         android:layout_marginBottom="24dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:text="@string/BugReportSend"
+        android:text="Отправить"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="@+id/MsgText"
         app:layout_constraintRight_toRightOf="@+id/MsgText"/>

@@ -500,7 +500,7 @@ public class MainActivity extends AppCompatActivity
 
 					database.child(MenuActivity.RoomName).child("Turns").setValue(0);
 
-					PlayerTurn.setText(R.string.CurrentPlayerY);
+					PlayerTurn.setText("Ваш ход");
 				}
 			}
 
@@ -530,22 +530,22 @@ public class MainActivity extends AppCompatActivity
 							switch (BaseColor)
 							{
 								case "RED":
-									ColorView.setText(R.string.ColorOrder + " " + R.string.ColorRed);
+									ColorView.setText("Заказан красный");
 									break;
 								case "YELLOW":
-									ColorView.setText(R.string.ColorOrder + " " + R.string.ColorYellow);
+									ColorView.setText("Заказан желтый");
 									break;
 								case "GREEN":
-									ColorView.setText(R.string.ColorOrder + " " + R.string.ColorGreen);
+									ColorView.setText("Заказан зеленый");
 									break;
 								case "BLUE":
-									ColorView.setText(R.string.ColorOrder + " " + R.string.ColorBlue);
+									ColorView.setText("Заказан синий");
 									break;
 							}
 							break;
 						case "ConnectedPlayers":
 							BaseConnectedPlayers = dataSnapshot.getValue().toString();
-							ConnectedPlayersText.setText(R.string.ConnectedPlayers + " 2 " + BaseConnectedPlayers);//TODO что за херня
+							ConnectedPlayersText.setText("Всего игроков " + BaseConnectedPlayers);//TODO что за херня
 							break;
 						case "CurrentPlayer":
 							BaseCurrentPlayer = dataSnapshot.getValue().toString();
@@ -562,9 +562,9 @@ public class MainActivity extends AppCompatActivity
 							//TODO Сюда хреначиш уведомления
 							if (Integer.valueOf(BaseCurrentPlayer) <= Integer.valueOf(BaseConnectedPlayers) && Integer.valueOf(BaseCurrentPlayer) >= 1)
 								if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
-									PlayerTurn.setText(R.string.CurrentPlayerY);
+									PlayerTurn.setText("Ваш ход");
 								else
-									PlayerTurn.setText(R.string.CurrentPlayer + " " + BaseCurrentPlayer);
+									PlayerTurn.setText("Ход игрока " + BaseCurrentPlayer);
 							break;
 						case "MaxDraw":
 							BaseMaxDraw = dataSnapshot.getValue().toString();
@@ -581,7 +581,7 @@ public class MainActivity extends AppCompatActivity
 						case "Winner":
 							if (dataSnapshot.getValue().toString().compareTo("0") != 0)
 							{
-								Toast.makeText(MainActivity.this, R.string.PlayerW + " " + dataSnapshot.getValue().toString() + " " + R.string.PlayerW2, Toast.LENGTH_LONG).show();
+								Toast.makeText(MainActivity.this,"Игрок " + dataSnapshot.getValue().toString() + " победил!", Toast.LENGTH_LONG).show();
 								database.child(MenuActivity.RoomName).removeValue();
 								finish();
 							}
@@ -680,22 +680,22 @@ public class MainActivity extends AppCompatActivity
 				if (RadioRed.isChecked())
 				{
 					database.child(MenuActivity.RoomName).child("Color").setValue("RED");
-					ColorView.setText(R.string.ColorOrder + " " + R.string.ColorRed);
+					ColorView.setText("Заказан красный");
 				}
 				if (RadioYellow.isChecked())
 				{
 					database.child(MenuActivity.RoomName).child("Color").setValue("YELLOW");
-					ColorView.setText(R.string.ColorOrder + " " + R.string.ColorYellow);
+					ColorView.setText("Заказан желтый");
 				}
 				if (RadioGreen.isChecked())
 				{
 					database.child(MenuActivity.RoomName).child("Color").setValue("GREEN");
-					ColorView.setText(R.string.ColorOrder + " " + R.string.ColorGreen);
+					ColorView.setText("Заказан зеленый");
 				}
 				if (RadioBlue.isChecked())
 				{
 					database.child(MenuActivity.RoomName).child("Color").setValue("BLUE");
-					ColorView.setText(R.string.ColorOrder + " " + R.string.ColorBlue);
+					ColorView.setText("Заказан синий");
 				}
 
 				database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
@@ -708,7 +708,7 @@ public class MainActivity extends AppCompatActivity
 			public void onClick(View view)
 			{
 				database.child(MenuActivity.RoomName).removeValue();
-				Toast.makeText(MainActivity.this, R.string.Room1 + " " + MenuActivity.RoomName + " " + R.string.Room2, Toast.LENGTH_LONG).show();
+				Toast.makeText(MainActivity.this, "Комната " + MenuActivity.RoomName + " удалена", Toast.LENGTH_LONG).show();
 				finish();
 			}
 		});

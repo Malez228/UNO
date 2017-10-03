@@ -89,31 +89,31 @@ public class MenuActivity extends AppCompatActivity
                         case 1:
                             Room1.setVisibility(View.VISIBLE);
                             Room1Name.setText(child.getKey());
-                            Room1Players.setText(R.string.ConnectedPlayers + " " + pl);
+                            Room1Players.setText("Подключено игроков " + pl);
                             i++;
                             break;
                         case 2:
                             Room2.setVisibility(View.VISIBLE);
                             Room2Name.setText(child.getKey());
-                            Room2Players.setText(R.string.ConnectedPlayers + " " + pl);
+                            Room2Players.setText("Подключено игроков " + pl);
                             i++;
                             break;
                         case 3:
                             Room3.setVisibility(View.VISIBLE);
                             Room3Name.setText(child.getKey());
-                            Room3Players.setText(R.string.ConnectedPlayers + " " + pl);
+                            Room3Players.setText("Подключено игроков " + pl);
                             i++;
                             break;
                         case 4:
                             Room4.setVisibility(View.VISIBLE);
                             Room4Name.setText(child.getKey());
-                            Room4Players.setText(R.string.ConnectedPlayers + " " + pl);
+                            Room4Players.setText("Подключено игроков " + pl);
                             i++;
                             break;
                         case 5:
                             Room5.setVisibility(View.VISIBLE);
                             Room5Name.setText(child.getKey());
-                            Room5Players.setText(R.string.ConnectedPlayers + " " + pl);
+                            Room5Players.setText("Подключено игроков " + pl);
                             i++;
                             break;
                     }
@@ -175,10 +175,10 @@ public class MenuActivity extends AppCompatActivity
 						} catch (Exception e)
 						{
 							AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this);
-							builder.setTitle(R.string.RoomFind);
-							builder.setMessage(R.string.FindRoomDialog);
+							builder.setTitle("Поиск");
+							builder.setMessage("Комната по данному запросу не найдена\nВы можете создать новую комнату с этим названием");
 							builder.setCancelable(true);
-							builder.setPositiveButton(R.string.RoomCreate, new DialogInterface.OnClickListener()
+							builder.setPositiveButton("Создать", new DialogInterface.OnClickListener()
 							{
 								@Override
 								public void onClick(DialogInterface dialog, int which)
@@ -198,7 +198,7 @@ public class MenuActivity extends AppCompatActivity
 									startActivity(new Intent(MenuActivity.this, MainActivity.class));
 								}
 							});
-							builder.setNegativeButton(R.string.FindRoomDialogCancel, new DialogInterface.OnClickListener()
+							builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener()
 							{
 								@Override
 								public void onClick(DialogInterface dialog, int which)
