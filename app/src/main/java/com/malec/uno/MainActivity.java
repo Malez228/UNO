@@ -545,7 +545,7 @@ public class MainActivity extends AppCompatActivity
 							break;
 						case "ConnectedPlayers":
 							BaseConnectedPlayers = dataSnapshot.getValue().toString();
-							ConnectedPlayersText.setText(R.string.ConnectedPlayers + " " + BaseConnectedPlayers);
+							ConnectedPlayersText.setText(R.string.ConnectedPlayers + " 2 " + BaseConnectedPlayers);//TODO что за херня
 							break;
 						case "CurrentPlayer":
 							BaseCurrentPlayer = dataSnapshot.getValue().toString();
