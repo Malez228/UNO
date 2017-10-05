@@ -308,13 +308,37 @@ public class MainActivity extends AppCompatActivity
 						DisplayMetrics displaymetrics = new DisplayMetrics();
 						getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 						int screenHeight = displaymetrics.heightPixels;
+						int screenWidth = displaymetrics.widthPixels;
 
-						Log.e("dermo", String.valueOf((screenHeight / 3 * 2 - screenHeight) / 2));
+						ImageView Card = (ImageView) view;
+
+						if (- x + StartPosX >= screenWidth / 2)
+						{
+							if (Card.getId() == RightCard0.getId() || Card.getId() == RightCard1.getId())
+							{
+								if (CardOffset - 1 >= 0)
+									CardOffset--;
+							}
+							DrawHand();
+						}
+
+						if (x - StartPosX >= screenWidth / 2)
+						{
+							if (Card.getId() == LeftCard0.getId())
+							{
+								if (CardOffset + 6 <= HandCards.size())
+									CardOffset++;
+							}
+							if (Card.getId() == LeftCard1.getId())
+							{
+								if (CardOffset + 5 <= HandCards.size())
+									CardOffset++;
+							}
+							DrawHand();
+						}
 
 						if (y + StartPosY <= (screenHeight / 3 * 2 - screenHeight) / 2.5)
 						{
-							ImageView Card = (ImageView) view;
-
 							Integer Offset = 0;
 							if (Card.getId() == LeftCard0.getId())
 								Offset = 4;
@@ -435,7 +459,7 @@ public class MainActivity extends AppCompatActivity
 		Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
 		setSupportActionBar(myToolbar);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		this.setTitle("UNO - " + MenuActivity.RoomName);
+		this.setTitle("INO - " + MenuActivity.RoomName);
 
 		//region Инициализация
 		LeftCard0 = (ImageView) findViewById(R.id.LeftCard0);

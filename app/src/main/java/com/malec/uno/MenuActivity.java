@@ -184,7 +184,7 @@ public class MenuActivity extends AppCompatActivity
 								public void onClick(DialogInterface dialog, int which)
 								{
 									Random rnd = new Random();
-									if (RoomName.compareTo("") == 0) RoomName = "Room" + rnd.nextLong();
+									if (RoomName.compareTo("") == 0) RoomName = "Room" + rnd.nextInt();
 
 									database.child(RoomName).child("Card").setValue(0);
 									database.child(RoomName).child("Color").setValue(0);
@@ -223,6 +223,9 @@ public class MenuActivity extends AppCompatActivity
 			public void onClick(View view)
 			{
 				RoomName = CreateRoomField.getText().toString();
+
+				Random rnd = new Random();
+				if (RoomName.compareTo("") == 0) RoomName = "Room" + rnd.nextInt();
 
 				database.child(RoomName).child("Card").setValue(0);
 				database.child(RoomName).child("Color").setValue(0);

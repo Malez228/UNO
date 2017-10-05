@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">INO</string>
+
     <!-- Menu -->
     <string name="CreateRoom">Создать комнату</string>
     <string name="RoomCreate">Создать</string>
