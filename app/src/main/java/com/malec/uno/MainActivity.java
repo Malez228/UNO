@@ -31,6 +31,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+
 import android.content.pm.ActivityInfo;
 
 public class MainActivity extends AppCompatActivity
@@ -58,6 +60,8 @@ public class MainActivity extends AppCompatActivity
 	Random rnd = new Random();
 
 	Integer Player = 0;
+
+	Boolean DeckTouch = true;
 
 	DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
@@ -312,6 +316,7 @@ public class MainActivity extends AppCompatActivity
 
 						ImageView Card = (ImageView) view;
 
+						//Свайп влево
 						if (- x + StartPosX >= screenWidth / 2)
 						{
 							if (Card.getId() == RightCard0.getId() || Card.getId() == RightCard1.getId())
@@ -322,6 +327,7 @@ public class MainActivity extends AppCompatActivity
 							DrawHand();
 						}
 
+						//Свайп вправо
 						if (x - StartPosX >= screenWidth / 2)
 						{
 							if (Card.getId() == LeftCard0.getId())
@@ -337,6 +343,7 @@ public class MainActivity extends AppCompatActivity
 							DrawHand();
 						}
 
+						//Свайп вверх
 						if (y + StartPosY <= (screenHeight / 3 * 2 - screenHeight) / 2.5)
 						{
 							Integer Offset = 0;
@@ -354,58 +361,123 @@ public class MainActivity extends AppCompatActivity
 							String HandType = HandCards.get(CardOffset + Offset).split(" ")[1];
 							String BoardType = BaseCard.split(" ")[1];
 
-							if (HandColor.compareTo(BoardColor) == 0 || HandType.compareTo(BoardType) == 0 || HandColor.compareTo(BaseColor) == 0 || HandColor.compareTo("BLACK") == 0 && Integer.valueOf(BaseMaxDraw) <= 1)
+							if ((HandColor.compareTo(BoardColor) == 0 || HandType.compareTo(BoardType) == 0 || HandColor.compareTo(BaseColor) == 0 || HandColor.compareTo("BLACK") == 0) && Integer.valueOf(BaseMaxDraw) <= 1)
 							{
 								if (HandColor.compareTo("BLACK") == 0)
 								{
 									WildChoice.setVisibility(View.VISIBLE);
 								} else
 								{
+									//Пропуск хода
 									Integer SkipTurn = 1;
 									if (HandType.compareTo("@") == 0)
 										SkipTurn = 2;
-									if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) > Integer.valueOf(BaseConnectedPlayers))
-										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
-									else
-										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
 
+									//+2
 									if (HandType.compareTo("$") == 0)
 										database.child(MenuActivity.RoomName).child("MaxDraw").setValue(3);
 
+									//Реверс хода
 									if (HandType.compareTo("^") == 0)
 									{
 										if (BaseTurnDir.compareTo("1") == 0)
+										{
 											database.child(MenuActivity.RoomName).child("TurnDir").setValue(-1);
+											BaseTurnDir = "-1";
+										}
 										else
+										{
 											database.child(MenuActivity.RoomName).child("TurnDir").setValue(1);
+											BaseTurnDir = "1";
+										}
 									}
+
+									//Передаем ход
+									if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) > Integer.valueOf(BaseConnectedPlayers))
+										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
+									else
+									if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) <= 0)
+										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
+									else
+										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
 
 									if (HandColor.compareTo(BaseColor) == 0)
 										database.child(MenuActivity.RoomName).child("Color").setValue(0);
 								}
 
+								//+4
 								if (HandType.compareTo("+") == 0)
 									database.child(MenuActivity.RoomName).child("MaxDraw").setValue(5);
 
 								database.child(MenuActivity.RoomName).child("Card").setValue(HandCards.get(CardOffset + Offset));
 								HandCards.remove(CardOffset + Offset);
 
+								//Определение победителя
 								if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
+								{
+									database.child(MenuActivity.RoomName).child("Winner").setValue("W " + Player);
+								}
+
+								//Показываем у кого осталась одна карта
+								if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
 								{
 									database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
 								}
 
+								if (CardOffset > 4) CardOffset--;
 							}
-
-							//TODO проверку если на столе нет карты
-							if (CardOffset > 0)
-								CardOffset--;
 
 							DrawHand();
 						}
 						break;
 				}
 			}
+			return false;
+		}
+	};
+	//endregion
+
+	//region OnTouchListenerDeck
+	private View.OnTouchListener myListenerDeck = new View.OnTouchListener()
+	{
+		@Override
+		public boolean onTouch(View view, MotionEvent motionEvent)
+		{
+			if (DeckTouch)
+				if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
+				{
+					if (Integer.valueOf(BaseMaxDraw) >= 1 && BaseNewCard.compareTo("0") != 0)
+					{
+						DeckTouch = false;
+						new Thread(new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								try
+								{
+									Thread.sleep(1500);
+									DeckTouch = true;
+								} catch (InterruptedException e)
+								{
+									e.printStackTrace();
+								}
+							}
+						}).start();
+
+						HandCards.add(BaseNewCard);
+						if (HandCards.size() > CardOffset + 5)
+							CardOffset = HandCards.size() - 5;
+						DrawHand();
+						database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
+						if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
+							database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+						else
+							database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+
+					}
+				}
+
 			return false;
 		}
 	};
@@ -421,7 +493,7 @@ public class MainActivity extends AppCompatActivity
 		database.child(MenuActivity.RoomName).child("NewCard").setValue(card);
 		Cards.remove(card);
 		card = Cards.get(rnd.nextInt(Cards.size()));
-		//это если на стол положилась черная мы задаем случайный цвет
+		//если на стол положилась черная мы задаем случайный цвет
 		if (card.split(" ")[0].compareTo("BLACK") == 0)
 		{
 			Integer r = rnd.nextInt(4);
@@ -429,15 +501,19 @@ public class MainActivity extends AppCompatActivity
 			{
 				case 0:
 					database.child(MenuActivity.RoomName).child("Color").setValue("RED");
+					BaseColor = "RED";
 					break;
 				case 1:
 					database.child(MenuActivity.RoomName).child("Color").setValue("BLUE");
+					BaseColor = "BLUE";
 					break;
 				case 2:
 					database.child(MenuActivity.RoomName).child("Color").setValue("GREEN");
+					BaseColor = "GREEN";
 					break;
 				case 3:
 					database.child(MenuActivity.RoomName).child("Color").setValue("YELLOW");
+					BaseColor = "YELLOW";
 					break;
 			}
 		} else
@@ -507,7 +583,7 @@ public class MainActivity extends AppCompatActivity
 							BaseCurrentPlayer = child.getValue().toString();
 							break;
 						case "MaxDraw":
-							BaseMaxDraw = child.getValue().toString();
+							BaseMaxDraw = "7";
 							break;
 						case "NewCard":
 							BaseNewCard = child.getValue().toString();
@@ -526,6 +602,7 @@ public class MainActivity extends AppCompatActivity
 				if (Player - 1 == 0)
 				{
 					ServerThing();
+
 					CloseRoom.setVisibility(View.VISIBLE);
 
 					database.child(MenuActivity.RoomName).child("Turns").setValue(0);
@@ -575,7 +652,7 @@ public class MainActivity extends AppCompatActivity
 							break;
 						case "ConnectedPlayers":
 							BaseConnectedPlayers = dataSnapshot.getValue().toString();
-							ConnectedPlayersText.setText("Всего игроков " + BaseConnectedPlayers);//TODO что за херня
+							ConnectedPlayersText.setText("Всего игроков " + BaseConnectedPlayers);
 							break;
 						case "CurrentPlayer":
 							BaseCurrentPlayer = dataSnapshot.getValue().toString();
@@ -610,19 +687,26 @@ public class MainActivity extends AppCompatActivity
 							break;
 						case "Winner":
 							if (dataSnapshot.getValue().toString().compareTo("0") != 0)
-							{
-								Toast.makeText(MainActivity.this,"Игрок " + dataSnapshot.getValue().toString() + " победил!", Toast.LENGTH_LONG).show();
-								database.child(MenuActivity.RoomName).removeValue();
-								finish();
-							}
+								if (dataSnapshot.getValue().toString().startsWith("W "))
+								{
+									Toast.makeText(MainActivity.this,"Игрок " + dataSnapshot.getValue().toString().split("W ")[1] + " победил!", Toast.LENGTH_LONG).show();
+									database.child(MenuActivity.RoomName).removeValue();
+									finish();
+								}
+								else
+								{
+									Toast.makeText(MainActivity.this,"У игрока " + dataSnapshot.getValue().toString() + " осталась одна карта", Toast.LENGTH_LONG).show();
+								}
 							break;
 
 						default:
-							Toast.makeText(MainActivity.this, "database.child(\"Room1\").addChildEventListener сломался", Toast.LENGTH_SHORT).show();
+							Log.e("Error", "ChildEventListener сломался");
 					}
 
 					if (Player - 1 == 0)
 					{
+						if (Cards.isEmpty()) GenerateCards();
+
 						if (BaseNewCard.compareTo("0") == 0)
 						{
 							String card = Cards.get(rnd.nextInt(Cards.size()));
@@ -659,46 +743,7 @@ public class MainActivity extends AppCompatActivity
 		});
 
 		//region Listeners
-		Deck.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
-				{
-					if (Integer.valueOf(BaseMaxDraw) >= 1 && BaseNewCard.compareTo("0") != 0)
-					{
-						Deck.setClickable(false);
-						new Thread(new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								try
-								{
-									Thread.sleep(1500);
-									Deck.setClickable(true);
-								} catch (InterruptedException e)
-								{
-									e.printStackTrace();
-								}
-							}
-						}).start();
-
-						HandCards.add(BaseNewCard);
-						if (HandCards.size() > CardOffset + 5)
-							CardOffset++;
-						DrawHand();
-						database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
-						if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
-							database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
-						else
-							database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
-
-					}
-				}
-			}
-		});
+		Deck.setOnTouchListener(myListenerDeck);
 
 		SubmitRadio.setOnClickListener(new View.OnClickListener()
 		{
