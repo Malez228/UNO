@@ -354,7 +354,7 @@ public class MainActivity extends AppCompatActivity
 							String HandType = HandCards.get(CardOffset + Offset).split(" ")[1];
 							String BoardType = BaseCard.split(" ")[1];
 
-							if (HandColor.compareTo(BoardColor) == 0 || HandType.compareTo(BoardType) == 0 || HandColor.compareTo(BaseColor) == 0 || HandColor.compareTo("BLACK") == 0 || Integer.valueOf(BaseMaxDraw) <= 1)
+							if (HandColor.compareTo(BoardColor) == 0 || HandType.compareTo(BoardType) == 0 || HandColor.compareTo(BaseColor) == 0 || HandColor.compareTo("BLACK") == 0 && Integer.valueOf(BaseMaxDraw) <= 1)
 							{
 								if (HandColor.compareTo("BLACK") == 0)
 								{
