@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="Всего игроков"
+        android:text="@string/TotalPlayers"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/PlayerTurn"
@@ -39,7 +39,7 @@
         android:layout_marginEnd="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginTop="4dp"
-        android:text="Закрыть комнату"
+        android:text="@string/CloseRoom"
         android:visibility="invisible"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/my_toolbar"/>
@@ -51,7 +51,7 @@
         android:layout_marginLeft="4dp"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
-        android:text="Покинуть игру"
+        android:text="@string/LeaveGame"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/my_toolbar"/>
 
@@ -71,7 +71,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:text="Заказан цвет"
+        android:text="@string/ColorOrder"
         android:textColor="@color/colorPrimaryDark"
         android:visibility="invisible"
         app:layout_constraintRight_toLeftOf="@+id/CurrentCard"
@@ -110,28 +110,28 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Зеленый"/>
+                    android:text="@string/ColorGreen"/>
 
                 <RadioButton
                     android:id="@+id/RadioRed"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Красный"/>
+                    android:text="@string/ColorRed"/>
 
                 <RadioButton
                     android:id="@+id/RadioBlue"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Синий"/>
+                    android:text="@string/ColorBlue"/>
 
                 <RadioButton
                     android:id="@+id/RadioYellow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Желтый"/>
+                    android:text="@string/ColorYellow"/>
             </RadioGroup>
 
         </LinearLayout>
@@ -146,7 +146,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="Принять"
+            android:text="@string/ColorSubmitBtnText"
             app:layout_constraintBottom_toBottomOf="@+id/linearLayout2"
             app:layout_constraintLeft_toRightOf="@+id/linearLayout2"
             app:layout_constraintRight_toRightOf="parent"
@@ -160,7 +160,7 @@
         android:layout_marginBottom="6dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:text="Карт в руке"
+        android:text="@string/HandSize"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/HandLayout"
@@ -173,7 +173,7 @@
         android:layout_marginBottom="7dp"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
-        android:text="Ход игрока 1"
+        android:text="@string/CurrentPlayer"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/HandLayout"

@@ -3,11 +3,11 @@
     <string name="app_name">INO</string>
 
     <!-- Menu -->
-    <string name="CreateRoom">Создать комнату</string>
-    <string name="RoomCreate">Создать</string>
+    <string name="CreateRoomLabelText">Создать комнату</string>
+    <string name="CreateRoom">Создать</string>
     <string name="RoomName">Название</string>
-    <string name="FindRoom">Поиск комнаты</string>
-    <string name="RoomFind">Поиск</string>
+    <string name="FindRoomLabelText">Поиск комнаты</string>
+    <string name="FindRoomBtnText">Поиск</string>
     <string name="FindRoomDialog">Комната по данному запросу не найдена\nВы можете создать новую комнату с этим названием</string>
     <string name="FindRoomDialogCancel">Отмена</string>
 
@@ -19,20 +19,23 @@
     <string name="ColorGreen">зеленый</string>
     <string name="ColorBlue">синий</string>
     <string name="ColorYellow">желтый</string>
-    <string name="ColorSubmit">Принять</string>
+    <string name="ColorSubmitBtnText">Принять</string>
     <string name="TotalPlayers">Всего игроков</string>
-    <string name="CurrentPlayerY">Твой ход</string>
+    <string name="MyTurn">Твой ход</string>
     <string name="CurrentPlayer">Ход игрока</string>
     <string name="HandSize">Карт в руке</string>
 
-    <string name="PlayerW">Игрок</string>
-    <string name="PlayerW2">победил!</string>
+    <string name="PlayerLabelText">Игрок</string>
+    <string name="PlayerWinLabelText">победил!</string>
 
-    <string name="Room1">Комната</string>
-    <string name="Room2">удалена</string>
+    <string name="RoomLabelText">Комната</string>
+    <string name="RoomDelLabelText">удалена</string>
+
+    <string name="PlayerPreLabelText">У игрока</string>
+    <string name="PlayerPreWinLabelText">осталась одна карта</string>
 
     <!-- BugReport -->
     <string name="BugReportTitle">Сообщение разработчику</string>
-    <string name="BugReportText">Помогите сделать наше приложение лучше\nОставьте отзыв или сообщение об ошибке</string>
-    <string name="BugReportSend">Отправить</string>
+    <string name="BugReportLabelText">Помогите сделать наше приложение лучше\nОставьте отзыв или сообщение об ошибке</string>
+    <string name="BugReportSendBtnText">Отправить</string>
 </resources>

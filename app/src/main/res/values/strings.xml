@@ -1,12 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">INO</string>
 
     <!-- Menu -->
-    <string name="CreateRoom">Create room</string>
-    <string name="RoomCreate">Create</string>
+    <string name="CreateRoomLabelText">Create room</string>
+    <string name="CreateRoom">Create</string>
     <string name="RoomName">Name</string>
-    <string name="FindRoom">Search room</string>
-    <string name="RoomFind">Search</string>
+    <string name="FindRoomLabelText">Search room</string>
+    <string name="FindRoomBtnText">Search</string>
     <string name="FindRoomDialog">Room not found\nYou can create a new room with this name</string>
     <string name="FindRoomDialogCancel">Cancel</string>
 
@@ -18,20 +19,24 @@
     <string name="ColorGreen">green</string>
     <string name="ColorBlue">blue</string>
     <string name="ColorYellow">yellow</string>
-    <string name="ColorSubmit">Submit</string>
+    <string name="ColorSubmitBtnText">Submit</string>
     <string name="TotalPlayers">Total players</string>
-    <string name="CurrentPlayerY">Your turn</string>
-    <string name="CurrentPlayer">Player\as turn</string>
+    <string name="MyTurn">Your turn</string>
+    <string name="CurrentPlayer">Player\'s</string>
     <string name="HandSize">Cards in hand</string>
 
-    <string name="PlayerW">Player</string>
-    <string name="PlayerW2">won!</string>
+    <string name="PlayerLabelText">Player</string>
+    <string name="PlayerWinLabelText">won!</string>
 
-    <string name="Room1">Room</string>
-    <string name="Room2">removed</string>
+    <string name="RoomLabelText">Room</string>
+    <string name="RoomDelLabelText">removed</string>
+
+    <string name="PlayerPreLabelText">Player</string>
+    <string name="PlayerPreWinLabelText">has one card left</string>
 
     <!-- BugReport -->
     <string name="BugReportTitle">Message to the developer</string>
-    <string name="BugReportText">Help make our application better\nLeave a review or bug report</string>
-    <string name="BugReportSend">Send</string>
+    <string name="BugReportLabelText">Help make our application better\nLeave a review or bug report</string>
+    <string name="BugReportSendBtnText">Send</string>
 </resources>
+
