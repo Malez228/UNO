@@ -27,7 +27,7 @@ public class BugReportActivity extends AppCompatActivity
         setContentView(R.layout.activity_bug_report);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
-        this.setTitle("INO - Сообщение разработчику");
+        this.setTitle(getString(R.string.app_name) + " - " + getString(R.string.BugReportTitle));
 
         SendBtn = (Button) findViewById(R.id.SendBtn);
         MsgText = (EditText) findViewById(R.id.MsgText);

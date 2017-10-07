@@ -11,6 +11,7 @@
         android:roundIcon="@drawable/ino"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
+        android:largeHeap="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity android:name=".MainActivity">
             <intent-filter>

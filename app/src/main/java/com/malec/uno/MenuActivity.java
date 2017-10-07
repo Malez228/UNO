@@ -12,7 +12,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,10 +33,14 @@ public class MenuActivity extends AppCompatActivity
 	TextView Room1Name, Room2Name, Room3Name, Room4Name, Room5Name;
 	TextView Room1Players, Room2Players, Room3Players, Room4Players, Room5Players;
 
+	ImageView LockButton;
+
 	Button CreateRoomButton, FindRoomButton;
 	EditText CreateRoomField, FindRoomField;
 
 	public static String RoomName = "";
+
+	String pass = "0";
 
 	protected View.OnClickListener RoomClick = new View.OnClickListener()
 	{
@@ -44,7 +50,49 @@ public class MenuActivity extends AppCompatActivity
 			ConstraintLayout Room = (ConstraintLayout) view;
 
 			RoomName = ((TextView) Room.getChildAt(1)).getText().toString();
-			startActivity(new Intent(MenuActivity.this, MainActivity.class));
+
+			database.child(RoomName).child("Pass").addListenerForSingleValueEvent(new ValueEventListener()
+			{
+				@Override
+				public void onDataChange(final DataSnapshot dataSnapshot)
+				{
+					if (dataSnapshot.getValue().toString().compareTo("0") != 0)
+					{
+						AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
+
+						alert.setTitle("Введите пароль");
+
+						final EditText input = new EditText(MenuActivity.this);
+						alert.setView(input);
+
+						alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+						{
+							public void onClick(DialogInterface dialog, int whichButton)
+							{
+								if (input.getText().toString().compareTo(dataSnapshot.getValue().toString()) == 0)
+								{
+									startActivity(new Intent(MenuActivity.this, MainActivity.class));
+								} else
+								{
+									Toast.makeText(MenuActivity.this, "Пароль неверный", Toast.LENGTH_SHORT).show();
+								}
+							}
+						});
+
+						alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+						{
+							public void onClick(DialogInterface dialog, int whichButton) { }
+						});
+
+						alert.show();
+					}
+					else
+						startActivity(new Intent(MenuActivity.this, MainActivity.class));
+				}
+
+				@Override
+				public void onCancelled(DatabaseError databaseError) { }
+			});
 		}
 	};
 
@@ -152,6 +200,7 @@ public class MenuActivity extends AppCompatActivity
 		FindRoomButton = (Button) findViewById(R.id.FindRoomButton);
 		CreateRoomField = (EditText) findViewById(R.id.CreateRoomField);
 		FindRoomField = (EditText) findViewById(R.id.FindRoomField);
+		LockButton = (ImageView) findViewById(R.id.LockButton);
 		//endregion
 
         Thing();
@@ -193,7 +242,12 @@ public class MenuActivity extends AppCompatActivity
 									database.child(RoomName).child("MaxDraw").setValue(1);
 									database.child(RoomName).child("NewCard").setValue(0);
 									database.child(RoomName).child("TurnDir").setValue(1);
+									database.child(RoomName).child("Msg").setValue(0);
 									database.child(RoomName).child("Winner").setValue(0);
+									if (pass.length() >= 3)
+										database.child(RoomName).child("Pass").setValue(pass);
+									else
+										database.child(RoomName).child("Pass").setValue(0);
 
 									startActivity(new Intent(MenuActivity.this, MainActivity.class));
 								}
@@ -217,6 +271,37 @@ public class MenuActivity extends AppCompatActivity
 			}
 		});
 
+		LockButton.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
+
+				alert.setTitle("Введите пароль");
+				alert.setMessage("Он должен быть длиньше трех символов");
+
+				final EditText input = new EditText(MenuActivity.this);
+				alert.setView(input);
+
+				alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int whichButton)
+					{
+						if (input.getText().toString().length() >= 3)
+							pass = input.getText().toString();
+						else
+							pass = "0";
+					}
+				});
+
+				alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+				{ public void onClick(DialogInterface dialog, int whichButton) { } });
+
+				alert.show();
+			}
+		});
+
 		CreateRoomButton.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -234,7 +319,12 @@ public class MenuActivity extends AppCompatActivity
 				database.child(RoomName).child("MaxDraw").setValue(1);
 				database.child(RoomName).child("NewCard").setValue(0);
 				database.child(RoomName).child("TurnDir").setValue(1);
+				database.child(RoomName).child("Msg").setValue(0);
 				database.child(RoomName).child("Winner").setValue(0);
+				if (pass.length() >= 3)
+					database.child(RoomName).child("Pass").setValue(pass);
+				else
+					database.child(RoomName).child("Pass").setValue(0);
 
 				startActivity(new Intent(MenuActivity.this, MainActivity.class));
 			}
@@ -250,7 +340,7 @@ public class MenuActivity extends AppCompatActivity
 	@Override
 	public boolean onPrepareOptionsMenu(final Menu menu)
 	{
-		getMenuInflater().inflate(R.menu.my_menu, menu);
+		getMenuInflater().inflate(R.menu.menu_menu, menu);
 
 		return super.onCreateOptionsMenu(menu);
 	}

@@ -24,7 +24,7 @@
     <string name="MyTurn">Your turn</string>
     <string name="CurrentPlayer">Player\'s</string>
     <string name="HandSize">Cards in hand</string>
-    <string name="NextTurn">Next turn</string>
+    <string name="NextTurn">End turn</string>
 
     <string name="PlayerLabelText">Player</string>
     <string name="PlayerWinLabelText">won!</string>

@@ -2,22 +2,20 @@ package com.malec.uno;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -35,7 +33,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 
 import android.content.pm.ActivityInfo;
 
@@ -400,18 +397,17 @@ public class MainActivity extends AppCompatActivity
 									if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) > Integer.valueOf(BaseConnectedPlayers))
 										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
 									else
-									if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) <= 0)
-										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
-									else
-										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
+										if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) < 1)
+											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
+										else
+											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
 
 									if (HandColor.compareTo(BaseColor) == 0)
 										database.child(MenuActivity.RoomName).child("Color").setValue(0);
 								}
 
 								//+4
-								if (HandType.compareTo("+") == 0)
-									database.child(MenuActivity.RoomName).child("MaxDraw").setValue(5);
+								if (HandType.compareTo("+") == 0) database.child(MenuActivity.RoomName).child("MaxDraw").setValue(5);
 
 								database.child(MenuActivity.RoomName).child("Card").setValue(HandCards.get(CardOffset + Offset));
 								HandCards.remove(CardOffset + Offset);
@@ -428,9 +424,34 @@ public class MainActivity extends AppCompatActivity
 									database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
 								}
 
-								if (CardOffset > 4) CardOffset--;
+								if (CardOffset > 1) CardOffset--;
 
 								if (GiveTurn.getVisibility() == View.VISIBLE) GiveTurn.setVisibility(View.INVISIBLE);
+							}
+							else
+							{
+								if (HandType.compareTo(BoardType) == 0 && BaseMaxDraw.compareTo("2") == 0)
+								{
+									HandCards.remove(CardOffset + Offset);
+									database.child(MenuActivity.RoomName).child("MaxDraw").setValue(3);
+
+									//Передаем ход
+									if (Player + 1 * Integer.valueOf(BaseTurnDir) > Integer.valueOf(BaseConnectedPlayers))
+										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
+									else
+									if (Player + 1 * Integer.valueOf(BaseTurnDir) < 1)
+										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
+									else
+										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+								}
+								else
+								if (HandColor.compareTo("BLACK") == 0 && BaseMaxDraw.compareTo("4") == 0)
+								{
+									HandCards.remove(CardOffset + Offset);
+									database.child(MenuActivity.RoomName).child("MaxDraw").setValue(5);
+
+									WildChoice.setVisibility(View.VISIBLE);
+								}
 							}
 
 							DrawHand();
@@ -472,12 +493,12 @@ public class MainActivity extends AppCompatActivity
 						}).start();
 
 						HandCards.add(BaseNewCard);
-						if (HandCards.size() > CardOffset + 5)
+						if (CardOffset + 5 < HandCards.size())
 							CardOffset = HandCards.size() - 5;
 						DrawHand();
 						database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
 
-						if (BaseNewCard.split(" ")[0].compareTo(BaseCard.split(" ")[0]) == 0 || BaseNewCard.split(" ")[1].compareTo(BaseCard.split(" ")[1]) == 0)
+						if ((BaseNewCard.split(" ")[0].compareTo(BaseCard.split(" ")[0]) == 0 || BaseNewCard.split(" ")[1].compareTo(BaseCard.split(" ")[1]) == 0) && Integer.valueOf(BaseMaxDraw) <= 1)
 							GiveTurn.setVisibility(View.VISIBLE);
 						else
 						{
@@ -587,6 +608,27 @@ public class MainActivity extends AppCompatActivity
 							break;
 						case "Color":
 							BaseColor = child.getValue().toString();
+
+							if (BaseColor.compareTo("0") != 0)
+							{
+								ColorView.setVisibility(View.VISIBLE);
+
+								switch (BaseColor)
+								{
+									case "RED":
+										ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorRed));
+										break;
+									case "YELLOW":
+										ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorYellow));
+										break;
+									case "GREEN":
+										ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorGreen));
+										break;
+									case "BLUE":
+										ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorBlue));
+										break;
+								}
+							}
 							break;
 						case "ConnectedPlayers":
 							BaseConnectedPlayers = child.getValue().toString();
@@ -649,16 +691,16 @@ public class MainActivity extends AppCompatActivity
 							switch (BaseColor)
 							{
 								case "RED":
-									ColorView.setText(getString(R.string.ColorOrder) + " " + getString(R.string.ColorRed));
+									ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorRed));
 									break;
 								case "YELLOW":
-									ColorView.setText(getString(R.string.ColorOrder) + " " + getString(R.string.ColorYellow));
+									ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorYellow));
 									break;
 								case "GREEN":
-									ColorView.setText(getString(R.string.ColorOrder) + " " + getString(R.string.ColorGreen));
+									ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorGreen));
 									break;
 								case "BLUE":
-									ColorView.setText(getString(R.string.ColorOrder) + " " + getString(R.string.ColorBlue));
+									ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorBlue));
 									break;
 							}
 							break;
@@ -684,7 +726,7 @@ public class MainActivity extends AppCompatActivity
 									PlayerTurn.setText(getString(R.string.MyTurn));
 
 									//TODO странно но оно даже не выводится
-									/*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
+									if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
 									{
 										Notification.Builder builder = new Notification.Builder(getApplicationContext());
 										Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
@@ -702,13 +744,17 @@ public class MainActivity extends AppCompatActivity
 
 										NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
 										notificationManager.notify(1, notification);
-									}*/
+									}
 								}
 								else
+								{
+									if (GiveTurn.getVisibility() == View.VISIBLE) GiveTurn.setVisibility(View.INVISIBLE);
+
 									if (getString(R.string.CurrentPlayer).compareTo("Ход игрока") == 0)
 										PlayerTurn.setText(getString(R.string.CurrentPlayer) + " " + BaseCurrentPlayer);
 									else
 										PlayerTurn.setText(getString(R.string.CurrentPlayer) + " " + BaseCurrentPlayer + " turn");
+								}
 							break;
 						case "MaxDraw":
 							BaseMaxDraw = dataSnapshot.getValue().toString();
@@ -722,6 +768,9 @@ public class MainActivity extends AppCompatActivity
 						case "Turns":
 							BaseTurns = Integer.valueOf(dataSnapshot.getValue().toString());
 							break;
+						case "Msg":
+							Toast.makeText(MainActivity.this, dataSnapshot.getValue().toString(), Toast.LENGTH_LONG).show();
+							break;
 						case "Winner":
 							if (dataSnapshot.getValue().toString().compareTo("0") != 0)
 								if (dataSnapshot.getValue().toString().startsWith("W "))
@@ -733,6 +782,7 @@ public class MainActivity extends AppCompatActivity
 								else
 								{
 									Toast.makeText(MainActivity.this, getString(R.string.PlayerPreLabelText) + " " + dataSnapshot.getValue().toString() + " " + getString(R.string.PlayerPreWinLabelText), Toast.LENGTH_LONG).show();
+									database.child(MenuActivity.RoomName).child("Winner").setValue(0);
 								}
 							break;
 
@@ -792,22 +842,22 @@ public class MainActivity extends AppCompatActivity
 				if (RadioRed.isChecked())
 				{
 					database.child(MenuActivity.RoomName).child("Color").setValue("RED");
-					ColorView.setText(getString(R.string.ColorOrder) + " " + getString(R.string.ColorRed));
+					ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorRed));
 				}
 				if (RadioYellow.isChecked())
 				{
 					database.child(MenuActivity.RoomName).child("Color").setValue("YELLOW");
-					ColorView.setText(getString(R.string.ColorOrder) + " " + getString(R.string.ColorYellow));
+					ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorYellow));
 				}
 				if (RadioGreen.isChecked())
 				{
 					database.child(MenuActivity.RoomName).child("Color").setValue("GREEN");
-					ColorView.setText(getString(R.string.ColorOrder) + " " + getString(R.string.ColorGreen));
+					ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorGreen));
 				}
 				if (RadioBlue.isChecked())
 				{
 					database.child(MenuActivity.RoomName).child("Color").setValue("BLUE");
-					ColorView.setText(getString(R.string.ColorOrder) + " " + getString(R.string.ColorBlue));
+					ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorBlue));
 				}
 
 				database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
@@ -901,7 +951,7 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	public boolean onPrepareOptionsMenu(final Menu menu)
 	{
-		getMenuInflater().inflate(R.menu.my_menu, menu);
+		getMenuInflater().inflate(R.menu.main_menu, menu);
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -913,6 +963,28 @@ public class MainActivity extends AppCompatActivity
 		{
 			case R.id.bug_report:
 				startActivity(new Intent(MainActivity.this, BugReportActivity.class));
+				return true;
+
+			case R.id.send_msg:
+				AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+
+				alert.setTitle("Введите сообщение");
+
+				final EditText input = new EditText(MainActivity.this);
+				alert.setView(input);
+
+				alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int whichButton)
+					{
+						database.child(MenuActivity.RoomName).child("Msg").setValue("Игрок " + Player + ": " + input.getText().toString());
+					}
+				});
+
+				alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+				{ public void onClick(DialogInterface dialog, int whichButton) { } });
+
+				alert.show();
 				return true;
 
 			default:
