@@ -24,6 +24,7 @@
     <string name="MyTurn">Твой ход</string>
     <string name="CurrentPlayer">Ход игрока</string>
     <string name="HandSize">Карт в руке</string>
+    <string name="NextTurn">Следующий ход</string>
 
     <string name="PlayerLabelText">Игрок</string>
     <string name="PlayerWinLabelText">победил!</string>

@@ -1,9 +1,13 @@
 package com.malec.uno;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -425,6 +429,8 @@ public class MainActivity extends AppCompatActivity
 								}
 
 								if (CardOffset > 4) CardOffset--;
+
+								if (GiveTurn.getVisibility() == View.VISIBLE) GiveTurn.setVisibility(View.INVISIBLE);
 							}
 
 							DrawHand();
@@ -470,10 +476,16 @@ public class MainActivity extends AppCompatActivity
 							CardOffset = HandCards.size() - 5;
 						DrawHand();
 						database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
-						if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
-							database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+
+						if (BaseNewCard.split(" ")[0].compareTo(BaseCard.split(" ")[0]) == 0 || BaseNewCard.split(" ")[1].compareTo(BaseCard.split(" ")[1]) == 0)
+							GiveTurn.setVisibility(View.VISIBLE);
 						else
-							database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+						{
+							if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
+								database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+							else
+								database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+						}
 
 					}
 				}
@@ -666,10 +678,32 @@ public class MainActivity extends AppCompatActivity
 								}
 							}
 
-							//TODO Сюда хреначиш уведомления
 							if (Integer.valueOf(BaseCurrentPlayer) <= Integer.valueOf(BaseConnectedPlayers) && Integer.valueOf(BaseCurrentPlayer) >= 1)
 								if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
+								{
 									PlayerTurn.setText(getString(R.string.MyTurn));
+
+									//TODO странно но оно даже не выводится
+									/*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
+									{
+										Notification.Builder builder = new Notification.Builder(getApplicationContext());
+										Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+										notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+										PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+										builder.setContentIntent(contentIntent)
+												.setSmallIcon(R.drawable.ino_mini)
+												.setContentTitle("Напоминание")
+												.setContentText("Наступил ваш черед ходить");
+
+										Notification notification = null;
+
+											notification.defaults = Notification.DEFAULT_VIBRATE;
+											notification = builder.build();
+
+										NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+										notificationManager.notify(1, notification);
+									}*/
+								}
 								else
 									if (getString(R.string.CurrentPlayer).compareTo("Ход игрока") == 0)
 										PlayerTurn.setText(getString(R.string.CurrentPlayer) + " " + BaseCurrentPlayer);
@@ -806,7 +840,11 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+				if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
+					database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+				else
+					database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+
 				GiveTurn.setVisibility(View.INVISIBLE);
 			}
 		});

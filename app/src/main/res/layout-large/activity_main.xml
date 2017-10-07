@@ -61,7 +61,7 @@
         android:id="@+id/GiveTurn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Закончить ход"
+        android:text="@string/NextTurn"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/CurrentCard"
         app:layout_constraintLeft_toLeftOf="parent"
