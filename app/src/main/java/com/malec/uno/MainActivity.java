@@ -725,8 +725,11 @@ public class MainActivity extends AppCompatActivity
 								{
 									PlayerTurn.setText(getString(R.string.MyTurn));
 
+									for (int i = 0; i < HandCards.size() - 1; i++)
+										HandCards.remove("");
+
 									//TODO странно но оно даже не выводится
-									if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
+									/*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
 									{
 										Notification.Builder builder = new Notification.Builder(getApplicationContext());
 										Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
@@ -744,7 +747,7 @@ public class MainActivity extends AppCompatActivity
 
 										NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
 										notificationManager.notify(1, notification);
-									}
+									}*/
 								}
 								else
 								{

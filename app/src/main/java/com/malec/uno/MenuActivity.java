@@ -220,7 +220,29 @@ public class MenuActivity extends AppCompatActivity
 						try
 						{
 							String s = dataSnapshot.getValue().toString();
-							startActivity(new Intent(MenuActivity.this, MainActivity.class));
+
+							AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
+							alert.setTitle("Введите пароль");
+							final EditText input = new EditText(MenuActivity.this);
+							alert.setView(input);
+							alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+							{
+								public void onClick(DialogInterface dialog, int whichButton)
+								{
+									if (input.getText().toString().length() >= 3)
+										pass = input.getText().toString();
+									else
+										pass = "0";
+								}
+							});
+							alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+							{ public void onClick(DialogInterface dialog, int whichButton) { } });
+							alert.show();
+
+							if (dataSnapshot.child("Pass").getValue().toString().compareTo(pass) == 0)
+								startActivity(new Intent(MenuActivity.this, MainActivity.class));
+							else
+								Toast.makeText(MenuActivity.this, "Пароль неверный", Toast.LENGTH_SHORT).show();
 						} catch (Exception e)
 						{
 							AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this);
