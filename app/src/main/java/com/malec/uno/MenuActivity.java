@@ -51,12 +51,12 @@ public class MenuActivity extends AppCompatActivity
 
 			RoomName = ((TextView) Room.getChildAt(1)).getText().toString();
 
-			database.child(RoomName).child("Pass").addListenerForSingleValueEvent(new ValueEventListener()
+			database.child(RoomName).addListenerForSingleValueEvent(new ValueEventListener()
 			{
 				@Override
 				public void onDataChange(final DataSnapshot dataSnapshot)
 				{
-					if (dataSnapshot.getValue().toString().compareTo("0") != 0)
+					if (dataSnapshot.child("Pass").getValue().toString().compareTo("0") != 0)
 					{
 						AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
 
@@ -69,9 +69,12 @@ public class MenuActivity extends AppCompatActivity
 						{
 							public void onClick(DialogInterface dialog, int whichButton)
 							{
-								if (input.getText().toString().compareTo(dataSnapshot.getValue().toString()) == 0)
+								if (input.getText().toString().compareTo(dataSnapshot.child("Pass").getValue().toString()) == 0)
 								{
-									startActivity(new Intent(MenuActivity.this, MainActivity.class));
+									if (Integer.valueOf(dataSnapshot.child("Turns").getValue().toString()) <= Integer.valueOf(dataSnapshot.child("ConnectedPlayers").getValue().toString()))
+										startActivity(new Intent(MenuActivity.this, MainActivity.class));
+									else
+										Toast.makeText(MenuActivity.this, "Игра уже началась", Toast.LENGTH_SHORT).show();
 								} else
 								{
 									Toast.makeText(MenuActivity.this, "Пароль неверный", Toast.LENGTH_SHORT).show();
@@ -87,7 +90,10 @@ public class MenuActivity extends AppCompatActivity
 						alert.show();
 					}
 					else
-						startActivity(new Intent(MenuActivity.this, MainActivity.class));
+						if (Integer.valueOf(dataSnapshot.child("Turns").getValue().toString()) <= Integer.valueOf(dataSnapshot.child("ConnectedPlayers").getValue().toString()))
+							startActivity(new Intent(MenuActivity.this, MainActivity.class));
+						else
+							Toast.makeText(MenuActivity.this, "Игра уже началась", Toast.LENGTH_SHORT).show();
 				}
 
 				@Override
@@ -130,7 +136,7 @@ public class MenuActivity extends AppCompatActivity
                     }
 
                     if (child.getKey().compareTo("Msg") == 0)
-                        break;
+                        continue;//тут был break
 
                     switch (i)
                     {
@@ -240,7 +246,12 @@ public class MenuActivity extends AppCompatActivity
 							alert.show();
 
 							if (dataSnapshot.child("Pass").getValue().toString().compareTo(pass) == 0)
-								startActivity(new Intent(MenuActivity.this, MainActivity.class));
+							{
+								if (Integer.valueOf(dataSnapshot.child("Turns").getValue().toString()) <= Integer.valueOf(dataSnapshot.child("ConnectedPlayers").getValue().toString()))
+									startActivity(new Intent(MenuActivity.this, MainActivity.class));
+								else
+									Toast.makeText(MenuActivity.this, "Игра уже началась", Toast.LENGTH_SHORT).show();
+							}
 							else
 								Toast.makeText(MenuActivity.this, "Пароль неверный", Toast.LENGTH_SHORT).show();
 						} catch (Exception e)

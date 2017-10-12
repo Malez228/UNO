@@ -371,12 +371,10 @@ public class MainActivity extends AppCompatActivity
 								{
 									//Пропуск хода
 									Integer SkipTurn = 1;
-									if (HandType.compareTo("@") == 0)
-										SkipTurn = 2;
+									if (HandType.compareTo("@") == 0) SkipTurn = 2;
 
 									//+2
-									if (HandType.compareTo("$") == 0)
-										database.child(MenuActivity.RoomName).child("MaxDraw").setValue(3);
+									if (HandType.compareTo("$") == 0) database.child(MenuActivity.RoomName).child("MaxDraw").setValue(3);
 
 									//Реверс хода
 									if (HandType.compareTo("^") == 0)
@@ -394,13 +392,19 @@ public class MainActivity extends AppCompatActivity
 									}
 
 									//Передаем ход
-									if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) > Integer.valueOf(BaseConnectedPlayers))
+									if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) == Integer.valueOf(BaseConnectedPlayers) + 1)
 										database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
 									else
-										if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) < 1)
-											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
+										if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) == Integer.valueOf(BaseConnectedPlayers) + 2)
+											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(2);
 										else
-											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
+											if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) == 0)
+												database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
+											else
+												if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) == -1)
+													database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers) - 1);
+												else
+													database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
 
 									if (HandColor.compareTo(BaseColor) == 0)
 										database.child(MenuActivity.RoomName).child("Color").setValue(0);
@@ -707,7 +711,9 @@ public class MainActivity extends AppCompatActivity
 						case "ConnectedPlayers":
 							BaseConnectedPlayers = dataSnapshot.getValue().toString();
 							ConnectedPlayersText.setText(getString(R.string.TotalPlayers) + " " + BaseConnectedPlayers);
-							break;
+
+                            Toast.makeText(MainActivity.this, "Игрок " + BaseConnectedPlayers + " подключен", Toast.LENGTH_SHORT).show();
+                            break;
 						case "CurrentPlayer":
 							BaseCurrentPlayer = dataSnapshot.getValue().toString();
 
