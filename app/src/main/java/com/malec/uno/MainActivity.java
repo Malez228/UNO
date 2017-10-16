@@ -422,9 +422,7 @@ public class MainActivity extends AppCompatActivity
 									//Анимация
 									Drawable drawable = Card.getDrawable();
 									AnimCard.setImageDrawable(drawable);
-									test2 = new int[2];
-									CurrentCard.getLocationOnScreen(test2);
-									final TranslateAnimation DropCard = new TranslateAnimation(0, screenWidth / 2 - test2[0], 0, - 250 - test2[1]);
+									final TranslateAnimation DropCard = new TranslateAnimation(- AnimCard.getX() + Card.getX(), CurrentCard.getX() - AnimCard.getX(), 0, - AnimCard.getY() + CurrentCard.getY());
 									DropCard.setDuration(800);
 									AnimCard.setVisibility(View.VISIBLE);
 									AnimCard.startAnimation(DropCard);
@@ -442,28 +440,28 @@ public class MainActivity extends AppCompatActivity
 											database.child(MenuActivity.RoomName).child("Card").setValue(HandCards.get(CardOffset + finalOffset));
 											HandCards.remove(CardOffset + finalOffset);
 
-											if (CardOffset > 5) CardOffset--;
+											if (CardOffset > 0) CardOffset--;
+
+											//Определение победителя
+											if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
+											{
+												database.child(MenuActivity.RoomName).child("Winner").setValue("W " + Player);
+											}
+
+											//Показываем у кого осталась одна карта
+											if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
+											{
+												database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
+											}
+
+											if (GiveTurn.getVisibility() == View.VISIBLE)
+												GiveTurn.setVisibility(View.INVISIBLE);
 										}
 
 										@Override
 										public void onAnimationRepeat(Animation animation) { }
 									};
 									DropCard.setAnimationListener(animationListener);
-
-									//Определение победителя
-									if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
-									{
-										database.child(MenuActivity.RoomName).child("Winner").setValue("W " + Player);
-									}
-
-									//Показываем у кого осталась одна карта
-									if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
-									{
-										database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
-									}
-
-									if (GiveTurn.getVisibility() == View.VISIBLE)
-										GiveTurn.setVisibility(View.INVISIBLE);
 								} else
 								{
 									if (HandType.compareTo(BoardType) == 0 && BaseMaxDraw.compareTo("2") == 0)
