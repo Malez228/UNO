@@ -427,18 +427,21 @@ public class MainActivity extends AppCompatActivity
 									AnimCard.setVisibility(View.VISIBLE);
 									AnimCard.startAnimation(DropCard);
 									final Integer finalOffset = Offset;
+									final String c = HandCards.get(CardOffset + finalOffset);
 									Animation.AnimationListener animationListener = new Animation.AnimationListener()
 									{
 										@Override
-										public void onAnimationStart(Animation animation) { }
+										public void onAnimationStart(Animation animation)
+										{
+											HandCards.remove(c);
+										}
 
 										@Override
 										public void onAnimationEnd(Animation animation)
 										{
 											AnimCard.setVisibility(View.GONE);
 
-											database.child(MenuActivity.RoomName).child("Card").setValue(HandCards.get(CardOffset + finalOffset));
-											HandCards.remove(CardOffset + finalOffset);
+											database.child(MenuActivity.RoomName).child("Card").setValue(c);
 
 											if (CardOffset > 0) CardOffset--;
 
