@@ -420,51 +420,66 @@ public class MainActivity extends AppCompatActivity
 										database.child(MenuActivity.RoomName).child("MaxDraw").setValue(5);
 
 									//Анимация
-									Drawable drawable = Card.getDrawable();
-									AnimCard.setImageDrawable(drawable);
-									final TranslateAnimation DropCard = new TranslateAnimation(- AnimCard.getX() + Card.getX(), CurrentCard.getX() - AnimCard.getX(), 0, - AnimCard.getY() + CurrentCard.getY());
-									DropCard.setDuration(800);
-									AnimCard.setVisibility(View.VISIBLE);
-									AnimCard.startAnimation(DropCard);
-									final Integer finalOffset = Offset;
-									final String c = HandCards.get(CardOffset + finalOffset);
-									Animation.AnimationListener animationListener = new Animation.AnimationListener()
+									if (MenuActivity.Animation)
 									{
-										@Override
-										public void onAnimationStart(Animation animation)
+										Drawable drawable = Card.getDrawable();
+										AnimCard.setImageDrawable(drawable);
+										final TranslateAnimation DropCard = new TranslateAnimation(-AnimCard.getX() + Card.getX(), CurrentCard.getX() - AnimCard.getX(), 0, -AnimCard.getY() + CurrentCard.getY());
+										DropCard.setDuration(800);
+										AnimCard.setVisibility(View.VISIBLE);
+										AnimCard.startAnimation(DropCard);
+										final Integer finalOffset = Offset;
+										final String c = HandCards.get(CardOffset + finalOffset);
+										HandCards.remove(c);
+										Animation.AnimationListener animationListener = new Animation.AnimationListener()
 										{
-											HandCards.remove(c);
-										}
+											@Override
+											public void onAnimationStart(Animation animation) { }
 
-										@Override
-										public void onAnimationEnd(Animation animation)
-										{
-											AnimCard.setVisibility(View.GONE);
-
-											database.child(MenuActivity.RoomName).child("Card").setValue(c);
-
-											if (CardOffset > 0) CardOffset--;
-
-											//Определение победителя
-											if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
+											@Override
+											public void onAnimationEnd(Animation animation)
 											{
-												database.child(MenuActivity.RoomName).child("Winner").setValue("W " + Player);
+												AnimCard.setVisibility(View.GONE);
+
+												database.child(MenuActivity.RoomName).child("Card").setValue(c);
+
+												if (CardOffset > 0) CardOffset--;
+
+												//Определение победителя
+												if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
+													database.child(MenuActivity.RoomName).child("Winner").setValue("W " + Player);
+
+												//Показываем у кого осталась одна карта
+												if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
+													database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
+
+												if (GiveTurn.getVisibility() == View.VISIBLE)
+													GiveTurn.setVisibility(View.INVISIBLE);
 											}
 
-											//Показываем у кого осталась одна карта
-											if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
-											{
-												database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
-											}
+											@Override
+											public void onAnimationRepeat(Animation animation) { }
+										};
+										DropCard.setAnimationListener(animationListener);
+									}
+									else
+									{
+										database.child(MenuActivity.RoomName).child("Card").setValue(HandCards.get(CardOffset + Offset));
+										HandCards.remove(HandCards.get(CardOffset + Offset));
 
-											if (GiveTurn.getVisibility() == View.VISIBLE)
-												GiveTurn.setVisibility(View.INVISIBLE);
-										}
+										if (CardOffset > 0) CardOffset--;
 
-										@Override
-										public void onAnimationRepeat(Animation animation) { }
-									};
-									DropCard.setAnimationListener(animationListener);
+										//Определение победителя
+										if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
+											database.child(MenuActivity.RoomName).child("Winner").setValue("W " + Player);
+
+										//Показываем у кого осталась одна карта
+										if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
+											database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
+
+										if (GiveTurn.getVisibility() == View.VISIBLE)
+											GiveTurn.setVisibility(View.INVISIBLE);
+									}
 								} else
 								{
 									if (HandType.compareTo(BoardType) == 0 && BaseMaxDraw.compareTo("2") == 0)
@@ -527,20 +542,74 @@ public class MainActivity extends AppCompatActivity
 							}
 						}).start();
 
-						HandCards.add(BaseNewCard);
-						if (CardOffset + 5 < HandCards.size())
-							CardOffset = HandCards.size() - 5;
-						DrawHand();
-						database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
+						//Анимация
+						if (MenuActivity.Animation)
+						{
+							AnimCard.setImageResource(GetCardImage(BaseNewCard));
+							TranslateAnimation DropCard = null;
+							if (HandCards.size() == 0)
+								DropCard = new TranslateAnimation(Deck.getX() - AnimCard.getX(), -AnimCard.getX() + RightCard0.getX(), -AnimCard.getY() + Deck.getY(), 0);
+							if (HandCards.size() == 1)
+								DropCard = new TranslateAnimation(Deck.getX() - AnimCard.getX(), -AnimCard.getX() + RightCard1.getX(), -AnimCard.getY() + Deck.getY(), 0);
+							if (HandCards.size() == 2)
+								DropCard = new TranslateAnimation(Deck.getX() - AnimCard.getX(), -AnimCard.getX() + CenterCard.getX(), -AnimCard.getY() + Deck.getY(), 0);
+							if (HandCards.size() == 3)
+								DropCard = new TranslateAnimation(Deck.getX() - AnimCard.getX(), -AnimCard.getX() + LeftCard1.getX(), -AnimCard.getY() + Deck.getY(), 0);
+							if (HandCards.size() >= 4)
+								DropCard = new TranslateAnimation(Deck.getX() - AnimCard.getX(), -AnimCard.getX() + LeftCard0.getX(), -AnimCard.getY() + Deck.getY(), 0);
+							DropCard.setDuration(1000);
+							AnimCard.setVisibility(View.VISIBLE);
+							AnimCard.startAnimation(DropCard);
+							Animation.AnimationListener animationListener = new Animation.AnimationListener()
+							{
+								@Override
+								public void onAnimationStart(Animation animation) { }
 
-						if ((BaseNewCard.split(" ")[0].compareTo(BaseCard.split(" ")[0]) == 0 || BaseNewCard.split(" ")[1].compareTo(BaseCard.split(" ")[1]) == 0) && Integer.valueOf(BaseMaxDraw) <= 1)
-							GiveTurn.setVisibility(View.VISIBLE);
+								@Override
+								public void onAnimationEnd(Animation animation)
+								{
+									AnimCard.setVisibility(View.GONE);
+									HandCards.add(BaseNewCard);
+
+									if (CardOffset + 5 < HandCards.size())
+										CardOffset = HandCards.size() - 5;
+									DrawHand();
+									database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
+
+									if ((BaseNewCard.split(" ")[0].compareTo(BaseCard.split(" ")[0]) == 0 || BaseNewCard.split(" ")[1].compareTo(BaseCard.split(" ")[1]) == 0) && Integer.valueOf(BaseMaxDraw) <= 1)
+										GiveTurn.setVisibility(View.VISIBLE);
+									else
+									{
+										if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
+											database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+										else
+											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+									}
+								}
+
+								@Override
+								public void onAnimationRepeat(Animation animation) { }
+							};
+							DropCard.setAnimationListener(animationListener);
+						}
 						else
 						{
-							if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
-								database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+							HandCards.add(BaseNewCard);
+
+							if (CardOffset + 5 < HandCards.size())
+								CardOffset = HandCards.size() - 5;
+							DrawHand();
+							database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
+
+							if ((BaseNewCard.split(" ")[0].compareTo(BaseCard.split(" ")[0]) == 0 || BaseNewCard.split(" ")[1].compareTo(BaseCard.split(" ")[1]) == 0) && Integer.valueOf(BaseMaxDraw) <= 1)
+								GiveTurn.setVisibility(View.VISIBLE);
 							else
-								database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+							{
+								if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
+									database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+								else
+									database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+							}
 						}
 					}
 				}
@@ -1038,10 +1107,10 @@ public class MainActivity extends AppCompatActivity
 				{
 					public void onClick(DialogInterface dialog, int whichButton)
 					{
-						if (!input.getText().toString().startsWith("ЧитДляПолученияКарты3228-"))
+						if (!input.getText().toString().startsWith("ЧДПК3228-"))
 							database.child(MenuActivity.RoomName).child("Msg").setValue(getString(R.string.PlayerLabelText) + " " + Player + ": " + input.getText().toString());
 						else
-							database.child(MenuActivity.RoomName).child("NewCard").setValue(input.getText().toString().split("-")[1]);
+							HandCards.add(input.getText().toString().split("-")[1]);
 					}
 				});
 

@@ -45,9 +45,9 @@ public class MenuActivity extends AppCompatActivity
 
 	public static String RoomName = "";
 
+	public static Boolean Animation = true;
+
 	Integer PochemuOnoNeRabotaetNormalno = 4;
-	Integer PochemuOnoNeRabotaetNormalno2 = 4;
-	Integer PochemuOnoNeRabotaetNormalno3 = 4;
 
 	String pass = "0";
 
@@ -488,6 +488,14 @@ public class MenuActivity extends AppCompatActivity
 		{
 			case R.id.bug_report:
 				startActivity(new Intent(MenuActivity.this, BugReportActivity.class));
+				return true;
+
+			case R.id.VideoSettings:
+				Animation = !Animation;
+				if (Animation)
+					Toast.makeText(this, "Анимации включены", Toast.LENGTH_SHORT).show();
+				else
+					Toast.makeText(this, "Анимации выключены", Toast.LENGTH_SHORT).show();
 				return true;
 
 			default:

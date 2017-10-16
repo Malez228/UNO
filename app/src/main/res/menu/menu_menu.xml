@@ -3,6 +3,12 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/VideoSettings"
+        android:icon="@android:drawable/ic_menu_slideshow"
+        android:title="Выкл. анимации"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/bug_report"
         android:icon="@drawable/bug_icon"
         android:title="Сообщить об ошибке"
