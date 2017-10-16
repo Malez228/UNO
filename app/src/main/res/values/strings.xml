@@ -10,6 +10,7 @@
     <string name="FindRoomBtnText">Search</string>
     <string name="FindRoomDialog">Room not found\nYou can create a new room with this name</string>
     <string name="FindRoomDialogCancel">Cancel</string>
+    <string name="FindCreateRoom">Create / Search Room</string>
 
     <!-- Main -->
     <string name="LeaveGame">Leave game</string>
@@ -26,7 +27,16 @@
     <string name="HandSize">Cards in hand</string>
     <string name="NextTurn">End turn</string>
 
+    <string name="DontLeave">You can\'t leave this party</string>
+    <string name="RoomRemove">Server removed this room</string>
+    <string name="EnterMessage">Enter message</string>
+    <string name="EnterPass">Enter password</string>
+    <string name="GameIsRunning">The game is running</string>
+    <string name="WrongPassword">Wrong password</string>
+    <string name="SizePassword">It must be longer than three symbols</string>
+
     <string name="PlayerLabelText">Player</string>
+    <string name="PlayerConnectLabelText">connected</string>
     <string name="PlayerWinLabelText">won!</string>
 
     <string name="RoomLabelText">Room</string>

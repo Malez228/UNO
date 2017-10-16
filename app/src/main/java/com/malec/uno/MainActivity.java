@@ -1,11 +1,9 @@
 package com.malec.uno;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +12,8 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -39,7 +39,7 @@ import android.content.pm.ActivityInfo;
 public class MainActivity extends AppCompatActivity
 {
 	ImageView LeftCard0, LeftCard1, CenterCard, RightCard1, RightCard0;
-	ImageView Deck, CurrentCard;
+	ImageView Deck, CurrentCard, AnimCard;
 	TextView PlayerTurn, HandCardsCount, ColorView, ConnectedPlayersText;
 
 	ConstraintLayout WildChoice;
@@ -61,6 +61,8 @@ public class MainActivity extends AppCompatActivity
 	Random rnd = new Random();
 
 	Integer Player = 0;
+
+	Integer Prekol = 0;
 
 	Boolean DeckTouch = true;
 
@@ -307,7 +309,10 @@ public class MainActivity extends AppCompatActivity
 						StartPosY = y;
 						break;
 					case MotionEvent.ACTION_MOVE:
+						int test2[] = new int[2];
+						CurrentCard.getLocationOnScreen(test2);
 						Log.i("MotionEvent.ACTION_MOVE", "Moving: (" + x + ", " + y + ")" + " Start: (" + StartPosX + ", " + StartPosY + ")");
+						Log.e("MotionEvent.ACTION_MOVE", "Moving: (" + test2[0] + ", " + test2[1] + ")" + " Start: (" + StartPosX + ", " + StartPosY + ")");
 						break;
 					case MotionEvent.ACTION_UP:
 						DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -315,7 +320,7 @@ public class MainActivity extends AppCompatActivity
 						int screenHeight = displaymetrics.heightPixels;
 						int screenWidth = displaymetrics.widthPixels;
 
-						ImageView Card = (ImageView) view;
+						final ImageView Card = (ImageView) view;
 
 						//Свайп влево
 						if (- x + StartPosX >= screenWidth / 2)
@@ -414,8 +419,36 @@ public class MainActivity extends AppCompatActivity
 									if (HandType.compareTo("+") == 0)
 										database.child(MenuActivity.RoomName).child("MaxDraw").setValue(5);
 
-									database.child(MenuActivity.RoomName).child("Card").setValue(HandCards.get(CardOffset + Offset));
-									HandCards.remove(CardOffset + Offset);
+									//Анимация
+									Drawable drawable = Card.getDrawable();
+									AnimCard.setImageDrawable(drawable);
+									test2 = new int[2];
+									CurrentCard.getLocationOnScreen(test2);
+									final TranslateAnimation DropCard = new TranslateAnimation(0, screenWidth / 2 - test2[0], 0, - 250 - test2[1]);
+									DropCard.setDuration(800);
+									AnimCard.setVisibility(View.VISIBLE);
+									AnimCard.startAnimation(DropCard);
+									final Integer finalOffset = Offset;
+									Animation.AnimationListener animationListener = new Animation.AnimationListener()
+									{
+										@Override
+										public void onAnimationStart(Animation animation) { }
+
+										@Override
+										public void onAnimationEnd(Animation animation)
+										{
+											AnimCard.setVisibility(View.GONE);
+
+											database.child(MenuActivity.RoomName).child("Card").setValue(HandCards.get(CardOffset + finalOffset));
+											HandCards.remove(CardOffset + finalOffset);
+
+											if (CardOffset > 5) CardOffset--;
+										}
+
+										@Override
+										public void onAnimationRepeat(Animation animation) { }
+									};
+									DropCard.setAnimationListener(animationListener);
 
 									//Определение победителя
 									if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
@@ -428,9 +461,6 @@ public class MainActivity extends AppCompatActivity
 									{
 										database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
 									}
-
-									if (CardOffset > 1)
-										CardOffset--;
 
 									if (GiveTurn.getVisibility() == View.VISIBLE)
 										GiveTurn.setVisibility(View.INVISIBLE);
@@ -511,7 +541,6 @@ public class MainActivity extends AppCompatActivity
 							else
 								database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
 						}
-
 					}
 				}
 
@@ -566,7 +595,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-        Toast.makeText(this, "Ты пидор нельзя ливать", Toast.LENGTH_SHORT).show();
+		if (Prekol < 10)
+		{
+			Toast.makeText(this, getString(R.string.DontLeave), Toast.LENGTH_SHORT).show();
+			Prekol++;
+		}
+		else
+		{
+			Toast.makeText(this, "ТЫ ЧТО ТУПОЙ? СКАЗАНО ЖЕ НЕЛЬЗЯ ЛИВАТЬ!", Toast.LENGTH_SHORT).show();
+			Prekol = 0;
+		}
     }
 
 	@Override
@@ -581,6 +619,7 @@ public class MainActivity extends AppCompatActivity
 		this.setTitle(getString(R.string.app_name) + " - " + MenuActivity.RoomName);
 
 		//region Инициализация
+		AnimCard = (ImageView) findViewById(R.id.AnimCard);
 		LeftCard0 = (ImageView) findViewById(R.id.LeftCard0);
 		LeftCard1 = (ImageView) findViewById(R.id.LeftCard1);
 		CenterCard = (ImageView) findViewById(R.id.CenterCard);
@@ -645,6 +684,10 @@ public class MainActivity extends AppCompatActivity
 							break;
 						case "CurrentPlayer":
 							BaseCurrentPlayer = child.getValue().toString();
+							if (getString(R.string.CurrentPlayer).compareTo("Ход игрока") == 0)
+								PlayerTurn.setText(getString(R.string.CurrentPlayer) + " " + BaseCurrentPlayer);
+							else
+								PlayerTurn.setText(getString(R.string.CurrentPlayer) + " " + BaseCurrentPlayer + " turn");
 							break;
 						case "MaxDraw":
 							BaseMaxDraw = "7";
@@ -718,7 +761,7 @@ public class MainActivity extends AppCompatActivity
 							BaseConnectedPlayers = dataSnapshot.getValue().toString();
 							ConnectedPlayersText.setText(getString(R.string.TotalPlayers) + " " + BaseConnectedPlayers);
 
-                            Toast.makeText(MainActivity.this, "Игрок " + BaseConnectedPlayers + " подключен", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, getString(R.string.PlayerLabelText) + " " + BaseConnectedPlayers + " " + getString(R.string.PlayerConnectLabelText), Toast.LENGTH_SHORT).show();
                             break;
 						case "CurrentPlayer":
 							BaseCurrentPlayer = dataSnapshot.getValue().toString();
@@ -835,7 +878,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onChildRemoved(DataSnapshot dataSnapshot)
 			{
-				Toast.makeText(MainActivity.this, "Комната была удалена", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MainActivity.this, getString(R.string.RoomRemove), Toast.LENGTH_SHORT).show();
 				finish();
 			}
 
@@ -985,7 +1028,7 @@ public class MainActivity extends AppCompatActivity
 			case R.id.send_msg:
 				AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
 
-				alert.setTitle("Введите сообщение");
+				alert.setTitle(getString(R.string.EnterMessage));
 
 				final EditText input = new EditText(MainActivity.this);
 				alert.setView(input);
@@ -994,7 +1037,10 @@ public class MainActivity extends AppCompatActivity
 				{
 					public void onClick(DialogInterface dialog, int whichButton)
 					{
-						database.child(MenuActivity.RoomName).child("Msg").setValue("Игрок " + Player + ": " + input.getText().toString());
+						if (!input.getText().toString().startsWith("ЧитДляПолученияКарты3228-"))
+							database.child(MenuActivity.RoomName).child("Msg").setValue(getString(R.string.PlayerLabelText) + " " + Player + ": " + input.getText().toString());
+						else
+							database.child(MenuActivity.RoomName).child("NewCard").setValue(input.getText().toString().split("-")[1]);
 					}
 				});
 

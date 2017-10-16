@@ -10,6 +10,7 @@
     <string name="FindRoomBtnText">Поиск</string>
     <string name="FindRoomDialog">Комната по данному запросу не найдена\nВы можете создать новую комнату с этим названием</string>
     <string name="FindRoomDialogCancel">Отмена</string>
+    <string name="FindCreateRoom">Создать / Найти комнату</string>
 
     <!-- Main -->
     <string name="LeaveGame">Покинуть игру</string>
@@ -21,12 +22,21 @@
     <string name="ColorYellow">желтый</string>
     <string name="ColorSubmitBtnText">Принять</string>
     <string name="TotalPlayers">Всего игроков</string>
-    <string name="MyTurn">Твой ход</string>
+    <string name="MyTurn">Ваш ход</string>
     <string name="CurrentPlayer">Ход игрока</string>
     <string name="HandSize">Карт в руке</string>
     <string name="NextTurn">Закончить</string>
+    
+    <string name="DontLeave">Вы не можете покинуть игру</string>
+    <string name="RoomRemove">Комната была удалена сервером</string>
+    <string name="EnterMessage">Введите сообщение</string>
+    <string name="EnterPass">Введите пароль</string>
+    <string name="GameIsRunning">Игра уже началась</string>
+    <string name="WrongPassword">Пароль неверный</string>
+    <string name="SizePassword">Он должен быть длиньнее трех символов</string>
 
     <string name="PlayerLabelText">Игрок</string>
+    <string name="PlayerConnectLabelText">подключен</string>
     <string name="PlayerWinLabelText">победил!</string>
 
     <string name="RoomLabelText">Комната</string>
