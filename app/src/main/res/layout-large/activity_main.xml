@@ -211,56 +211,69 @@
             android:id="@+id/LeftCard0"
             android:layout_width="130dp"
             android:layout_height="208dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="4dp"
             android:layout_weight="1"
-            android:paddingBottom="4dp"
-            android:paddingLeft="4dp"
-            android:paddingRight="2dp"
-            android:paddingTop="4dp"
             app:srcCompat="@drawable/empty_card"/>
 
         <ImageView
             android:id="@+id/LeftCard1"
             android:layout_width="130dp"
             android:layout_height="208dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="2dp"
             android:layout_weight="1"
-            android:paddingBottom="4dp"
-            android:paddingLeft="2dp"
-            android:paddingRight="2dp"
-            android:paddingTop="4dp"
             app:srcCompat="@drawable/empty_card"/>
 
         <ImageView
             android:id="@+id/CenterCard"
             android:layout_width="130dp"
             android:layout_height="208dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="4dp"
             android:layout_weight="1"
-            android:paddingBottom="4dp"
-            android:paddingLeft="2dp"
-            android:paddingRight="2dp"
-            android:paddingTop="4dp"
             app:srcCompat="@drawable/empty_card"/>
 
         <ImageView
             android:id="@+id/RightCard1"
             android:layout_width="130dp"
             android:layout_height="208dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="4dp"
             android:layout_weight="1"
-            android:paddingBottom="4dp"
-            android:paddingLeft="2dp"
-            android:paddingRight="2dp"
-            android:paddingTop="4dp"
             app:srcCompat="@drawable/empty_card"/>
 
         <ImageView
             android:id="@+id/RightCard0"
             android:layout_width="130dp"
             android:layout_height="208dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="4dp"
             android:layout_weight="1"
-            android:paddingBottom="4dp"
-            android:paddingLeft="2dp"
-            android:paddingRight="4dp"
-            android:paddingTop="4dp"
             app:srcCompat="@drawable/empty_card"/>
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/AnimCard"
+        android:layout_width="130dp"
+        android:layout_height="208dp"
+        android:layout_marginBottom="4dp"
+        android:layout_weight="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
+        app:srcCompat="@drawable/empty_card"
+        app:layout_constraintVertical_bias="1.0"/>
 
 </android.support.constraint.ConstraintLayout>

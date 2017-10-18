@@ -313,40 +313,49 @@ public class MenuActivity extends AppCompatActivity
 				database.child(RoomName).addListenerForSingleValueEvent(new ValueEventListener()
 				{
 					@Override
-					public void onDataChange(DataSnapshot dataSnapshot)
+					public void onDataChange(final DataSnapshot dataSnapshot)
 					{
 						try
 						{
 							String s = dataSnapshot.getValue().toString();
 
-							AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
-							alert.setTitle(getString(R.string.EnterPass));
-							final EditText input = new EditText(MenuActivity.this);
-							alert.setView(input);
-							alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+							if (dataSnapshot.child("Pass").getValue().toString().compareTo("0") != 0)
 							{
-								public void onClick(DialogInterface dialog, int whichButton)
+								AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
+								alert.setTitle(getString(R.string.EnterPass));
+								final EditText input = new EditText(MenuActivity.this);
+								alert.setView(input);
+								alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
 								{
-									if (input.getText().toString().length() >= 3)
-										pass = input.getText().toString();
-									else
-										pass = "0";
-								}
-							});
-							alert.setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
-							{
-								public void onClick(DialogInterface dialog, int whichButton) { }
-							});
-							alert.show();
+									public void onClick(DialogInterface dialog, int whichButton)
+									{
+										if (input.getText().toString().length() >= 3)
+											pass = input.getText().toString();
+										else
+											pass = "0";
 
-							if (dataSnapshot.child("Pass").getValue().toString().compareTo(pass) == 0)
+										if (dataSnapshot.child("Pass").getValue().toString().compareTo(pass) == 0)
+										{
+											if (Integer.valueOf(dataSnapshot.child("Turns").getValue().toString()) <= Integer.valueOf(dataSnapshot.child("ConnectedPlayers").getValue().toString()))
+												startActivity(new Intent(MenuActivity.this, MainActivity.class));
+											else
+												Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
+										} else
+											Toast.makeText(MenuActivity.this, getString(R.string.WrongPassword), Toast.LENGTH_SHORT).show();
+									}
+								});
+								alert.setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
+								{
+									public void onClick(DialogInterface dialog, int whichButton) { }
+								});
+								alert.show();
+							} else
 							{
 								if (Integer.valueOf(dataSnapshot.child("Turns").getValue().toString()) <= Integer.valueOf(dataSnapshot.child("ConnectedPlayers").getValue().toString()))
 									startActivity(new Intent(MenuActivity.this, MainActivity.class));
 								else
 									Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
-							} else
-								Toast.makeText(MenuActivity.this, getString(R.string.WrongPassword), Toast.LENGTH_SHORT).show();
+							}
 						} catch (Exception e)
 						{
 							AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this);
@@ -438,26 +447,51 @@ public class MenuActivity extends AppCompatActivity
 			{
 				RoomName = CreateRoomField.getText().toString();
 
-				Random rnd = new Random();
-				if (RoomName.compareTo("") == 0)
-					RoomName = "Room" + rnd.nextInt();
+				database.child(RoomName).addListenerForSingleValueEvent(new ValueEventListener()
+				{
+					@Override
+					public void onDataChange(DataSnapshot dataSnapshot)
+					{
+						try
+						{
+							String s = dataSnapshot.getValue().toString();
 
-				database.child(RoomName).child("Card").setValue(0);
-				database.child(RoomName).child("Color").setValue(0);
-				database.child(RoomName).child("ConnectedPlayers").setValue(0);
-				database.child(RoomName).child("CurrentPlayer").setValue(1);
-				database.child(RoomName).child("MaxDraw").setValue(1);
-				database.child(RoomName).child("NewCard").setValue(0);
-				database.child(RoomName).child("TurnDir").setValue(1);
-				database.child(RoomName).child("Msg").setValue(0);
-				database.child(RoomName).child("Winner").setValue(0);
-				database.child(RoomName).child("Turns").setValue(0);
-				if (pass.length() >= 3)
-					database.child(RoomName).child("Pass").setValue(pass);
-				else
-					database.child(RoomName).child("Pass").setValue(0);
+							AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
+							alert.setTitle(getString(R.string.CreateRoomLabelText));
+							alert.setMessage(getString(R.string.RoomAlive));
+							alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+							{
+								public void onClick(DialogInterface dialog, int whichButton) { }
+							});
+							alert.show();
 
-				startActivity(new Intent(MenuActivity.this, MainActivity.class));
+						} catch (Exception e)
+						{
+							Random rnd = new Random();
+							if (RoomName.compareTo("") == 0) RoomName = "Room" + rnd.nextInt();
+
+							database.child(RoomName).child("Card").setValue(0);
+							database.child(RoomName).child("Color").setValue(0);
+							database.child(RoomName).child("ConnectedPlayers").setValue(0);
+							database.child(RoomName).child("CurrentPlayer").setValue(1);
+							database.child(RoomName).child("MaxDraw").setValue(1);
+							database.child(RoomName).child("NewCard").setValue(0);
+							database.child(RoomName).child("TurnDir").setValue(1);
+							database.child(RoomName).child("Msg").setValue(0);
+							database.child(RoomName).child("Winner").setValue(0);
+							database.child(RoomName).child("Turns").setValue(0);
+							if (pass.length() >= 3)
+								database.child(RoomName).child("Pass").setValue(pass);
+							else
+								database.child(RoomName).child("Pass").setValue(0);
+
+							startActivity(new Intent(MenuActivity.this, MainActivity.class));
+						}
+					}
+
+					@Override
+					public void onCancelled(DatabaseError databaseError) { }
+				});
 			}
 		});
 
@@ -474,7 +508,7 @@ public class MenuActivity extends AppCompatActivity
 	}
 
 	@Override
-	public boolean onPrepareOptionsMenu(final Menu menu)
+	public boolean onCreateOptionsMenu(final Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.menu_menu, menu);
 

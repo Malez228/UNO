@@ -28,6 +28,7 @@
     <string name="NextTurn">End turn</string>
 
     <string name="DontLeave">You can\'t leave this party</string>
+    <string name="RoomAlive"> This room already exists.\nUse the search to connect</string>
     <string name="RoomRemove">Server removed this room</string>
     <string name="EnterMessage">Enter message</string>
     <string name="EnterPass">Enter password</string>

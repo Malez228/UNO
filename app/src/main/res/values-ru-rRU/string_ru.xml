@@ -28,12 +28,13 @@
     <string name="NextTurn">Закончить</string>
     
     <string name="DontLeave">Вы не можете покинуть игру</string>
+    <string name="RoomAlive">Данная комната уже существует.\nВоспользуйтесь поиском, чтобы подключиться</string>
     <string name="RoomRemove">Комната была удалена сервером</string>
     <string name="EnterMessage">Введите сообщение</string>
     <string name="EnterPass">Введите пароль</string>
     <string name="GameIsRunning">Игра уже началась</string>
     <string name="WrongPassword">Пароль неверный</string>
-    <string name="SizePassword">Он должен быть длиньнее трех символов</string>
+    <string name="SizePassword">Он должен быть длиннее трех символов</string>
 
     <string name="PlayerLabelText">Игрок</string>
     <string name="PlayerConnectLabelText">подключен</string>

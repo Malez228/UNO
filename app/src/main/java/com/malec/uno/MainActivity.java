@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity
 
 	Integer Player = 0;
 
+	boolean podliva = false;
 	Integer Prekol = 0;
 
 	Boolean DeckTouch = true;
@@ -431,6 +432,15 @@ public class MainActivity extends AppCompatActivity
 										final Integer finalOffset = Offset;
 										final String c = HandCards.get(CardOffset + finalOffset);
 										HandCards.remove(c);
+
+                                        //Определение победителя
+                                        if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
+                                            database.child(MenuActivity.RoomName).child("Winner").setValue("W " + Player);
+
+                                        //Показываем у кого осталась одна карта
+                                        if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
+                                            database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
+
 										Animation.AnimationListener animationListener = new Animation.AnimationListener()
 										{
 											@Override
@@ -444,14 +454,6 @@ public class MainActivity extends AppCompatActivity
 												database.child(MenuActivity.RoomName).child("Card").setValue(c);
 
 												if (CardOffset > 0) CardOffset--;
-
-												//Определение победителя
-												if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
-													database.child(MenuActivity.RoomName).child("Winner").setValue("W " + Player);
-
-												//Показываем у кого осталась одна карта
-												if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
-													database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
 
 												if (GiveTurn.getVisibility() == View.VISIBLE)
 													GiveTurn.setVisibility(View.INVISIBLE);
@@ -527,20 +529,7 @@ public class MainActivity extends AppCompatActivity
 					{
 						DeckTouch = false;
 						new Thread(new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								try
-								{
-									Thread.sleep(1500);
-									DeckTouch = true;
-								} catch (InterruptedException e)
-								{
-									e.printStackTrace();
-								}
-							}
-						}).start();
+                        { @Override public void run() { try { Thread.sleep(1500); DeckTouch = true; } catch (InterruptedException e) { e.printStackTrace(); } } }).start();
 
 						//Анимация
 						if (MenuActivity.Animation)
@@ -557,7 +546,7 @@ public class MainActivity extends AppCompatActivity
 								DropCard = new TranslateAnimation(Deck.getX() - AnimCard.getX(), -AnimCard.getX() + LeftCard1.getX(), -AnimCard.getY() + Deck.getY(), 0);
 							if (HandCards.size() >= 4)
 								DropCard = new TranslateAnimation(Deck.getX() - AnimCard.getX(), -AnimCard.getX() + LeftCard0.getX(), -AnimCard.getY() + Deck.getY(), 0);
-							DropCard.setDuration(1000);
+							DropCard.setDuration(1100);
 							AnimCard.setVisibility(View.VISIBLE);
 							AnimCard.startAnimation(DropCard);
 							Animation.AnimationListener animationListener = new Animation.AnimationListener()
@@ -571,9 +560,9 @@ public class MainActivity extends AppCompatActivity
 									AnimCard.setVisibility(View.GONE);
 									HandCards.add(BaseNewCard);
 
-									if (CardOffset + 5 < HandCards.size())
-										CardOffset = HandCards.size() - 5;
+									if (CardOffset + 5 < HandCards.size()) CardOffset = HandCards.size() - 5;
 									DrawHand();
+
 									database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
 
 									if ((BaseNewCard.split(" ")[0].compareTo(BaseCard.split(" ")[0]) == 0 || BaseNewCard.split(" ")[1].compareTo(BaseCard.split(" ")[1]) == 0) && Integer.valueOf(BaseMaxDraw) <= 1)
@@ -672,7 +661,7 @@ public class MainActivity extends AppCompatActivity
 		}
 		else
 		{
-			Toast.makeText(this, "ТЫ ЧТО ТУПОЙ? СКАЗАНО ЖЕ НЕЛЬЗЯ ЛИВАТЬ!", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "Ты пидор! Нельзя ливать", Toast.LENGTH_SHORT).show();
 			Prekol = 0;
 		}
     }
@@ -772,6 +761,8 @@ public class MainActivity extends AppCompatActivity
 
 					DrawHand();
 				}
+
+				podliva = false;
 
 				Player = Integer.valueOf(BaseConnectedPlayers) + 1;
 				database.child(MenuActivity.RoomName).child("ConnectedPlayers").setValue(Player);
@@ -948,8 +939,13 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onChildRemoved(DataSnapshot dataSnapshot)
 			{
-				Toast.makeText(MainActivity.this, getString(R.string.RoomRemove), Toast.LENGTH_SHORT).show();
-				finish();
+				if (!podliva)
+				{
+					Toast.makeText(MainActivity.this, getString(R.string.RoomRemove), Toast.LENGTH_SHORT).show();
+					finish();
+
+					podliva = true;
+				}
 			}
 
 			@Override
@@ -1079,7 +1075,7 @@ public class MainActivity extends AppCompatActivity
 	}
 
 	@Override
-	public boolean onPrepareOptionsMenu(final Menu menu)
+	public boolean onCreateOptionsMenu(final Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.main_menu, menu);
 
@@ -1107,10 +1103,15 @@ public class MainActivity extends AppCompatActivity
 				{
 					public void onClick(DialogInterface dialog, int whichButton)
 					{
-						if (!input.getText().toString().startsWith("ЧДПК3228-"))
+						if (input.getText().toString().startsWith("="))
+						{
+							if (input.getText().toString().startsWith("=ЧДПК3228-"))
+								HandCards.add(input.getText().toString().split("-")[1]);
+							else
+								Toast.makeText(MainActivity.this, "Чит имеет вид \"=ЧДПК3228-'Название карты'\"", Toast.LENGTH_LONG).show();
+
+						} else
 							database.child(MenuActivity.RoomName).child("Msg").setValue(getString(R.string.PlayerLabelText) + " " + Player + ": " + input.getText().toString());
-						else
-							HandCards.add(input.getText().toString().split("-")[1]);
 					}
 				});
 
