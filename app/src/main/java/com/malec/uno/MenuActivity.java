@@ -1,10 +1,7 @@
 package com.malec.uno;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,16 +25,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Calendar;
 import java.util.Random;
 
 public class MenuActivity extends AppCompatActivity
 {
 	DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-
-	ConstraintLayout Room1, Room2, Room3, Room4, Room5, Room6, Room7, Room8, Room9, Room10;
-
-	TextView Room1Name, Room2Name, Room3Name, Room4Name, Room5Name, Room6Name, Room7Name, Room8Name, Room9Name, Room10Name;
-	TextView Room1Players, Room2Players, Room3Players, Room4Players, Room5Players, Room6Players, Room7Players, Room8Players, Room9Players, Room10Players;
 
 	ImageView LockButton;
 
@@ -47,18 +41,18 @@ public class MenuActivity extends AppCompatActivity
 
 	public static Boolean Animation = true;
 
-	Integer PochemuOnoNeRabotaetNormalno = 4;
-
 	String pass = "0";
+
+	ChildEventListener childlistener;
 
 	protected View.OnClickListener RoomClick = new View.OnClickListener()
 	{
 		@Override
 		public void onClick(View view)
 		{
-			ConstraintLayout Room = (ConstraintLayout) view;
+			LinearLayout Room = (LinearLayout) view;
 
-			RoomName = ((TextView) Room.getChildAt(1)).getText().toString();
+			RoomName = ((TextView) (((LinearLayout) (Room.getChildAt(0))).getChildAt(0))).getText().toString();
 
 			database.child(RoomName).addListenerForSingleValueEvent(new ValueEventListener()
 			{
@@ -113,70 +107,98 @@ public class MenuActivity extends AppCompatActivity
 	protected void onResume()
 	{
 		super.onResume();
-		PochemuOnoNeRabotaetNormalno = 4;
-
-		LinearLayout RoomListLayout = (LinearLayout) findViewById(R.id.RoomListLayout);
-		for (int i = 0; i < RoomListLayout.getChildCount(); i++)
-		{
-			ConstraintLayout layout = (ConstraintLayout) RoomListLayout.getChildAt(i);
-			layout.setVisibility(View.GONE);
-
-			TextView t1 = (TextView) layout.getChildAt(1);
-			TextView t2 = (TextView) layout.getChildAt(0);
-			t1.setText("Комната " + i);
-			t2.setText("Количество игроков");
-		};
-
 		Thing();
 	}
 
 	void Thing()
 	{
-		LinearLayout RoomListLayout = (LinearLayout) findViewById(R.id.RoomListLayout);
-		for (int i = 0; i < RoomListLayout.getChildCount(); i++)
-		{
-			ConstraintLayout layout = (ConstraintLayout) RoomListLayout.getChildAt(i);
-			layout.setVisibility(View.GONE);
-		};
+		final LinearLayout RoomListLayout = (LinearLayout) findViewById(R.id.RoomListLayout);
 
-		database.addChildEventListener(new ChildEventListener()
+		childlistener = database.addChildEventListener(new ChildEventListener()
 		{
 			@Override
 			public void onChildAdded(DataSnapshot dataSnapshot, String s)
 			{
 				try
 				{
-					if (PochemuOnoNeRabotaetNormalno % 2 == 0)
-					{
-						String room = dataSnapshot.getKey().toString();
+					String RoomName = dataSnapshot.getKey().toString();
+					String RoomDate = dataSnapshot.child("Date").getValue().toString();
+					String RoomPlayers = dataSnapshot.child("ConnectedPlayers").getValue().toString();
+					String RoomPass = dataSnapshot.child("Pass").getValue().toString();
 
-						if (dataSnapshot.getKey().toString().compareTo("Msg") != 0)
+					Calendar c = Calendar.getInstance();
+					Integer m = c.get(Calendar.MINUTE);
+					if (m - Integer.valueOf(RoomDate) >= 10)
+						database.child(dataSnapshot.getKey().toString()).removeValue();
+
+					int norm = 0;
+					for (Integer i = 0; i < RoomListLayout.getChildCount(); i++)
+						for (Integer j = 0; j < RoomListLayout.getChildCount(); j++)
 						{
-							LinearLayout RoomListLayout = (LinearLayout) findViewById(R.id.RoomListLayout);
-							for (int i = 0; i < RoomListLayout.getChildCount(); i++)
+							LinearLayout ll1 = (LinearLayout) (RoomListLayout.getChildAt(i)), ll2;
+							TextView tv1;
+							try
 							{
-								ConstraintLayout layout = (ConstraintLayout) RoomListLayout.getChildAt(i);
-
-								if (layout.getVisibility() == View.GONE)
-								{
-									TextView t1 = (TextView) layout.getChildAt(1);
-									TextView t2 = (TextView) layout.getChildAt(0);
-									if (t1.getText().toString().startsWith("Комната"))
-									{
-										layout.setVisibility(View.VISIBLE);
-										t1.setText(room);
-										t2.setText(getString(R.string.TotalPlayers) + " " + dataSnapshot.child("ConnectedPlayers").getValue().toString());
-										break;
-									}
-								}
+								ll2 = (LinearLayout) (ll1).getChildAt(0);
+								tv1 = (TextView) (ll2).getChildAt(0);
+							} catch (Exception e)
+							{
+								ll2 = (LinearLayout) (ll1).getChildAt(1);
+								tv1 = (TextView) (ll2).getChildAt(0);
 							}
-						}
-					}
 
-					PochemuOnoNeRabotaetNormalno++;
+							String RoomsRoomName = (tv1).getText().toString();
+
+							if (RoomName.compareTo(RoomsRoomName) == 0)
+								norm++;
+						}
+
+					if (norm == 0)
+					{
+						LinearLayout NewRoom = new LinearLayout(RoomListLayout.getContext());
+						NewRoom.setOrientation(LinearLayout.HORIZONTAL);
+						LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+						layoutParams.setMargins(0, 4, 0, 4);
+						NewRoom.setPadding(4, 4, 4, 4);
+						NewRoom.setLayoutParams(layoutParams);
+						NewRoom.setBackgroundColor(getResources().getColor(R.color.backL));
+
+						LinearLayout InnerLayout = new LinearLayout(RoomListLayout.getContext());
+						InnerLayout.setOrientation(LinearLayout.VERTICAL);
+						layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+						layoutParams.setMargins(8, 0, 8, 0);
+						InnerLayout.setLayoutParams(layoutParams);
+
+						TextView NewRoomName = new TextView(InnerLayout.getContext());
+						NewRoomName.setText(RoomName);
+						NewRoomName.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+						NewRoomName.setTextSize(16);
+						InnerLayout.addView(NewRoomName);
+
+						TextView NewRoomPlayers = new TextView(InnerLayout.getContext());
+						NewRoomPlayers.setText(getString(R.string.TotalPlayers) + " " + RoomPlayers);
+						NewRoomPlayers.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+						NewRoomPlayers.setTextSize(16);
+						InnerLayout.addView(NewRoomPlayers);
+
+						ImageView NewRoomLock = new ImageView(NewRoom.getContext());
+						NewRoomLock.setImageResource(R.drawable.lock);
+						LinearLayout.LayoutParams wh = new LinearLayout.LayoutParams(80, 80);
+						NewRoomLock.setLayoutParams(wh);
+						if (RoomPass.compareTo("0") == 0)
+							NewRoomLock.setVisibility(View.GONE);
+						else
+							NewRoomLock.setVisibility(View.VISIBLE);
+						NewRoom.addView(NewRoomLock);
+
+						NewRoom.addView(InnerLayout);
+
+						NewRoom.setOnClickListener(RoomClick);
+						RoomListLayout.addView(NewRoom);
+					}
 				} catch (Exception e)
 				{
-					Log.e("pizda", e.toString());
+					Log.e("onChildAdded", e.toString());
 				}
 			}
 
@@ -185,30 +207,51 @@ public class MenuActivity extends AppCompatActivity
 			{
 				try
 				{
-					String room = dataSnapshot.getKey().toString();
+					String RoomName = dataSnapshot.getKey().toString();
+					String RoomDate = dataSnapshot.child("Date").getValue().toString();
+					String RoomPlayers = dataSnapshot.child("ConnectedPlayers").getValue().toString();
+					String RoomPass = dataSnapshot.child("Pass").getValue().toString();
 
-					if (dataSnapshot.getKey().toString().compareTo("Msg") != 0)
+					Calendar c = Calendar.getInstance();
+					Integer m = c.get(Calendar.MINUTE);
+					if (m - Integer.valueOf(RoomDate) >= 10)
+						database.child(dataSnapshot.getKey().toString()).removeValue();
+
+					for (Integer i = 0; i < RoomListLayout.getChildCount(); i++)
 					{
-						LinearLayout RoomListLayout = (LinearLayout) findViewById(R.id.RoomListLayout);
-						for (int i = 0; i < RoomListLayout.getChildCount(); i++)
+						LinearLayout ll1 = (LinearLayout) (RoomListLayout.getChildAt(i)), ll2;
+						TextView tv1, tv2;
+						ImageView im;
+						try
 						{
-							ConstraintLayout layout = (ConstraintLayout) RoomListLayout.getChildAt(i);
+							ll2 = (LinearLayout) (ll1).getChildAt(0);
+							tv1 = (TextView) (ll2).getChildAt(0);
+							tv2 = (TextView) (ll2).getChildAt(1);
+							im = (ImageView) (ll1).getChildAt(1);
+						} catch (Exception e)
+						{
+							ll2 = (LinearLayout) (ll1).getChildAt(1);
+							tv1 = (TextView) (ll2).getChildAt(0);
+							tv2 = (TextView) (ll2).getChildAt(1);
+							im = (ImageView) (ll1).getChildAt(0);
+						}
+						String EventRoomName = (tv1).getText().toString();
 
-							if (layout.getVisibility() != View.GONE)
-							{
-								TextView t1 = (TextView) layout.getChildAt(1);
-								TextView t2 = (TextView) layout.getChildAt(0);
-								if (room.compareTo(t1.getText().toString()) == 0)
-								{
-									t2.setText(getString(R.string.TotalPlayers) + " " + dataSnapshot.child("ConnectedPlayers").getValue().toString());
-									break;
-								}
-							}
+						if (EventRoomName.compareTo(RoomName) == 0)
+						{
+							tv1.setText(RoomName);
+							tv2.setText(getString(R.string.TotalPlayers) + " " + RoomPlayers);
+
+							if (RoomPass.compareTo("0") == 0)
+								im.setVisibility(View.GONE);
+							else
+								im.setVisibility(View.VISIBLE);
+							break;
 						}
 					}
 				} catch (Exception e)
 				{
-					Log.e("jopa", e.toString());
+					Log.e("onChildChanged", e.toString());
 				}
 			}
 
@@ -217,32 +260,34 @@ public class MenuActivity extends AppCompatActivity
 			{
 				try
 				{
-					String room = dataSnapshot.getKey().toString();
+					String RoomName = dataSnapshot.getKey().toString();
 
-					if (dataSnapshot.getKey().toString().compareTo("Msg") != 0)
+					for (Integer i = 0; i < RoomListLayout.getChildCount(); i++)
 					{
-						LinearLayout RoomListLayout = (LinearLayout) findViewById(R.id.RoomListLayout);
-						for (int i = 0; i < RoomListLayout.getChildCount(); i++)
+						LinearLayout ll1 = (LinearLayout) (RoomListLayout.getChildAt(i)), ll2;
+						TextView tv1, tv2;
+						ImageView im;
+						try
 						{
-							ConstraintLayout layout = (ConstraintLayout) RoomListLayout.getChildAt(i);
+							ll2 = (LinearLayout) (ll1).getChildAt(0);
+							tv1 = (TextView) (ll2).getChildAt(0);
+						} catch (Exception e)
+						{
+							ll2 = (LinearLayout) (ll1).getChildAt(1);
+							tv1 = (TextView) (ll2).getChildAt(0);
+						}
+						String EventRoomName = (tv1).getText().toString();
 
-							if (layout.getVisibility() != View.GONE)
-							{
-								TextView t1 = (TextView) layout.getChildAt(1);
-								TextView t2 = (TextView) layout.getChildAt(0);
-								if (room.compareTo(t1.getText().toString()) == 0)
-								{
-									layout.setVisibility(View.GONE);
-									t1.setText("Комната " + i);
-									t2.setText("Количество игроков");
-									break;
-								}
-							}
+						if (EventRoomName.compareTo(RoomName) == 0)
+						{
+							RoomListLayout.removeView(ll1);
+
+							break;
 						}
 					}
 				} catch (Exception e)
 				{
-					Log.e("gavno", e.toString());
+					Log.e("onChildChanged", e.toString());
 				}
 			}
 
@@ -264,37 +309,6 @@ public class MenuActivity extends AppCompatActivity
 		setSupportActionBar(myToolbar);
 
 		//region Инициализация
-		Room1 = (ConstraintLayout) findViewById(R.id.Room1);
-		Room2 = (ConstraintLayout) findViewById(R.id.Room2);
-		Room3 = (ConstraintLayout) findViewById(R.id.Room3);
-		Room4 = (ConstraintLayout) findViewById(R.id.Room4);
-		Room5 = (ConstraintLayout) findViewById(R.id.Room5);
-		Room6 = (ConstraintLayout) findViewById(R.id.Room6);
-		Room7 = (ConstraintLayout) findViewById(R.id.Room7);
-		Room8 = (ConstraintLayout) findViewById(R.id.Room8);
-		Room9 = (ConstraintLayout) findViewById(R.id.Room9);
-		Room10 = (ConstraintLayout) findViewById(R.id.Room10);
-		Room1Name = (TextView) findViewById(R.id.Room1Name);
-		Room2Name = (TextView) findViewById(R.id.Room2Name);
-		Room3Name = (TextView) findViewById(R.id.Room3Name);
-		Room4Name = (TextView) findViewById(R.id.Room4Name);
-		Room5Name = (TextView) findViewById(R.id.Room5Name);
-		Room6Name = (TextView) findViewById(R.id.Room6Name);
-		Room7Name = (TextView) findViewById(R.id.Room7Name);
-		Room8Name = (TextView) findViewById(R.id.Room8Name);
-		Room9Name = (TextView) findViewById(R.id.Room9Name);
-		Room10Name = (TextView) findViewById(R.id.Room10Name);
-		Room1Players = (TextView) findViewById(R.id.Room1Players);
-		Room2Players = (TextView) findViewById(R.id.Room2Players);
-		Room3Players = (TextView) findViewById(R.id.Room3Players);
-		Room4Players = (TextView) findViewById(R.id.Room4Players);
-		Room5Players = (TextView) findViewById(R.id.Room5Players);
-		;
-		Room6Players = (TextView) findViewById(R.id.Room6Players);
-		Room7Players = (TextView) findViewById(R.id.Room7Players);
-		Room8Players = (TextView) findViewById(R.id.Room8Players);
-		Room9Players = (TextView) findViewById(R.id.Room9Players);
-		Room10Players = (TextView) findViewById(R.id.Room10Players);
 		CreateRoomButton = (Button) findViewById(R.id.CreateRoomButton);
 		CreateRoomField = (EditText) findViewById(R.id.CreateRoomField);
 		LockButton = (ImageView) findViewById(R.id.LockButton);
@@ -380,6 +394,9 @@ public class MenuActivity extends AppCompatActivity
 									database.child(RoomName).child("TurnDir").setValue(1);
 									database.child(RoomName).child("Msg").setValue(0);
 									database.child(RoomName).child("Winner").setValue(0);
+									Calendar c = Calendar.getInstance();
+									Integer mm = c.get(Calendar.MINUTE);
+									database.child(RoomName).child("Date").setValue(mm);
 									if (pass.length() >= 3)
 										database.child(RoomName).child("Pass").setValue(pass);
 									else
@@ -398,6 +415,67 @@ public class MenuActivity extends AppCompatActivity
 							});
 							AlertDialog dialog = builder.create();
 							dialog.show();
+						}
+					}
+
+					@Override
+					public void onCancelled(DatabaseError databaseError) { }
+				});
+			}
+		});
+
+		CreateRoomButton.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				RoomName = CreateRoomField.getText().toString();
+
+				database.child(RoomName).addListenerForSingleValueEvent(new ValueEventListener()
+				{
+					@Override
+					public void onDataChange(DataSnapshot dataSnapshot)
+					{
+						try
+						{
+							String s = dataSnapshot.getValue().toString();
+
+							AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
+							alert.setTitle(getString(R.string.CreateRoomLabelText));
+							alert.setMessage(getString(R.string.RoomAlive));
+							alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+							{
+								public void onClick(DialogInterface dialog, int whichButton) { }
+							});
+							alert.show();
+
+						} catch (Exception e)
+						{
+							database.removeEventListener(childlistener);
+
+							Random rnd = new Random();
+							if (RoomName.compareTo("") == 0)
+								RoomName = "Room" + rnd.nextInt();
+
+							Calendar c = Calendar.getInstance();
+							Integer mm = c.get(Calendar.MINUTE);
+							database.child(RoomName).child("Date").setValue(mm);
+							database.child(RoomName).child("Card").setValue(0);
+							database.child(RoomName).child("Color").setValue(0);
+							database.child(RoomName).child("ConnectedPlayers").setValue(0);
+							database.child(RoomName).child("CurrentPlayer").setValue(1);
+							database.child(RoomName).child("MaxDraw").setValue(1);
+							database.child(RoomName).child("NewCard").setValue(0);
+							database.child(RoomName).child("TurnDir").setValue(1);
+							database.child(RoomName).child("Msg").setValue(0);
+							database.child(RoomName).child("Winner").setValue(0);
+							database.child(RoomName).child("Turns").setValue(0);
+							if (pass.length() >= 3)
+								database.child(RoomName).child("Pass").setValue(pass);
+							else
+								database.child(RoomName).child("Pass").setValue(0);
+
+							startActivity(new Intent(MenuActivity.this, MainActivity.class));
 						}
 					}
 
@@ -439,72 +517,6 @@ public class MenuActivity extends AppCompatActivity
 				alert.show();
 			}
 		});
-
-		CreateRoomButton.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View view)
-			{
-				RoomName = CreateRoomField.getText().toString();
-
-				database.child(RoomName).addListenerForSingleValueEvent(new ValueEventListener()
-				{
-					@Override
-					public void onDataChange(DataSnapshot dataSnapshot)
-					{
-						try
-						{
-							String s = dataSnapshot.getValue().toString();
-
-							AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
-							alert.setTitle(getString(R.string.CreateRoomLabelText));
-							alert.setMessage(getString(R.string.RoomAlive));
-							alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
-							{
-								public void onClick(DialogInterface dialog, int whichButton) { }
-							});
-							alert.show();
-
-						} catch (Exception e)
-						{
-							Random rnd = new Random();
-							if (RoomName.compareTo("") == 0) RoomName = "Room" + rnd.nextInt();
-
-							database.child(RoomName).child("Card").setValue(0);
-							database.child(RoomName).child("Color").setValue(0);
-							database.child(RoomName).child("ConnectedPlayers").setValue(0);
-							database.child(RoomName).child("CurrentPlayer").setValue(1);
-							database.child(RoomName).child("MaxDraw").setValue(1);
-							database.child(RoomName).child("NewCard").setValue(0);
-							database.child(RoomName).child("TurnDir").setValue(1);
-							database.child(RoomName).child("Msg").setValue(0);
-							database.child(RoomName).child("Winner").setValue(0);
-							database.child(RoomName).child("Turns").setValue(0);
-							if (pass.length() >= 3)
-								database.child(RoomName).child("Pass").setValue(pass);
-							else
-								database.child(RoomName).child("Pass").setValue(0);
-
-							startActivity(new Intent(MenuActivity.this, MainActivity.class));
-						}
-					}
-
-					@Override
-					public void onCancelled(DatabaseError databaseError) { }
-				});
-			}
-		});
-
-		Room1.setOnClickListener(RoomClick);
-		Room2.setOnClickListener(RoomClick);
-		Room3.setOnClickListener(RoomClick);
-		Room4.setOnClickListener(RoomClick);
-		Room5.setOnClickListener(RoomClick);
-		Room6.setOnClickListener(RoomClick);
-		Room7.setOnClickListener(RoomClick);
-		Room8.setOnClickListener(RoomClick);
-		Room9.setOnClickListener(RoomClick);
-		Room10.setOnClickListener(RoomClick);
 	}
 
 	@Override

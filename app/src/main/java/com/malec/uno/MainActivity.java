@@ -31,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
@@ -38,36 +39,29 @@ import android.content.pm.ActivityInfo;
 
 public class MainActivity extends AppCompatActivity
 {
+	//region Отображаемые элементы
 	ImageView LeftCard0, LeftCard1, CenterCard, RightCard1, RightCard0;
 	ImageView Deck, CurrentCard, AnimCard;
-	TextView PlayerTurn, HandCardsCount, ColorView, ConnectedPlayersText;
-
+	TextView PlayerTurn, HandCardsCount, ColorView, ConnectedPlayersText, MaxDrawText;
 	ConstraintLayout WildChoice;
-
 	RadioButton RadioRed, RadioYellow, RadioGreen, RadioBlue;
-
 	Button SubmitRadio, GiveTurn, Quit, CloseRoom;
+	//endregion
 
-	List<String> HandCards = new ArrayList();
-	List<String> Cards = new ArrayList();
-
+	//region Игровые переменные
 	String BaseCard, BaseColor, BaseConnectedPlayers, BaseCurrentPlayer, BaseMaxDraw, BaseNewCard, BaseTurnDir;
 	Integer BaseTurns = 0;
-
-	Integer CardOffset = 0;
-
-	Integer StartPosX, StartPosY;
-
-	Random rnd = new Random();
-
 	Integer Player = 0;
+	//endregion
 
-	boolean podliva = false;
-	Integer Prekol = 0;
-
-	Boolean DeckTouch = true;
+	//region Другие переменные
+	List<String> HandCards = new ArrayList(), Cards = new ArrayList();
+	Integer CardOffset = 0, StartPosX, StartPosY, Prekol = 0;
+	Random rnd = new Random();
+	boolean firstTime = false, DeckTouch = true;
 
 	DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+	//endregion
 
 	int GetCardImage(String name)
 	{
@@ -324,7 +318,7 @@ public class MainActivity extends AppCompatActivity
 						final ImageView Card = (ImageView) view;
 
 						//Свайп влево
-						if (- x + StartPosX >= screenWidth / 2)
+						if (-x + StartPosX >= screenWidth / 2)
 						{
 							if (Card.getId() == RightCard0.getId() || Card.getId() == RightCard1.getId())
 							{
@@ -433,13 +427,13 @@ public class MainActivity extends AppCompatActivity
 										final String c = HandCards.get(CardOffset + finalOffset);
 										HandCards.remove(c);
 
-                                        //Определение победителя
-                                        if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
-                                            database.child(MenuActivity.RoomName).child("Winner").setValue("W " + Player);
+										//Определение победителя
+										if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
+											database.child(MenuActivity.RoomName).child("Winner").setValue("W " + Player);
 
-                                        //Показываем у кого осталась одна карта
-                                        if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
-                                            database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
+										//Показываем у кого осталась одна карта
+										if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
+											database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
 
 										Animation.AnimationListener animationListener = new Animation.AnimationListener()
 										{
@@ -453,7 +447,8 @@ public class MainActivity extends AppCompatActivity
 
 												database.child(MenuActivity.RoomName).child("Card").setValue(c);
 
-												if (CardOffset > 0) CardOffset--;
+												if (CardOffset > 0)
+													CardOffset--;
 
 												if (GiveTurn.getVisibility() == View.VISIBLE)
 													GiveTurn.setVisibility(View.INVISIBLE);
@@ -463,13 +458,13 @@ public class MainActivity extends AppCompatActivity
 											public void onAnimationRepeat(Animation animation) { }
 										};
 										DropCard.setAnimationListener(animationListener);
-									}
-									else
+									} else
 									{
 										database.child(MenuActivity.RoomName).child("Card").setValue(HandCards.get(CardOffset + Offset));
 										HandCards.remove(HandCards.get(CardOffset + Offset));
 
-										if (CardOffset > 0) CardOffset--;
+										if (CardOffset > 0)
+											CardOffset--;
 
 										//Определение победителя
 										if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
@@ -529,7 +524,17 @@ public class MainActivity extends AppCompatActivity
 					{
 						DeckTouch = false;
 						new Thread(new Runnable()
-                        { @Override public void run() { try { Thread.sleep(1500); DeckTouch = true; } catch (InterruptedException e) { e.printStackTrace(); } } }).start();
+						{
+							@Override
+							public void run()
+							{
+								try
+								{
+									Thread.sleep(1500);
+									DeckTouch = true;
+								} catch (InterruptedException e) { e.printStackTrace(); }
+							}
+						}).start();
 
 						//Анимация
 						if (MenuActivity.Animation)
@@ -560,7 +565,8 @@ public class MainActivity extends AppCompatActivity
 									AnimCard.setVisibility(View.GONE);
 									HandCards.add(BaseNewCard);
 
-									if (CardOffset + 5 < HandCards.size()) CardOffset = HandCards.size() - 5;
+									if (CardOffset + 5 < HandCards.size())
+										CardOffset = HandCards.size() - 5;
 									DrawHand();
 
 									database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
@@ -580,8 +586,7 @@ public class MainActivity extends AppCompatActivity
 								public void onAnimationRepeat(Animation animation) { }
 							};
 							DropCard.setAnimationListener(animationListener);
-						}
-						else
+						} else
 						{
 							HandCards.add(BaseNewCard);
 
@@ -618,7 +623,7 @@ public class MainActivity extends AppCompatActivity
 		database.child(MenuActivity.RoomName).child("NewCard").setValue(card);
 		Cards.remove(card);
 		card = Cards.get(rnd.nextInt(Cards.size()));
-		//если на стол положилась черная мы задаем случайный цвет
+		//Если на стол положилась черная мы задаем случайный цвет
 		if (card.split(" ")[0].compareTo("BLACK") == 0)
 		{
 			Integer r = rnd.nextInt(4);
@@ -651,20 +656,19 @@ public class MainActivity extends AppCompatActivity
 		database.child(MenuActivity.RoomName).child("Winner").setValue(0);
 	}
 
-    @Override
-    public void onBackPressed()
-    {
+	@Override
+	public void onBackPressed()
+	{
 		if (Prekol < 10)
 		{
 			Toast.makeText(this, getString(R.string.DontLeave), Toast.LENGTH_SHORT).show();
 			Prekol++;
-		}
-		else
+		} else
 		{
 			Toast.makeText(this, "Ты пидор! Нельзя ливать", Toast.LENGTH_SHORT).show();
 			Prekol = 0;
 		}
-    }
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -699,6 +703,7 @@ public class MainActivity extends AppCompatActivity
 		Quit = (Button) findViewById(R.id.Quit);
 		CloseRoom = (Button) findViewById(R.id.CloseRoom);
 		ConnectedPlayersText = (TextView) findViewById(R.id.ConnectedPlayersText);
+		MaxDrawText = (TextView) findViewById(R.id.MaxDrawText);
 		//endregion
 
 		//Получим начальные значения и делаем свои штуки
@@ -762,7 +767,7 @@ public class MainActivity extends AppCompatActivity
 					DrawHand();
 				}
 
-				podliva = false;
+				firstTime = false;
 
 				Player = Integer.valueOf(BaseConnectedPlayers) + 1;
 				database.child(MenuActivity.RoomName).child("ConnectedPlayers").setValue(Player);
@@ -822,11 +827,12 @@ public class MainActivity extends AppCompatActivity
 							BaseConnectedPlayers = dataSnapshot.getValue().toString();
 							ConnectedPlayersText.setText(getString(R.string.TotalPlayers) + " " + BaseConnectedPlayers);
 
-                            Toast.makeText(MainActivity.this, getString(R.string.PlayerLabelText) + " " + BaseConnectedPlayers + " " + getString(R.string.PlayerConnectLabelText), Toast.LENGTH_SHORT).show();
-                            break;
+							Toast.makeText(MainActivity.this, getString(R.string.PlayerLabelText) + " " + BaseConnectedPlayers + " " + getString(R.string.PlayerConnectLabelText), Toast.LENGTH_SHORT).show();
+							break;
 						case "CurrentPlayer":
 							BaseCurrentPlayer = dataSnapshot.getValue().toString();
 
+							//Если это сервер
 							if (Player - 1 == 0)
 							{
 								if (BaseTurns + 1 < Integer.valueOf(BaseConnectedPlayers))
@@ -837,35 +843,19 @@ public class MainActivity extends AppCompatActivity
 							if (Integer.valueOf(BaseCurrentPlayer) <= Integer.valueOf(BaseConnectedPlayers) && Integer.valueOf(BaseCurrentPlayer) >= 1)
 								if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
 								{
+									MaxDrawText.setText(BaseMaxDraw);
+									MaxDrawText.setVisibility(View.VISIBLE);
+
 									PlayerTurn.setText(getString(R.string.MyTurn));
 
 									for (int i = 0; i < HandCards.size() - 1; i++)
 										HandCards.remove("");
-
-									//TODO странно но оно даже не выводится
-									/*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
-									{
-										Notification.Builder builder = new Notification.Builder(getApplicationContext());
-										Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
-										notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-										PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-										builder.setContentIntent(contentIntent)
-												.setSmallIcon(R.drawable.ino_mini)
-												.setContentTitle("Напоминание")
-												.setContentText("Наступил ваш черед ходить");
-
-										Notification notification = null;
-
-											notification.defaults = Notification.DEFAULT_VIBRATE;
-											notification = builder.build();
-
-										NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-										notificationManager.notify(1, notification);
-									}*/
-								}
-								else
+								} else
 								{
-									if (GiveTurn.getVisibility() == View.VISIBLE) GiveTurn.setVisibility(View.INVISIBLE);
+									MaxDrawText.setVisibility(View.INVISIBLE);
+
+									if (GiveTurn.getVisibility() == View.VISIBLE)
+										GiveTurn.setVisibility(View.INVISIBLE);
 
 									if (getString(R.string.CurrentPlayer).compareTo("Ход игрока") == 0)
 										PlayerTurn.setText(getString(R.string.CurrentPlayer) + " " + BaseCurrentPlayer);
@@ -895,8 +885,7 @@ public class MainActivity extends AppCompatActivity
 									Toast.makeText(MainActivity.this, getString(R.string.PlayerLabelText) + " " + dataSnapshot.getValue().toString().split("W ")[1] + " " + getString(R.string.PlayerWinLabelText), Toast.LENGTH_LONG).show();
 									database.child(MenuActivity.RoomName).removeValue();
 									finish();
-								}
-								else
+								} else
 								{
 									Toast.makeText(MainActivity.this, getString(R.string.PlayerPreLabelText) + " " + dataSnapshot.getValue().toString() + " " + getString(R.string.PlayerPreWinLabelText), Toast.LENGTH_LONG).show();
 									database.child(MenuActivity.RoomName).child("Winner").setValue(0);
@@ -905,11 +894,13 @@ public class MainActivity extends AppCompatActivity
 
 						default:
 							Log.e("Error", "ChildEventListener сломался");
+
 					}
 
 					if (Player - 1 == 0)
 					{
-						if (Cards.isEmpty()) GenerateCards();
+						if (Cards.isEmpty())
+							GenerateCards();
 
 						if (BaseNewCard.compareTo("0") == 0)
 						{
@@ -917,6 +908,11 @@ public class MainActivity extends AppCompatActivity
 							database.child(MenuActivity.RoomName).child("NewCard").setValue(card);
 							Cards.remove(card);
 						}
+
+						//Комната удаляется если игра не активна более 10 минут
+						Calendar c = Calendar.getInstance();
+						int mm = c.get(Calendar.MINUTE);
+						database.child(MenuActivity.RoomName).child("Date").setValue(mm);
 
 						if (Integer.valueOf(BaseCurrentPlayer) > Integer.valueOf(BaseConnectedPlayers))
 							database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
@@ -939,12 +935,12 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onChildRemoved(DataSnapshot dataSnapshot)
 			{
-				if (!podliva)
+				if (!firstTime)
 				{
 					Toast.makeText(MainActivity.this, getString(R.string.RoomRemove), Toast.LENGTH_SHORT).show();
 					finish();
 
-					podliva = true;
+					firstTime = true;
 				}
 			}
 
@@ -1116,7 +1112,9 @@ public class MainActivity extends AppCompatActivity
 				});
 
 				alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-				{ public void onClick(DialogInterface dialog, int whichButton) { } });
+				{
+					public void onClick(DialogInterface dialog, int whichButton) { }
+				});
 
 				alert.show();
 				return true;
