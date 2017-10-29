@@ -277,4 +277,18 @@
         app:srcCompat="@drawable/empty_card"
         app:layout_constraintVertical_bias="1.0"/>
 
+    <TextView
+        android:id="@+id/maxDrawText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="7"
+        android:textAlignment="center"
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="24sp"
+        android:visibility="visible"
+        app:layout_constraintLeft_toLeftOf="@+id/CurrentCard"
+        app:layout_constraintRight_toRightOf="@+id/CurrentCard"
+        app:layout_constraintTop_toBottomOf="@+id/CurrentCard"/>
+
 </android.support.constraint.ConstraintLayout>

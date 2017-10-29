@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/send_msg"
-        android:icon="@drawable/msg_icon"
+        android:icon="@android:drawable/stat_notify_chat"
         android:title="Написать сообщение"
         app:showAsAction="ifRoom"/>
 

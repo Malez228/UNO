@@ -304,10 +304,6 @@ public class MainActivity extends AppCompatActivity
 						StartPosY = y;
 						break;
 					case MotionEvent.ACTION_MOVE:
-						int test2[] = new int[2];
-						CurrentCard.getLocationOnScreen(test2);
-						Log.i("MotionEvent.ACTION_MOVE", "Moving: (" + x + ", " + y + ")" + " Start: (" + StartPosX + ", " + StartPosY + ")");
-						Log.e("MotionEvent.ACTION_MOVE", "Moving: (" + test2[0] + ", " + test2[1] + ")" + " Start: (" + StartPosX + ", " + StartPosY + ")");
 						break;
 					case MotionEvent.ACTION_UP:
 						DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -843,17 +839,12 @@ public class MainActivity extends AppCompatActivity
 							if (Integer.valueOf(BaseCurrentPlayer) <= Integer.valueOf(BaseConnectedPlayers) && Integer.valueOf(BaseCurrentPlayer) >= 1)
 								if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
 								{
-									MaxDrawText.setText(BaseMaxDraw);
-									MaxDrawText.setVisibility(View.VISIBLE);
-
 									PlayerTurn.setText(getString(R.string.MyTurn));
 
 									for (int i = 0; i < HandCards.size() - 1; i++)
 										HandCards.remove("");
 								} else
 								{
-									MaxDrawText.setVisibility(View.INVISIBLE);
-
 									if (GiveTurn.getVisibility() == View.VISIBLE)
 										GiveTurn.setVisibility(View.INVISIBLE);
 
@@ -896,6 +887,8 @@ public class MainActivity extends AppCompatActivity
 							Log.e("Error", "ChildEventListener сломался");
 
 					}
+
+					MaxDrawText.setText(BaseMaxDraw);
 
 					if (Player - 1 == 0)
 					{

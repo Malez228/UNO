@@ -45,6 +45,8 @@ public class MenuActivity extends AppCompatActivity
 
 	ChildEventListener childlistener;
 
+	Random rnd = new Random();
+
 	protected View.OnClickListener RoomClick = new View.OnClickListener()
 	{
 		@Override
@@ -52,7 +54,7 @@ public class MenuActivity extends AppCompatActivity
 		{
 			LinearLayout Room = (LinearLayout) view;
 
-			RoomName = ((TextView) (((LinearLayout) (Room.getChildAt(0))).getChildAt(0))).getText().toString();
+			RoomName = ((TextView) (((LinearLayout) (Room.getChildAt(1))).getChildAt(0))).getText().toString();
 
 			database.child(RoomName).addListenerForSingleValueEvent(new ValueEventListener()
 			{
@@ -137,15 +139,8 @@ public class MenuActivity extends AppCompatActivity
 						{
 							LinearLayout ll1 = (LinearLayout) (RoomListLayout.getChildAt(i)), ll2;
 							TextView tv1;
-							try
-							{
-								ll2 = (LinearLayout) (ll1).getChildAt(0);
-								tv1 = (TextView) (ll2).getChildAt(0);
-							} catch (Exception e)
-							{
-								ll2 = (LinearLayout) (ll1).getChildAt(1);
-								tv1 = (TextView) (ll2).getChildAt(0);
-							}
+							ll2 = (LinearLayout) (ll1).getChildAt(1);
+							tv1 = (TextView) (ll2).getChildAt(0);
 
 							String RoomsRoomName = (tv1).getText().toString();
 
@@ -222,19 +217,11 @@ public class MenuActivity extends AppCompatActivity
 						LinearLayout ll1 = (LinearLayout) (RoomListLayout.getChildAt(i)), ll2;
 						TextView tv1, tv2;
 						ImageView im;
-						try
-						{
-							ll2 = (LinearLayout) (ll1).getChildAt(0);
-							tv1 = (TextView) (ll2).getChildAt(0);
-							tv2 = (TextView) (ll2).getChildAt(1);
-							im = (ImageView) (ll1).getChildAt(1);
-						} catch (Exception e)
-						{
-							ll2 = (LinearLayout) (ll1).getChildAt(1);
-							tv1 = (TextView) (ll2).getChildAt(0);
-							tv2 = (TextView) (ll2).getChildAt(1);
-							im = (ImageView) (ll1).getChildAt(0);
-						}
+						ll2 = (LinearLayout) (ll1).getChildAt(1);
+						tv1 = (TextView) (ll2).getChildAt(0);
+						tv2 = (TextView) (ll2).getChildAt(1);
+						im = (ImageView) (ll1).getChildAt(0);
+
 						String EventRoomName = (tv1).getText().toString();
 
 						if (EventRoomName.compareTo(RoomName) == 0)
@@ -431,6 +418,9 @@ public class MenuActivity extends AppCompatActivity
 			{
 				RoomName = CreateRoomField.getText().toString();
 
+				if (RoomName.compareTo("") == 0)
+					RoomName = "Room" + rnd.nextInt();
+
 				database.child(RoomName).addListenerForSingleValueEvent(new ValueEventListener()
 				{
 					@Override
@@ -452,10 +442,6 @@ public class MenuActivity extends AppCompatActivity
 						} catch (Exception e)
 						{
 							database.removeEventListener(childlistener);
-
-							Random rnd = new Random();
-							if (RoomName.compareTo("") == 0)
-								RoomName = "Room" + rnd.nextInt();
 
 							Calendar c = Calendar.getInstance();
 							Integer mm = c.get(Calendar.MINUTE);
