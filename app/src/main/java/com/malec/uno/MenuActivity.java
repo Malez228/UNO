@@ -2,15 +2,16 @@ package com.malec.uno;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -25,7 +26,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Random;
 
 public class MenuActivity extends AppCompatActivity
@@ -43,6 +46,8 @@ public class MenuActivity extends AppCompatActivity
 
 	String pass = "0";
 
+	List<RoomClass> Rooms = new ArrayList<>();
+
 	ChildEventListener childlistener;
 
 	Random rnd = new Random();
@@ -52,9 +57,13 @@ public class MenuActivity extends AppCompatActivity
 		@Override
 		public void onClick(View view)
 		{
-			LinearLayout Room = (LinearLayout) view;
+			RoomDataAdapter.ViewHolder holder =(RoomDataAdapter.ViewHolder)view.getTag();
+			int position = holder.getLayoutPosition();
+			Log.d("testing ","pos" +position);
+			/*
+			ConstraintLayout Room = (ConstraintLayout) view;
 
-			RoomName = ((TextView) (((LinearLayout) (Room.getChildAt(1))).getChildAt(0))).getText().toString();
+			RoomName = ((TextView) (((LinearLayout) (Room.getChildAt(0))).getChildAt(0))).getText().toString();
 
 			database.child(RoomName).addListenerForSingleValueEvent(new ValueEventListener()
 			{
@@ -101,7 +110,7 @@ public class MenuActivity extends AppCompatActivity
 
 				@Override
 				public void onCancelled(DatabaseError databaseError) { }
-			});
+			});*/
 		}
 	};
 
@@ -114,7 +123,7 @@ public class MenuActivity extends AppCompatActivity
 
 	void Thing()
 	{
-		final LinearLayout RoomListLayout = (LinearLayout) findViewById(R.id.RoomListLayout);
+		final RecyclerView[] recyclerView = new RecyclerView[1];
 
 		childlistener = database.addChildEventListener(new ChildEventListener()
 		{
@@ -130,67 +139,27 @@ public class MenuActivity extends AppCompatActivity
 
 					Calendar c = Calendar.getInstance();
 					Integer m = c.get(Calendar.MINUTE);
-					if (m - Integer.valueOf(RoomDate) >= 10)
-						database.child(dataSnapshot.getKey().toString()).removeValue();
 
 					int norm = 0;
-					for (Integer i = 0; i < RoomListLayout.getChildCount(); i++)
-						for (Integer j = 0; j < RoomListLayout.getChildCount(); j++)
-						{
-							LinearLayout ll1 = (LinearLayout) (RoomListLayout.getChildAt(i)), ll2;
-							TextView tv1;
-							ll2 = (LinearLayout) (ll1).getChildAt(1);
-							tv1 = (TextView) (ll2).getChildAt(0);
-
-							String RoomsRoomName = (tv1).getText().toString();
-
-							if (RoomName.compareTo(RoomsRoomName) == 0)
-								norm++;
-						}
+					for (Integer i = 0; i < Rooms.size(); i++)
+						if (Rooms.get(i).getName().compareTo(RoomName) == 0)
+							norm++;
 
 					if (norm == 0)
 					{
-						LinearLayout NewRoom = new LinearLayout(RoomListLayout.getContext());
-						NewRoom.setOrientation(LinearLayout.HORIZONTAL);
-						LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-						layoutParams.setMargins(0, 4, 0, 4);
-						NewRoom.setPadding(4, 4, 4, 4);
-						NewRoom.setLayoutParams(layoutParams);
-						NewRoom.setBackgroundColor(getResources().getColor(R.color.backL));
-
-						LinearLayout InnerLayout = new LinearLayout(RoomListLayout.getContext());
-						InnerLayout.setOrientation(LinearLayout.VERTICAL);
-						layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-						layoutParams.setMargins(8, 0, 8, 0);
-						InnerLayout.setLayoutParams(layoutParams);
-
-						TextView NewRoomName = new TextView(InnerLayout.getContext());
-						NewRoomName.setText(RoomName);
-						NewRoomName.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-						NewRoomName.setTextSize(16);
-						InnerLayout.addView(NewRoomName);
-
-						TextView NewRoomPlayers = new TextView(InnerLayout.getContext());
-						NewRoomPlayers.setText(getString(R.string.TotalPlayers) + " " + RoomPlayers);
-						NewRoomPlayers.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-						NewRoomPlayers.setTextSize(16);
-						InnerLayout.addView(NewRoomPlayers);
-
-						ImageView NewRoomLock = new ImageView(NewRoom.getContext());
-						NewRoomLock.setImageResource(R.drawable.lock);
-						LinearLayout.LayoutParams wh = new LinearLayout.LayoutParams(80, 80);
-						NewRoomLock.setLayoutParams(wh);
-						if (RoomPass.compareTo("0") == 0)
-							NewRoomLock.setVisibility(View.GONE);
+						if (m - Integer.valueOf(RoomDate) >= 10)
+							database.child(dataSnapshot.getKey().toString()).removeValue();
 						else
-							NewRoomLock.setVisibility(View.VISIBLE);
-						NewRoom.addView(NewRoomLock);
+						{
+							Rooms.add(new RoomClass(RoomName, RoomPass, getString(R.string.TotalPlayers) + " " + RoomPlayers));
 
-						NewRoom.addView(InnerLayout);
-
-						NewRoom.setOnClickListener(RoomClick);
-						RoomListLayout.addView(NewRoom);
+							recyclerView[0] = (RecyclerView) findViewById(R.id.RoomList);
+							final RoomDataAdapter adapter = new RoomDataAdapter(getApplicationContext(), Rooms);
+							recyclerView[0].setAdapter(adapter);
+							recyclerView[0].getAdapter().notifyDataSetChanged();
+						}
 					}
+
 				} catch (Exception e)
 				{
 					Log.e("onChildAdded", e.toString());
@@ -209,33 +178,20 @@ public class MenuActivity extends AppCompatActivity
 
 					Calendar c = Calendar.getInstance();
 					Integer m = c.get(Calendar.MINUTE);
+
 					if (m - Integer.valueOf(RoomDate) >= 10)
 						database.child(dataSnapshot.getKey().toString()).removeValue();
+					else
+						for (Integer i = 0; i < Rooms.size(); i++)
+							if (Rooms.get(i).getName().compareTo(RoomName) == 0)
+							{
+								Rooms.get(i).setName(RoomName);
+								Rooms.get(i).setPass(RoomPass);
+								Rooms.get(i).setPlayers(getString(R.string.TotalPlayers) + " " + RoomPlayers);
 
-					for (Integer i = 0; i < RoomListLayout.getChildCount(); i++)
-					{
-						LinearLayout ll1 = (LinearLayout) (RoomListLayout.getChildAt(i)), ll2;
-						TextView tv1, tv2;
-						ImageView im;
-						ll2 = (LinearLayout) (ll1).getChildAt(1);
-						tv1 = (TextView) (ll2).getChildAt(0);
-						tv2 = (TextView) (ll2).getChildAt(1);
-						im = (ImageView) (ll1).getChildAt(0);
+								recyclerView[0].getAdapter().notifyDataSetChanged();
+							}
 
-						String EventRoomName = (tv1).getText().toString();
-
-						if (EventRoomName.compareTo(RoomName) == 0)
-						{
-							tv1.setText(RoomName);
-							tv2.setText(getString(R.string.TotalPlayers) + " " + RoomPlayers);
-
-							if (RoomPass.compareTo("0") == 0)
-								im.setVisibility(View.GONE);
-							else
-								im.setVisibility(View.VISIBLE);
-							break;
-						}
-					}
 				} catch (Exception e)
 				{
 					Log.e("onChildChanged", e.toString());
@@ -249,29 +205,13 @@ public class MenuActivity extends AppCompatActivity
 				{
 					String RoomName = dataSnapshot.getKey().toString();
 
-					for (Integer i = 0; i < RoomListLayout.getChildCount(); i++)
-					{
-						LinearLayout ll1 = (LinearLayout) (RoomListLayout.getChildAt(i)), ll2;
-						TextView tv1, tv2;
-						ImageView im;
-						try
+					for (Integer i = 0; i < Rooms.size(); i++)
+						if (Rooms.get(i).getName().compareTo(RoomName) == 0)
 						{
-							ll2 = (LinearLayout) (ll1).getChildAt(0);
-							tv1 = (TextView) (ll2).getChildAt(0);
-						} catch (Exception e)
-						{
-							ll2 = (LinearLayout) (ll1).getChildAt(1);
-							tv1 = (TextView) (ll2).getChildAt(0);
+							Rooms.remove(i);
+							
+							recyclerView[0].getAdapter().notifyDataSetChanged();
 						}
-						String EventRoomName = (tv1).getText().toString();
-
-						if (EventRoomName.compareTo(RoomName) == 0)
-						{
-							RoomListLayout.removeView(ll1);
-
-							break;
-						}
-					}
 				} catch (Exception e)
 				{
 					Log.e("onChildChanged", e.toString());
