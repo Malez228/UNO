@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity
 	//region Игровые переменные
 	String BaseCard, BaseColor, BaseConnectedPlayers, BaseCurrentPlayer, BaseMaxDraw, BaseNewCard, BaseTurnDir;
 	Integer BaseTurns = 0;
-	Integer Player = 0;
+	public static Integer Player = 0;
 	//endregion
 
 	//region Другие переменные
@@ -778,6 +778,9 @@ public class MainActivity extends AppCompatActivity
 
 					PlayerTurn.setText(getString(R.string.MyTurn));
 				}
+
+				//Запускаем Service для обработки ходов и отображения даже во время блокировки экрана
+				startService(new Intent(MainActivity.this, TurnExplorer.class));
 			}
 
 			@Override
@@ -875,6 +878,8 @@ public class MainActivity extends AppCompatActivity
 								{
 									Toast.makeText(MainActivity.this, getString(R.string.PlayerLabelText) + " " + dataSnapshot.getValue().toString().split("W ")[1] + " " + getString(R.string.PlayerWinLabelText), Toast.LENGTH_LONG).show();
 									database.child(MenuActivity.ClickRoomName).removeValue();
+									//Остановить службу
+									stopService(new Intent(MainActivity.this, TurnExplorer.class));
 									finish();
 								} else
 								{
@@ -931,6 +936,8 @@ public class MainActivity extends AppCompatActivity
 				if (!firstTime)
 				{
 					Toast.makeText(MainActivity.this, getString(R.string.RoomRemove), Toast.LENGTH_SHORT).show();
+					//Остановить службу
+					stopService(new Intent(MainActivity.this, TurnExplorer.class));
 					finish();
 
 					firstTime = true;
@@ -986,6 +993,8 @@ public class MainActivity extends AppCompatActivity
 			{
 				database.child(MenuActivity.ClickRoomName).removeValue();
 				Toast.makeText(MainActivity.this, getString(R.string.RoomLabelText) + " " + MenuActivity.ClickRoomName + " " + getString(R.string.RoomDelLabelText), Toast.LENGTH_LONG).show();
+				//Остановить службу
+				stopService(new Intent(MainActivity.this, TurnExplorer.class));
 				finish();
 			}
 		});
@@ -996,6 +1005,8 @@ public class MainActivity extends AppCompatActivity
 			public void onClick(View view)
 			{
 				database.child(MenuActivity.ClickRoomName).child("ConnectedPlayers").setValue(Integer.valueOf(BaseConnectedPlayers) - 1);
+				//Остановить службу
+				stopService(new Intent(MainActivity.this, TurnExplorer.class));
 				finish();
 			}
 		});
