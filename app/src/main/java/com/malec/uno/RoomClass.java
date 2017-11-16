@@ -2,13 +2,14 @@ package com.malec.uno;
 
 public class RoomClass
 {
-    private String Name, Pass, Players;
+    private String Name, Pass, Players, Turns;
 
-    public RoomClass(String name, String pass, String players)
+    public RoomClass(String name, String pass, String players, String turns)
     {
         this.Name = name;
         this.Pass = pass;
         this.Players = players;
+        this.Turns = turns;
     }
 
     public void setName(String newName)
@@ -39,5 +40,10 @@ public class RoomClass
     public String getPlayers()
     {
         return this.Players;
+    }
+
+    public String getTurns()
+    {
+        return this.Turns;
     }
 }

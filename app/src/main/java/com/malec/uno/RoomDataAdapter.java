@@ -60,16 +60,25 @@ public class RoomDataAdapter extends RecyclerView.Adapter<RoomDataAdapter.ViewHo
         return Rooms.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
     {
         final ImageView PassImage;
         final TextView RoomName, ConnectedPlayers;
         ViewHolder(final View view)
         {
             super(view);
+            
+            view.setOnClickListener(this);
+            
             PassImage = (ImageView)view.findViewById(R.id.LockImage);
             RoomName = (TextView) view.findViewById(R.id.RoomName);
             ConnectedPlayers = (TextView) view.findViewById(R.id.ConnectedPlayers);
+        }
+
+        @Override
+        public void onClick(View view)
+        {
+            MenuActivity.ClickRoomName = RoomName.getText().toString();
         }
     }
 }

@@ -1,7 +1,9 @@
 package com.malec.uno;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,6 +44,7 @@ public class MenuActivity extends AppCompatActivity
 	EditText CreateRoomField;
 
 	public static String RoomName = "";
+	public static String ClickRoomName = "";
 
 	public static Boolean Animation = true;
 
@@ -51,79 +55,94 @@ public class MenuActivity extends AppCompatActivity
 	ChildEventListener childlistener;
 
 	Random rnd = new Random();
-
-	protected View.OnClickListener RoomClick = new View.OnClickListener()
-	{
-		@Override
-		public void onClick(View view)
-		{
-			RoomDataAdapter.ViewHolder holder =(RoomDataAdapter.ViewHolder)view.getTag();
-			int position = holder.getLayoutPosition();
-			Log.d("testing ","pos" +position);
-			/*
-			ConstraintLayout Room = (ConstraintLayout) view;
-
-			RoomName = ((TextView) (((LinearLayout) (Room.getChildAt(0))).getChildAt(0))).getText().toString();
-
-			database.child(RoomName).addListenerForSingleValueEvent(new ValueEventListener()
-			{
-				@Override
-				public void onDataChange(final DataSnapshot dataSnapshot)
-				{
-					if (dataSnapshot.child("Pass").getValue().toString().compareTo("0") != 0)
-					{
-						AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
-
-						alert.setTitle(getString(R.string.EnterPass));
-
-						final EditText input = new EditText(MenuActivity.this);
-						alert.setView(input);
-
-						alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
-						{
-							public void onClick(DialogInterface dialog, int whichButton)
-							{
-								if (input.getText().toString().compareTo(dataSnapshot.child("Pass").getValue().toString()) == 0)
-								{
-									if (Integer.valueOf(dataSnapshot.child("Turns").getValue().toString()) <= Integer.valueOf(dataSnapshot.child("ConnectedPlayers").getValue().toString()))
-										startActivity(new Intent(MenuActivity.this, MainActivity.class));
-									else
-										Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
-								} else
-								{
-									Toast.makeText(MenuActivity.this, getString(R.string.WrongPassword), Toast.LENGTH_SHORT).show();
-								}
-							}
-						});
-
-						alert.setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
-						{
-							public void onClick(DialogInterface dialog, int whichButton) { }
-						});
-
-						alert.show();
-					} else if (Integer.valueOf(dataSnapshot.child("Turns").getValue().toString()) <= Integer.valueOf(dataSnapshot.child("ConnectedPlayers").getValue().toString()))
-						startActivity(new Intent(MenuActivity.this, MainActivity.class));
-					else
-						Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
-				}
-
-				@Override
-				public void onCancelled(DatabaseError databaseError) { }
-			});*/
-		}
-	};
-
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
+
+		((RecyclerView)(findViewById(R.id.RoomList))).getAdapter().notifyDataSetChanged();
 		Thing();
 	}
+
+	RecyclerView.OnItemTouchListener ItemTouchListener = new RecyclerView.OnItemTouchListener()
+	{
+		@Override
+		public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e)
+		{
+				final Handler handler = new Handler();
+				handler.postDelayed(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						for (Integer i = 0; i < Rooms.size(); i++)
+						{
+							if (Rooms.get(i).getName().compareTo(ClickRoomName) == 0)
+							{
+								final String CurPass = Rooms.get(i).getPass();
+								final Integer Players = Integer.valueOf(Rooms.get(i).getPlayers().split(" ")[2]);
+								final Integer Turns = Integer.valueOf(Rooms.get(i).getTurns());
+
+								if (CurPass.compareTo("0") == 0)
+								{
+									if (Turns <= Players)
+									{
+										startActivity(new Intent(MenuActivity.this, MainActivity.class));
+										break;
+									} else
+										Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
+								} else
+								{
+									AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
+
+									alert.setTitle(getString(R.string.EnterPass));
+
+									final EditText input = new EditText(MenuActivity.this);
+									alert.setView(input);
+
+									alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+									{
+										public void onClick(DialogInterface dialog, int whichButton)
+										{
+											if (input.getText().toString().compareTo(CurPass) == 0)
+											{
+												if (Turns <= Players)
+													startActivity(new Intent(MenuActivity.this, MainActivity.class));
+												else
+													Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
+											} else
+											{
+												Toast.makeText(MenuActivity.this, getString(R.string.WrongPassword), Toast.LENGTH_SHORT).show();
+											}
+										}
+									});
+
+									alert.setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
+									{ public void onClick(DialogInterface dialog, int whichButton) { } });
+
+									alert.show();
+								}
+							}
+						}
+					}
+				}, 100);
+
+			return false;
+		}
+
+		@Override
+		public void onTouchEvent(RecyclerView rv, MotionEvent e) { }
+
+		@Override
+		public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
+	};
 
 	void Thing()
 	{
 		final RecyclerView[] recyclerView = new RecyclerView[1];
+		final RoomDataAdapter adapter = new RoomDataAdapter(getApplicationContext(), Rooms);
+		recyclerView[0] = (RecyclerView) findViewById(R.id.RoomList);
+		recyclerView[0].setAdapter(adapter);
 
 		childlistener = database.addChildEventListener(new ChildEventListener()
 		{
@@ -136,6 +155,7 @@ public class MenuActivity extends AppCompatActivity
 					String RoomDate = dataSnapshot.child("Date").getValue().toString();
 					String RoomPlayers = dataSnapshot.child("ConnectedPlayers").getValue().toString();
 					String RoomPass = dataSnapshot.child("Pass").getValue().toString();
+					String RoomTurns = dataSnapshot.child("Turns").getValue().toString();
 
 					Calendar c = Calendar.getInstance();
 					Integer m = c.get(Calendar.MINUTE);
@@ -151,12 +171,10 @@ public class MenuActivity extends AppCompatActivity
 							database.child(dataSnapshot.getKey().toString()).removeValue();
 						else
 						{
-							Rooms.add(new RoomClass(RoomName, RoomPass, getString(R.string.TotalPlayers) + " " + RoomPlayers));
+							Rooms.add(new RoomClass(RoomName, RoomPass, getString(R.string.TotalPlayers) + " " + RoomPlayers, RoomTurns));
 
-							recyclerView[0] = (RecyclerView) findViewById(R.id.RoomList);
-							final RoomDataAdapter adapter = new RoomDataAdapter(getApplicationContext(), Rooms);
-							recyclerView[0].setAdapter(adapter);
 							recyclerView[0].getAdapter().notifyDataSetChanged();
+							recyclerView[0].addOnItemTouchListener(ItemTouchListener);
 						}
 					}
 
@@ -209,7 +227,7 @@ public class MenuActivity extends AppCompatActivity
 						if (Rooms.get(i).getName().compareTo(RoomName) == 0)
 						{
 							Rooms.remove(i);
-							
+
 							recyclerView[0].getAdapter().notifyDataSetChanged();
 						}
 				} catch (Exception e)
@@ -278,7 +296,10 @@ public class MenuActivity extends AppCompatActivity
 										if (dataSnapshot.child("Pass").getValue().toString().compareTo(pass) == 0)
 										{
 											if (Integer.valueOf(dataSnapshot.child("Turns").getValue().toString()) <= Integer.valueOf(dataSnapshot.child("ConnectedPlayers").getValue().toString()))
+											{
+												ClickRoomName = RoomName;
 												startActivity(new Intent(MenuActivity.this, MainActivity.class));
+											}
 											else
 												Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
 										} else
@@ -293,7 +314,10 @@ public class MenuActivity extends AppCompatActivity
 							} else
 							{
 								if (Integer.valueOf(dataSnapshot.child("Turns").getValue().toString()) <= Integer.valueOf(dataSnapshot.child("ConnectedPlayers").getValue().toString()))
+								{
+									ClickRoomName = RoomName;
 									startActivity(new Intent(MenuActivity.this, MainActivity.class));
+								}
 								else
 									Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
 							}
@@ -329,6 +353,7 @@ public class MenuActivity extends AppCompatActivity
 									else
 										database.child(RoomName).child("Pass").setValue(0);
 
+									ClickRoomName = RoomName;
 									startActivity(new Intent(MenuActivity.this, MainActivity.class));
 								}
 							});
@@ -401,6 +426,7 @@ public class MenuActivity extends AppCompatActivity
 							else
 								database.child(RoomName).child("Pass").setValue(0);
 
+							ClickRoomName = RoomName;
 							startActivity(new Intent(MenuActivity.this, MainActivity.class));
 						}
 					}

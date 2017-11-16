@@ -374,41 +374,41 @@ public class MainActivity extends AppCompatActivity
 
 										//+2
 										if (HandType.compareTo("$") == 0)
-											database.child(MenuActivity.RoomName).child("MaxDraw").setValue(3);
+											database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(3);
 
 										//Реверс хода
 										if (HandType.compareTo("^") == 0)
 										{
 											if (BaseTurnDir.compareTo("1") == 0)
 											{
-												database.child(MenuActivity.RoomName).child("TurnDir").setValue(-1);
+												database.child(MenuActivity.ClickRoomName).child("TurnDir").setValue(-1);
 												BaseTurnDir = "-1";
 											} else
 											{
-												database.child(MenuActivity.RoomName).child("TurnDir").setValue(1);
+												database.child(MenuActivity.ClickRoomName).child("TurnDir").setValue(1);
 												BaseTurnDir = "1";
 											}
 										}
 
 										//Передаем ход
 										if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) == Integer.valueOf(BaseConnectedPlayers) + 1)
-											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
+											database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(1);
 										else if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) == Integer.valueOf(BaseConnectedPlayers) + 2)
-											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(2);
+											database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(2);
 										else if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) == 0)
-											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
+											database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
 										else if (Player + SkipTurn * Integer.valueOf(BaseTurnDir) == -1)
-											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers) - 1);
+											database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers) - 1);
 										else
-											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
+											database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Player + SkipTurn * Integer.valueOf(BaseTurnDir));
 
 										if (HandColor.compareTo(BaseColor) == 0)
-											database.child(MenuActivity.RoomName).child("Color").setValue(0);
+											database.child(MenuActivity.ClickRoomName).child("Color").setValue(0);
 									}
 
 									//+4
 									if (HandType.compareTo("+") == 0)
-										database.child(MenuActivity.RoomName).child("MaxDraw").setValue(5);
+										database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(5);
 
 									//Анимация
 									if (MenuActivity.Animation)
@@ -425,11 +425,11 @@ public class MainActivity extends AppCompatActivity
 
 										//Определение победителя
 										if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
-											database.child(MenuActivity.RoomName).child("Winner").setValue("W " + Player);
+											database.child(MenuActivity.ClickRoomName).child("Winner").setValue("W " + Player);
 
 										//Показываем у кого осталась одна карта
 										if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
-											database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
+											database.child(MenuActivity.ClickRoomName).child("Winner").setValue(Player);
 
 										Animation.AnimationListener animationListener = new Animation.AnimationListener()
 										{
@@ -441,7 +441,7 @@ public class MainActivity extends AppCompatActivity
 											{
 												AnimCard.setVisibility(View.GONE);
 
-												database.child(MenuActivity.RoomName).child("Card").setValue(c);
+												database.child(MenuActivity.ClickRoomName).child("Card").setValue(c);
 
 												if (CardOffset > 0)
 													CardOffset--;
@@ -456,7 +456,7 @@ public class MainActivity extends AppCompatActivity
 										DropCard.setAnimationListener(animationListener);
 									} else
 									{
-										database.child(MenuActivity.RoomName).child("Card").setValue(HandCards.get(CardOffset + Offset));
+										database.child(MenuActivity.ClickRoomName).child("Card").setValue(HandCards.get(CardOffset + Offset));
 										HandCards.remove(HandCards.get(CardOffset + Offset));
 
 										if (CardOffset > 0)
@@ -464,11 +464,11 @@ public class MainActivity extends AppCompatActivity
 
 										//Определение победителя
 										if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
-											database.child(MenuActivity.RoomName).child("Winner").setValue("W " + Player);
+											database.child(MenuActivity.ClickRoomName).child("Winner").setValue("W " + Player);
 
 										//Показываем у кого осталась одна карта
 										if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
-											database.child(MenuActivity.RoomName).child("Winner").setValue(Player);
+											database.child(MenuActivity.ClickRoomName).child("Winner").setValue(Player);
 
 										if (GiveTurn.getVisibility() == View.VISIBLE)
 											GiveTurn.setVisibility(View.INVISIBLE);
@@ -478,19 +478,19 @@ public class MainActivity extends AppCompatActivity
 									if (HandType.compareTo(BoardType) == 0 && BaseMaxDraw.compareTo("2") == 0)
 									{
 										HandCards.remove(CardOffset + Offset);
-										database.child(MenuActivity.RoomName).child("MaxDraw").setValue(3);
+										database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(3);
 
 										//Передаем ход
 										if (Player + 1 * Integer.valueOf(BaseTurnDir) > Integer.valueOf(BaseConnectedPlayers))
-											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
+											database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(1);
 										else if (Player + 1 * Integer.valueOf(BaseTurnDir) < 1)
-											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
+											database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
 										else
-											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+											database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
 									} else if (HandColor.compareTo("BLACK") == 0 && BaseMaxDraw.compareTo("4") == 0)
 									{
 										HandCards.remove(CardOffset + Offset);
-										database.child(MenuActivity.RoomName).child("MaxDraw").setValue(5);
+										database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(5);
 
 										WildChoice.setVisibility(View.VISIBLE);
 									}
@@ -565,16 +565,16 @@ public class MainActivity extends AppCompatActivity
 										CardOffset = HandCards.size() - 5;
 									DrawHand();
 
-									database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
+									database.child(MenuActivity.ClickRoomName).child("NewCard").setValue(0);
 
 									if ((BaseNewCard.split(" ")[0].compareTo(BaseCard.split(" ")[0]) == 0 || BaseNewCard.split(" ")[1].compareTo(BaseCard.split(" ")[1]) == 0) && Integer.valueOf(BaseMaxDraw) <= 1)
 										GiveTurn.setVisibility(View.VISIBLE);
 									else
 									{
 										if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
-											database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+											database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
 										else
-											database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+											database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
 									}
 								}
 
@@ -589,16 +589,16 @@ public class MainActivity extends AppCompatActivity
 							if (CardOffset + 5 < HandCards.size())
 								CardOffset = HandCards.size() - 5;
 							DrawHand();
-							database.child(MenuActivity.RoomName).child("NewCard").setValue(0);
+							database.child(MenuActivity.ClickRoomName).child("NewCard").setValue(0);
 
 							if ((BaseNewCard.split(" ")[0].compareTo(BaseCard.split(" ")[0]) == 0 || BaseNewCard.split(" ")[1].compareTo(BaseCard.split(" ")[1]) == 0) && Integer.valueOf(BaseMaxDraw) <= 1)
 								GiveTurn.setVisibility(View.VISIBLE);
 							else
 							{
 								if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
-									database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+									database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
 								else
-									database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+									database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
 							}
 						}
 					}
@@ -616,7 +616,7 @@ public class MainActivity extends AppCompatActivity
 
 		//Готовим базу к началу игры
 		String card = Cards.get(rnd.nextInt(Cards.size()));
-		database.child(MenuActivity.RoomName).child("NewCard").setValue(card);
+		database.child(MenuActivity.ClickRoomName).child("NewCard").setValue(card);
 		Cards.remove(card);
 		card = Cards.get(rnd.nextInt(Cards.size()));
 		//Если на стол положилась черная мы задаем случайный цвет
@@ -626,30 +626,30 @@ public class MainActivity extends AppCompatActivity
 			switch (r)
 			{
 				case 0:
-					database.child(MenuActivity.RoomName).child("Color").setValue("RED");
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("RED");
 					BaseColor = "RED";
 					break;
 				case 1:
-					database.child(MenuActivity.RoomName).child("Color").setValue("BLUE");
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("BLUE");
 					BaseColor = "BLUE";
 					break;
 				case 2:
-					database.child(MenuActivity.RoomName).child("Color").setValue("GREEN");
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("GREEN");
 					BaseColor = "GREEN";
 					break;
 				case 3:
-					database.child(MenuActivity.RoomName).child("Color").setValue("YELLOW");
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("YELLOW");
 					BaseColor = "YELLOW";
 					break;
 			}
 		} else
-			database.child(MenuActivity.RoomName).child("Color").setValue(0);
-		database.child(MenuActivity.RoomName).child("Card").setValue(card);
+			database.child(MenuActivity.ClickRoomName).child("Color").setValue(0);
+		database.child(MenuActivity.ClickRoomName).child("Card").setValue(card);
 		Cards.remove(card);
-		database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
-		database.child(MenuActivity.RoomName).child("MaxDraw").setValue(7);
-		database.child(MenuActivity.RoomName).child("TurnDir").setValue(1);
-		database.child(MenuActivity.RoomName).child("Winner").setValue(0);
+		database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(1);
+		database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(7);
+		database.child(MenuActivity.ClickRoomName).child("TurnDir").setValue(1);
+		database.child(MenuActivity.ClickRoomName).child("Winner").setValue(0);
 	}
 
 	@Override
@@ -675,7 +675,7 @@ public class MainActivity extends AppCompatActivity
 		Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
 		setSupportActionBar(myToolbar);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		this.setTitle(getString(R.string.app_name) + " - " + MenuActivity.RoomName);
+		this.setTitle(getString(R.string.app_name) + " - " + MenuActivity.ClickRoomName);
 
 		//region Инициализация
 		AnimCard = (ImageView) findViewById(R.id.AnimCard);
@@ -703,7 +703,7 @@ public class MainActivity extends AppCompatActivity
 		//endregion
 
 		//Получим начальные значения и делаем свои штуки
-		database.child(MenuActivity.RoomName).addListenerForSingleValueEvent(new ValueEventListener()
+		database.child(MenuActivity.ClickRoomName).addListenerForSingleValueEvent(new ValueEventListener()
 		{
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot)
@@ -766,7 +766,7 @@ public class MainActivity extends AppCompatActivity
 				firstTime = false;
 
 				Player = Integer.valueOf(BaseConnectedPlayers) + 1;
-				database.child(MenuActivity.RoomName).child("ConnectedPlayers").setValue(Player);
+				database.child(MenuActivity.ClickRoomName).child("ConnectedPlayers").setValue(Player);
 
 				if (Player - 1 == 0)
 				{
@@ -774,7 +774,7 @@ public class MainActivity extends AppCompatActivity
 
 					CloseRoom.setVisibility(View.VISIBLE);
 
-					database.child(MenuActivity.RoomName).child("Turns").setValue(0);
+					database.child(MenuActivity.ClickRoomName).child("Turns").setValue(0);
 
 					PlayerTurn.setText(getString(R.string.MyTurn));
 				}
@@ -785,7 +785,7 @@ public class MainActivity extends AppCompatActivity
 		});
 
 		//Обновляем значения каждый раз при изминении и делаем свои штуки
-		database.child(MenuActivity.RoomName).addChildEventListener(new ChildEventListener()
+		database.child(MenuActivity.ClickRoomName).addChildEventListener(new ChildEventListener()
 		{
 			@Override
 			public void onChildChanged(DataSnapshot dataSnapshot, String s)
@@ -832,8 +832,8 @@ public class MainActivity extends AppCompatActivity
 							if (Player - 1 == 0)
 							{
 								if (BaseTurns + 1 < Integer.valueOf(BaseConnectedPlayers))
-									database.child(MenuActivity.RoomName).child("MaxDraw").setValue(7);
-								database.child(MenuActivity.RoomName).child("Turns").setValue(BaseTurns + 1);
+									database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(7);
+								database.child(MenuActivity.ClickRoomName).child("Turns").setValue(BaseTurns + 1);
 							}
 
 							if (Integer.valueOf(BaseCurrentPlayer) <= Integer.valueOf(BaseConnectedPlayers) && Integer.valueOf(BaseCurrentPlayer) >= 1)
@@ -874,12 +874,12 @@ public class MainActivity extends AppCompatActivity
 								if (dataSnapshot.getValue().toString().startsWith("W "))
 								{
 									Toast.makeText(MainActivity.this, getString(R.string.PlayerLabelText) + " " + dataSnapshot.getValue().toString().split("W ")[1] + " " + getString(R.string.PlayerWinLabelText), Toast.LENGTH_LONG).show();
-									database.child(MenuActivity.RoomName).removeValue();
+									database.child(MenuActivity.ClickRoomName).removeValue();
 									finish();
 								} else
 								{
 									Toast.makeText(MainActivity.this, getString(R.string.PlayerPreLabelText) + " " + dataSnapshot.getValue().toString() + " " + getString(R.string.PlayerPreWinLabelText), Toast.LENGTH_LONG).show();
-									database.child(MenuActivity.RoomName).child("Winner").setValue(0);
+									database.child(MenuActivity.ClickRoomName).child("Winner").setValue(0);
 								}
 							break;
 
@@ -898,20 +898,20 @@ public class MainActivity extends AppCompatActivity
 						if (BaseNewCard.compareTo("0") == 0)
 						{
 							String card = Cards.get(rnd.nextInt(Cards.size()));
-							database.child(MenuActivity.RoomName).child("NewCard").setValue(card);
+							database.child(MenuActivity.ClickRoomName).child("NewCard").setValue(card);
 							Cards.remove(card);
 						}
 
 						//Комната удаляется если игра не активна более 10 минут
 						Calendar c = Calendar.getInstance();
 						int mm = c.get(Calendar.MINUTE);
-						database.child(MenuActivity.RoomName).child("Date").setValue(mm);
+						database.child(MenuActivity.ClickRoomName).child("Date").setValue(mm);
 
 						if (Integer.valueOf(BaseCurrentPlayer) > Integer.valueOf(BaseConnectedPlayers))
-							database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(1);
+							database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(1);
 
 						if (Integer.valueOf(BaseCurrentPlayer) < 1)
-							database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
+							database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
 					}
 
 					DrawHand();
@@ -956,26 +956,26 @@ public class MainActivity extends AppCompatActivity
 
 				if (RadioRed.isChecked())
 				{
-					database.child(MenuActivity.RoomName).child("Color").setValue("RED");
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("RED");
 					ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorRed));
 				}
 				if (RadioYellow.isChecked())
 				{
-					database.child(MenuActivity.RoomName).child("Color").setValue("YELLOW");
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("YELLOW");
 					ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorYellow));
 				}
 				if (RadioGreen.isChecked())
 				{
-					database.child(MenuActivity.RoomName).child("Color").setValue("GREEN");
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("GREEN");
 					ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorGreen));
 				}
 				if (RadioBlue.isChecked())
 				{
-					database.child(MenuActivity.RoomName).child("Color").setValue("BLUE");
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("BLUE");
 					ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorBlue));
 				}
 
-				database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+				database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
 			}
 		});
 
@@ -984,8 +984,8 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				database.child(MenuActivity.RoomName).removeValue();
-				Toast.makeText(MainActivity.this, getString(R.string.RoomLabelText) + " " + MenuActivity.RoomName + " " + getString(R.string.RoomDelLabelText), Toast.LENGTH_LONG).show();
+				database.child(MenuActivity.ClickRoomName).removeValue();
+				Toast.makeText(MainActivity.this, getString(R.string.RoomLabelText) + " " + MenuActivity.ClickRoomName + " " + getString(R.string.RoomDelLabelText), Toast.LENGTH_LONG).show();
 				finish();
 			}
 		});
@@ -995,7 +995,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				database.child(MenuActivity.RoomName).child("ConnectedPlayers").setValue(Integer.valueOf(BaseConnectedPlayers) - 1);
+				database.child(MenuActivity.ClickRoomName).child("ConnectedPlayers").setValue(Integer.valueOf(BaseConnectedPlayers) - 1);
 				finish();
 			}
 		});
@@ -1006,9 +1006,9 @@ public class MainActivity extends AppCompatActivity
 			public void onClick(View view)
 			{
 				if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
-					database.child(MenuActivity.RoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+					database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
 				else
-					database.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+					database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
 
 				GiveTurn.setVisibility(View.INVISIBLE);
 			}
@@ -1100,7 +1100,7 @@ public class MainActivity extends AppCompatActivity
 								Toast.makeText(MainActivity.this, "Чит имеет вид \"=ЧДПК3228-'Название карты'\"", Toast.LENGTH_LONG).show();
 
 						} else
-							database.child(MenuActivity.RoomName).child("Msg").setValue(getString(R.string.PlayerLabelText) + " " + Player + ": " + input.getText().toString());
+							database.child(MenuActivity.ClickRoomName).child("Msg").setValue(getString(R.string.PlayerLabelText) + " " + Player + ": " + input.getText().toString());
 					}
 				});
 

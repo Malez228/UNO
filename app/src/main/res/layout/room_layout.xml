@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="8dp"
     android:background="@color/backL"
-    android:paddingBottom="8dp">
+    >
 
     <LinearLayout
         android:id="@+id/linearLayout"
