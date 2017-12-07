@@ -877,10 +877,22 @@ public class MainActivity extends AppCompatActivity
 								if (dataSnapshot.getValue().toString().startsWith("W "))
 								{
 									Toast.makeText(MainActivity.this, getString(R.string.PlayerLabelText) + " " + dataSnapshot.getValue().toString().split("W ")[1] + " " + getString(R.string.PlayerWinLabelText), Toast.LENGTH_LONG).show();
-									database.child(MenuActivity.ClickRoomName).removeValue();
-									//Остановить службу
-									stopService(new Intent(MainActivity.this, TurnExplorer.class));
-									finish();
+
+									new Thread(new Runnable()
+									{
+										@Override
+										public void run()
+										{
+											try
+											{
+												Thread.sleep(500);
+												database.child(MenuActivity.ClickRoomName).removeValue();
+												//Остановить службу
+												stopService(new Intent(MainActivity.this, TurnExplorer.class));
+												finish();
+											} catch (InterruptedException e) { e.printStackTrace(); }
+										}
+									}).start();
 								} else
 								{
 									Toast.makeText(MainActivity.this, getString(R.string.PlayerPreLabelText) + " " + dataSnapshot.getValue().toString() + " " + getString(R.string.PlayerPreWinLabelText), Toast.LENGTH_LONG).show();
