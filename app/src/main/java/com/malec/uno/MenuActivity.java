@@ -46,7 +46,7 @@ public class MenuActivity extends AppCompatActivity
 	public static String RoomName = "";
 	public static String ClickRoomName = "";
 
-	public static Boolean Animation = true;
+	public static Boolean Animation = true, CreateRoom = false;
 
 	String pass = "0";
 
@@ -69,12 +69,13 @@ public class MenuActivity extends AppCompatActivity
 		@Override
 		public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e)
 		{
-				final Handler handler = new Handler();
-				handler.postDelayed(new Runnable()
+			final Handler handler = new Handler();
+			handler.postDelayed(new Runnable()
+			{
+				@Override
+				public void run()
 				{
-					@Override
-					public void run()
-					{
+					if (!CreateRoom)
 						for (Integer i = 0; i < Rooms.size(); i++)
 						{
 							if (Rooms.get(i).getName().compareTo(ClickRoomName) == 0)
@@ -87,6 +88,7 @@ public class MenuActivity extends AppCompatActivity
 								{
 									if (Turns <= Players)
 									{
+										CreateRoom = true;
 										startActivity(new Intent(MenuActivity.this, MainActivity.class));
 										break;
 									} else
@@ -107,8 +109,10 @@ public class MenuActivity extends AppCompatActivity
 											if (input.getText().toString().compareTo(CurPass) == 0)
 											{
 												if (Turns <= Players)
+												{
+													CreateRoom = true;
 													startActivity(new Intent(MenuActivity.this, MainActivity.class));
-												else
+												} else
 													Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
 											} else
 											{
@@ -118,14 +122,16 @@ public class MenuActivity extends AppCompatActivity
 									});
 
 									alert.setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
-									{ public void onClick(DialogInterface dialog, int whichButton) { } });
+									{
+										public void onClick(DialogInterface dialog, int whichButton) { }
+									});
 
 									alert.show();
 								}
 							}
 						}
-					}
-				}, 100);
+				}
+			}, 100);
 
 			return false;
 		}
@@ -151,36 +157,44 @@ public class MenuActivity extends AppCompatActivity
 			{
 				try
 				{
-					String RoomName = dataSnapshot.getKey().toString();
-					String RoomDate = dataSnapshot.child("Date").getValue().toString();
-					String RoomPlayers = dataSnapshot.child("ConnectedPlayers").getValue().toString();
-					String RoomPass = dataSnapshot.child("Pass").getValue().toString();
-					String RoomTurns = dataSnapshot.child("Turns").getValue().toString();
-
-					Calendar c = Calendar.getInstance();
-					Integer m = c.get(Calendar.MINUTE);
-
-					int norm = 0;
-					for (Integer i = 0; i < Rooms.size(); i++)
-						if (Rooms.get(i).getName().compareTo(RoomName) == 0)
-							norm++;
-
-					if (norm == 0)
+					if (!CreateRoom)
 					{
-						if (m - Integer.valueOf(RoomDate) >= 10)
-							database.child(dataSnapshot.getKey().toString()).removeValue();
-						else
-						{
-							Rooms.add(new RoomClass(RoomName, RoomPass, getString(R.string.TotalPlayers) + " " + RoomPlayers, RoomTurns));
+						String RoomName = dataSnapshot.getKey().toString();
+						String RoomDate = dataSnapshot.child("Date").getValue().toString();
+						String RoomPlayers = dataSnapshot.child("ConnectedPlayers").getValue().toString();
+						String RoomPass = dataSnapshot.child("Pass").getValue().toString();
+						String RoomTurns = dataSnapshot.child("Turns").getValue().toString();
 
-							recyclerView[0].getAdapter().notifyDataSetChanged();
-							recyclerView[0].addOnItemTouchListener(ItemTouchListener);
+						Integer m = Calendar.getInstance().get(Calendar.MINUTE);
+
+						int norm = 0;
+						for (Integer i = 0; i < Rooms.size(); i++)
+							if (Rooms.get(i).getName().compareTo(RoomName) == 0)
+								norm++;
+
+						if (norm == 0)
+						{
+							if (m - Integer.valueOf(RoomDate) >= 10 || (m - Integer.valueOf(RoomDate) >= -50 && m - Integer.valueOf(RoomDate) < 0))
+								database.child(dataSnapshot.getKey().toString()).removeValue();
+							else
+							{
+								Rooms.add(new RoomClass(RoomName, RoomPass, getString(R.string.TotalPlayers) + " " + RoomPlayers, RoomTurns));
+
+								recyclerView[0].getAdapter().notifyDataSetChanged();
+								recyclerView[0].addOnItemTouchListener(ItemTouchListener);
+							}
 						}
 					}
-
 				} catch (Exception e)
 				{
-					Log.e("onChildAdded", e.toString());
+					if (!CreateRoom)
+					{
+						Log.e("onChildAdded", e.toString());
+
+						String RoomName = dataSnapshot.getKey().toString();
+						if (RoomName.compareTo("Msg") != 0)
+							database.child(dataSnapshot.getKey().toString()).removeValue();
+					}
 				}
 			}
 
@@ -406,7 +420,10 @@ public class MenuActivity extends AppCompatActivity
 
 						} catch (Exception e)
 						{
+							Log.e("gavno", "jopa 1");
 							database.removeEventListener(childlistener);
+							CreateRoom = true;
+							Log.e("gavno", "jopa 2");
 
 							Calendar c = Calendar.getInstance();
 							Integer mm = c.get(Calendar.MINUTE);

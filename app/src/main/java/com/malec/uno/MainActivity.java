@@ -519,6 +519,7 @@ public class MainActivity extends AppCompatActivity
 					if (Integer.valueOf(BaseMaxDraw) >= 1 && BaseNewCard.compareTo("0") != 0)
 					{
 						DeckTouch = false;
+						GiveTurn.setVisibility(View.INVISIBLE);
 						new Thread(new Runnable()
 						{
 							@Override
@@ -526,7 +527,7 @@ public class MainActivity extends AppCompatActivity
 							{
 								try
 								{
-									Thread.sleep(1500);
+									Thread.sleep(1200);
 									DeckTouch = true;
 								} catch (InterruptedException e) { e.printStackTrace(); }
 							}
@@ -885,10 +886,13 @@ public class MainActivity extends AppCompatActivity
 										{
 											try
 											{
-												Thread.sleep(500);
-												database.child(MenuActivity.ClickRoomName).removeValue();
-												//Остановить службу
-												stopService(new Intent(MainActivity.this, TurnExplorer.class));
+												if (Player - 1 == 0)
+												{
+													Thread.sleep(500);
+													database.child(MenuActivity.ClickRoomName).removeValue();
+													//Остановить службу
+													stopService(new Intent(MainActivity.this, TurnExplorer.class));
+												}
 												finish();
 											} catch (InterruptedException e) { e.printStackTrace(); }
 										}
