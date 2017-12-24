@@ -3,6 +3,7 @@ package com.malec.uno;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
@@ -321,6 +322,28 @@ public class MenuActivity extends AppCompatActivity
 		Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
 		myToolbar.setTitle(getString(R.string.app_name) + " - " + getString(R.string.FindCreateRoom));
 		setSupportActionBar(myToolbar);
+
+		//region Проверка новой версии
+		String HTML = null;
+		InternetRequest htm = new InternetRequest();
+		htm.execute("https://raw.githubusercontent.com/Malez228/UNO/Recycler/app/build.gradle");
+		try { HTML = htm.get().toString(); } catch (Exception e){ }
+		htm.cancel(true);
+		String HTMLVersion = HTML.split("versionName \"")[1].split("\"")[0];
+		String Version = "";
+		try
+		{
+			PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+			Version = pInfo.versionName;
+		} catch (PackageManager.NameNotFoundException e) { }
+		if (Version.compareTo(HTMLVersion) != 0)
+		{
+			AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
+			alert.setTitle("New version available").setNegativeButton("Ok",
+					new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) { dialog.cancel(); } });
+			alert.show();
+		}
+		//endregion
 
 		//region Инициализация
 		CreateRoomButton = (Button) findViewById(R.id.CreateRoomButton);
