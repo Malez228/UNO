@@ -2,12 +2,15 @@ package com.malec.uno;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity
 	ImageView Deck, CurrentCard, AnimCard;
 	TextView PlayerTurn, HandCardsCount, ColorView, ConnectedPlayersText, MaxDrawText;
 	ConstraintLayout WildChoice;
-	RadioButton RadioRed, RadioYellow, RadioGreen, RadioBlue;
+	RadioButton RadioR, RadioY, RadioG, RadioB;
 	Button SubmitRadio, GiveTurn, Quit, CloseRoom;
 	//endregion
 
@@ -60,6 +63,11 @@ public class MainActivity extends AppCompatActivity
 	Random rnd = new Random();
 	boolean firstTime = false, DeckTouch = true;
 
+	Float AnimX0, AnimX1, AnimY1;
+	String SaveCard = "";
+
+	public static Integer Reconnect = 0;
+
 	DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 	//endregion
 
@@ -67,113 +75,113 @@ public class MainActivity extends AppCompatActivity
 	{
 		switch (name)
 		{
-			case "RED 0":
-				return R.drawable.red0;
-			case "RED 1":
-				return R.drawable.red1;
-			case "RED 2":
-				return R.drawable.red2;
-			case "RED 3":
-				return R.drawable.red3;
-			case "RED 4":
-				return R.drawable.red4;
-			case "RED 5":
-				return R.drawable.red5;
-			case "RED 6":
-				return R.drawable.red6;
-			case "RED 7":
-				return R.drawable.red7;
-			case "RED 8":
-				return R.drawable.red8;
-			case "RED 9":
-				return R.drawable.red9;
-			case "RED $":
-				return R.drawable.red10;
-			case "RED @":
-				return R.drawable.red11;
-			case "RED ^":
-				return R.drawable.red12;
+			case "R 0":
+				return R.drawable.r0;
+			case "R 1":
+				return R.drawable.r1;
+			case "R 2":
+				return R.drawable.r2;
+			case "R 3":
+				return R.drawable.r3;
+			case "R 4":
+				return R.drawable.r4;
+			case "R 5":
+				return R.drawable.r5;
+			case "R 6":
+				return R.drawable.r6;
+			case "R 7":
+				return R.drawable.r7;
+			case "R 8":
+				return R.drawable.r8;
+			case "R 9":
+				return R.drawable.r9;
+			case "R $":
+				return R.drawable.r10;
+			case "R @":
+				return R.drawable.r11;
+			case "R ^":
+				return R.drawable.r12;
 
-			case "YELLOW 0":
-				return R.drawable.yellow0;
-			case "YELLOW 1":
-				return R.drawable.yellow1;
-			case "YELLOW 2":
-				return R.drawable.yellow2;
-			case "YELLOW 3":
-				return R.drawable.yellow3;
-			case "YELLOW 4":
-				return R.drawable.yellow4;
-			case "YELLOW 5":
-				return R.drawable.yellow5;
-			case "YELLOW 6":
-				return R.drawable.yellow6;
-			case "YELLOW 7":
-				return R.drawable.yellow7;
-			case "YELLOW 8":
-				return R.drawable.yellow8;
-			case "YELLOW 9":
-				return R.drawable.yellow9;
-			case "YELLOW $":
-				return R.drawable.yellow10;
-			case "YELLOW @":
-				return R.drawable.yellow11;
-			case "YELLOW ^":
-				return R.drawable.yellow12;
+			case "Y 0":
+				return R.drawable.y0;
+			case "Y 1":
+				return R.drawable.y1;
+			case "Y 2":
+				return R.drawable.y2;
+			case "Y 3":
+				return R.drawable.y3;
+			case "Y 4":
+				return R.drawable.y4;
+			case "Y 5":
+				return R.drawable.y5;
+			case "Y 6":
+				return R.drawable.y6;
+			case "Y 7":
+				return R.drawable.y7;
+			case "Y 8":
+				return R.drawable.y8;
+			case "Y 9":
+				return R.drawable.y9;
+			case "Y $":
+				return R.drawable.y10;
+			case "Y @":
+				return R.drawable.y11;
+			case "Y ^":
+				return R.drawable.y12;
 
-			case "GREEN 0":
-				return R.drawable.green0;
-			case "GREEN 1":
-				return R.drawable.green1;
-			case "GREEN 2":
-				return R.drawable.green2;
-			case "GREEN 3":
-				return R.drawable.green3;
-			case "GREEN 4":
-				return R.drawable.green4;
-			case "GREEN 5":
-				return R.drawable.green5;
-			case "GREEN 6":
-				return R.drawable.green6;
-			case "GREEN 7":
-				return R.drawable.green7;
-			case "GREEN 8":
-				return R.drawable.green8;
-			case "GREEN 9":
-				return R.drawable.green9;
-			case "GREEN $":
-				return R.drawable.green10;
-			case "GREEN @":
-				return R.drawable.green11;
-			case "GREEN ^":
-				return R.drawable.green12;
+			case "G 0":
+				return R.drawable.g0;
+			case "G 1":
+				return R.drawable.g1;
+			case "G 2":
+				return R.drawable.g2;
+			case "G 3":
+				return R.drawable.g3;
+			case "G 4":
+				return R.drawable.g4;
+			case "G 5":
+				return R.drawable.g5;
+			case "G 6":
+				return R.drawable.g6;
+			case "G 7":
+				return R.drawable.g7;
+			case "G 8":
+				return R.drawable.g8;
+			case "G 9":
+				return R.drawable.g9;
+			case "G $":
+				return R.drawable.g10;
+			case "G @":
+				return R.drawable.g11;
+			case "G ^":
+				return R.drawable.g12;
 
-			case "BLUE 0":
-				return R.drawable.blue0;
-			case "BLUE 1":
-				return R.drawable.blue1;
-			case "BLUE 2":
-				return R.drawable.blue2;
-			case "BLUE 3":
-				return R.drawable.blue3;
-			case "BLUE 4":
-				return R.drawable.blue4;
-			case "BLUE 5":
-				return R.drawable.blue5;
-			case "BLUE 6":
-				return R.drawable.blue6;
-			case "BLUE 7":
-				return R.drawable.blue7;
-			case "BLUE 8":
-				return R.drawable.blue8;
-			case "BLUE 9":
-				return R.drawable.blue9;
-			case "BLUE $":
-				return R.drawable.blue10;
-			case "BLUE @":
-				return R.drawable.blue11;
-			case "BLUE ^":
-				return R.drawable.blue12;
+			case "B 0":
+				return R.drawable.b0;
+			case "B 1":
+				return R.drawable.b1;
+			case "B 2":
+				return R.drawable.b2;
+			case "B 3":
+				return R.drawable.b3;
+			case "B 4":
+				return R.drawable.b4;
+			case "B 5":
+				return R.drawable.b5;
+			case "B 6":
+				return R.drawable.b6;
+			case "B 7":
+				return R.drawable.b7;
+			case "B 8":
+				return R.drawable.b8;
+			case "B 9":
+				return R.drawable.b9;
+			case "B $":
+				return R.drawable.b10;
+			case "B @":
+				return R.drawable.b11;
+			case "B ^":
+				return R.drawable.b12;
 
 			case "BLACK #":
 				return R.drawable.black1;
@@ -187,6 +195,9 @@ public class MainActivity extends AppCompatActivity
 
 	void DrawHand()
 	{
+		for (int i = 0; i < HandCards.size() - 1; i++)
+			HandCards.remove("");
+
 		try
 		{
 			LeftCard0.setImageResource(GetCardImage(HandCards.get(CardOffset + 4)));
@@ -212,78 +223,143 @@ public class MainActivity extends AppCompatActivity
 			RightCard0.setImageResource(GetCardImage(HandCards.get(CardOffset)));
 		} catch (Exception e) { RightCard0.setImageResource(GetCardImage("EmptyCard")); }
 
-		try { CurrentCard.setImageResource(GetCardImage(BaseCard)); } catch (Exception e)
+		try
 		{
-			CurrentCard.setImageResource(GetCardImage("EmptyCard"));
-		}
+			CurrentCard.setImageResource(GetCardImage(BaseCard));
+		} catch (Exception e) { CurrentCard.setImageResource(GetCardImage("EmptyCard")); }
 
 		try
 		{
 			HandCardsCount.setText(getString(R.string.HandSize) + " " + HandCards.size());
-		} catch (Exception e)
-		{
-			HandCardsCount.setText(getString(R.string.HandSize) + " 0");
-		}
+		} catch (Exception e) { HandCardsCount.setText(getString(R.string.HandSize) + " 0"); }
 	}
 
 	void GenerateCards()
 	{
-		Cards.add("YELLOW 0");
-		Cards.add("RED 0");
-		Cards.add("BLUE 0");
-		Cards.add("GREEN 0");
+		Cards.add("Y 0");
+		Cards.add("R 0");
+		Cards.add("B 0");
+		Cards.add("G 0");
 
 		for (int i = 1; i < 10; i++)
-			Cards.add("YELLOW " + i);
+			Cards.add("Y " + i);
 		for (int i = 1; i < 10; i++)
-			Cards.add("YELLOW " + i);
+			Cards.add("Y " + i);
 
 		for (int i = 1; i < 10; i++)
-			Cards.add("RED " + i);
+			Cards.add("R " + i);
 		for (int i = 1; i < 10; i++)
-			Cards.add("RED " + i);
+			Cards.add("R " + i);
 
 		for (int i = 1; i < 10; i++)
-			Cards.add("BLUE " + i);
+			Cards.add("B " + i);
 		for (int i = 1; i < 10; i++)
-			Cards.add("BLUE " + i);
+			Cards.add("B " + i);
 
 		for (int i = 1; i < 10; i++)
-			Cards.add("GREEN " + i);
+			Cards.add("G " + i);
 		for (int i = 1; i < 10; i++)
-			Cards.add("GREEN " + i);
+			Cards.add("G " + i);
 
-		Cards.add("YELLOW @");
-		Cards.add("YELLOW @");
-		Cards.add("RED @");
-		Cards.add("RED @");
-		Cards.add("BLUE @");
-		Cards.add("BLUE @");
-		Cards.add("GREEN @");
-		Cards.add("GREEN @");
+		Cards.add("Y @");
+		Cards.add("Y @");
+		Cards.add("R @");
+		Cards.add("R @");
+		Cards.add("B @");
+		Cards.add("B @");
+		Cards.add("G @");
+		Cards.add("G @");
 
-		Cards.add("YELLOW ^");
-		Cards.add("YELLOW ^");
-		Cards.add("RED ^");
-		Cards.add("RED ^");
-		Cards.add("BLUE ^");
-		Cards.add("BLUE ^");
-		Cards.add("GREEN ^");
-		Cards.add("GREEN ^");
+		Cards.add("Y ^");
+		Cards.add("Y ^");
+		Cards.add("R ^");
+		Cards.add("R ^");
+		Cards.add("B ^");
+		Cards.add("B ^");
+		Cards.add("G ^");
+		Cards.add("G ^");
 
-		Cards.add("YELLOW $");
-		Cards.add("YELLOW $");
-		Cards.add("RED $");
-		Cards.add("RED $");
-		Cards.add("BLUE $");
-		Cards.add("BLUE $");
-		Cards.add("GREEN $");
-		Cards.add("GREEN $");
+		Cards.add("Y $");
+		Cards.add("Y $");
+		Cards.add("R $");
+		Cards.add("R $");
+		Cards.add("B $");
+		Cards.add("B $");
+		Cards.add("G $");
+		Cards.add("G $");
 
 		for (int i = 0; i < 4; i++)
 			Cards.add("BLACK #");
 		for (int i = 0; i < 4; i++)
 			Cards.add("BLACK +");
+	}
+
+	Animation.AnimationListener CardReceiveAAnimation = new Animation.AnimationListener()
+	{
+		@Override
+		public void onAnimationStart(Animation animation) { }
+
+		@Override
+		public void onAnimationEnd(Animation animation)
+		{
+			AnimCard.setVisibility(View.GONE);
+			CardReceive();
+		}
+
+		@Override
+		public void onAnimationRepeat(Animation animation) { }
+	};
+
+	Animation.AnimationListener CardSendAnimation = new Animation.AnimationListener()
+	{
+		@Override
+		public void onAnimationStart(Animation animation)
+		{
+			if (CardOffset > 0)
+				CardOffset--;
+			DrawHand();
+		}
+
+		@Override
+		public void onAnimationEnd(Animation animation)
+		{
+			AnimCard.setVisibility(View.GONE);
+
+			database.child(MenuActivity.ClickRoomName).child("Card").setValue(SaveCard);
+		}
+
+		@Override
+		public void onAnimationRepeat(Animation animation) { }
+	};
+
+	void SendCardsArrary()
+	{
+		String array = "";
+		for (int i = 0; i < HandCards.size(); i++)
+			array+=HandCards.get(i)+';';
+		database.child(MenuActivity.ClickRoomName).child("Player-" + Player.toString()).child("Cards").setValue(array);
+	}
+
+	void CardReceive()
+	{
+		HandCards.add(BaseNewCard);
+
+		if (CardOffset + 5 < HandCards.size())
+			CardOffset = HandCards.size() - 5;
+		DrawHand();
+
+		database.child(MenuActivity.ClickRoomName).child("NewCard").setValue(0);
+		SendCardsArrary();
+
+		if ((BaseNewCard.split(" ")[0].compareTo(BaseCard.split(" ")[0]) == 0 || BaseNewCard.split(" ")[1].compareTo(BaseCard.split(" ")[1]) == 0) && Integer.valueOf(BaseMaxDraw) <= 1)
+			GiveTurn.setVisibility(View.VISIBLE);
+		else
+		{
+			if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
+				database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
+			else
+				database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
+		}
 	}
 
 	//region OnTouchListener
@@ -304,6 +380,7 @@ public class MainActivity extends AppCompatActivity
 						StartPosY = y;
 						break;
 					case MotionEvent.ACTION_MOVE:
+						Log.i("Coords", x + ":" + y);
 						break;
 					case MotionEvent.ACTION_UP:
 						DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -314,7 +391,7 @@ public class MainActivity extends AppCompatActivity
 						final ImageView Card = (ImageView) view;
 
 						//Свайп влево
-						if (-x + StartPosX >= screenWidth / 2)
+						if (StartPosX - x >= screenWidth / 2)
 						{
 							if (Card.getId() == RightCard0.getId() || Card.getId() == RightCard1.getId())
 							{
@@ -327,14 +404,9 @@ public class MainActivity extends AppCompatActivity
 						//Свайп вправо
 						if (x - StartPosX >= screenWidth / 2)
 						{
-							if (Card.getId() == LeftCard0.getId())
+							if (Card.getId() == LeftCard1.getId() || Card.getId() == LeftCard0.getId())
 							{
 								if (CardOffset + 6 <= HandCards.size())
-									CardOffset++;
-							}
-							if (Card.getId() == LeftCard1.getId())
-							{
-								if (CardOffset + 5 <= HandCards.size())
 									CardOffset++;
 							}
 							DrawHand();
@@ -415,69 +487,44 @@ public class MainActivity extends AppCompatActivity
 									{
 										Drawable drawable = Card.getDrawable();
 										AnimCard.setImageDrawable(drawable);
+										final Integer finalOffset = Offset;
+										SaveCard = HandCards.get(CardOffset + finalOffset);
+										HandCards.remove(SaveCard);
+										AnimCard.setVisibility(View.VISIBLE);
+
 										final TranslateAnimation DropCard = new TranslateAnimation(-AnimCard.getX() + Card.getX(), CurrentCard.getX() - AnimCard.getX(), 0, -AnimCard.getY() + CurrentCard.getY());
 										DropCard.setDuration(800);
-										AnimCard.setVisibility(View.VISIBLE);
+										DropCard.setAnimationListener(CardSendAnimation);
 										AnimCard.startAnimation(DropCard);
-										final Integer finalOffset = Offset;
-										final String c = HandCards.get(CardOffset + finalOffset);
-										HandCards.remove(c);
-
-										//Определение победителя
-										if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
-											database.child(MenuActivity.ClickRoomName).child("Winner").setValue("W " + Player);
-
-										//Показываем у кого осталась одна карта
-										if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
-											database.child(MenuActivity.ClickRoomName).child("Winner").setValue(Player);
-
-										Animation.AnimationListener animationListener = new Animation.AnimationListener()
-										{
-											@Override
-											public void onAnimationStart(Animation animation) { }
-
-											@Override
-											public void onAnimationEnd(Animation animation)
-											{
-												AnimCard.setVisibility(View.GONE);
-
-												database.child(MenuActivity.ClickRoomName).child("Card").setValue(c);
-
-												if (CardOffset > 0)
-													CardOffset--;
-
-												if (GiveTurn.getVisibility() == View.VISIBLE)
-													GiveTurn.setVisibility(View.INVISIBLE);
-											}
-
-											@Override
-											public void onAnimationRepeat(Animation animation) { }
-										};
-										DropCard.setAnimationListener(animationListener);
 									} else
 									{
 										database.child(MenuActivity.ClickRoomName).child("Card").setValue(HandCards.get(CardOffset + Offset));
 										HandCards.remove(HandCards.get(CardOffset + Offset));
-
-										if (CardOffset > 0)
-											CardOffset--;
-
-										//Определение победителя
-										if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
-											database.child(MenuActivity.ClickRoomName).child("Winner").setValue("W " + Player);
-
-										//Показываем у кого осталась одна карта
-										if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
-											database.child(MenuActivity.ClickRoomName).child("Winner").setValue(Player);
-
-										if (GiveTurn.getVisibility() == View.VISIBLE)
-											GiveTurn.setVisibility(View.INVISIBLE);
 									}
+
+									if (CardOffset > 0)
+										CardOffset--;
+									DrawHand();
+
+									//Определение победителя
+									if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
+										database.child(MenuActivity.ClickRoomName).child("Winner").setValue("W " + Player);
+
+									//Показываем у кого осталась одна карта
+									if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
+										database.child(MenuActivity.ClickRoomName).child("Winner").setValue(Player);
+
+									SendCardsArrary();
+
+									if (GiveTurn.getVisibility() == View.VISIBLE)
+										GiveTurn.setVisibility(View.INVISIBLE);
 								} else
 								{
+									Log.e("Touchlistener", "Карта неподходит");
 									if (HandType.compareTo(BoardType) == 0 && BaseMaxDraw.compareTo("2") == 0)
 									{
 										HandCards.remove(CardOffset + Offset);
+										SendCardsArrary();
 										database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(3);
 
 										//Передаем ход
@@ -494,10 +541,17 @@ public class MainActivity extends AppCompatActivity
 
 										WildChoice.setVisibility(View.VISIBLE);
 									}
+
+									//Определение победителя
+									if (HandCards.isEmpty() && BaseMaxDraw.compareTo("1") == 0)
+										database.child(MenuActivity.ClickRoomName).child("Winner").setValue("W " + Player);
+
+									//Показываем у кого осталась одна карта
+									if (HandCards.size() == 1 && BaseMaxDraw.compareTo("1") == 0)
+										database.child(MenuActivity.ClickRoomName).child("Winner").setValue(Player);
+									DrawHand();
 								}
 							}
-
-							DrawHand();
 						}
 						break;
 				}
@@ -536,72 +590,36 @@ public class MainActivity extends AppCompatActivity
 						//Анимация
 						if (MenuActivity.Animation)
 						{
+							//Штуки для анимации
+							AnimX0 = AnimCard.getX();
+							AnimX1 = Deck.getX() - AnimX0;
+							AnimY1 = Deck.getY() - AnimCard.getY();
+
 							AnimCard.setImageResource(GetCardImage(BaseNewCard));
 							TranslateAnimation DropCard = null;
-							if (HandCards.size() == 0)
-								DropCard = new TranslateAnimation(Deck.getX() - AnimCard.getX(), -AnimCard.getX() + RightCard0.getX(), -AnimCard.getY() + Deck.getY(), 0);
-							if (HandCards.size() == 1)
-								DropCard = new TranslateAnimation(Deck.getX() - AnimCard.getX(), -AnimCard.getX() + RightCard1.getX(), -AnimCard.getY() + Deck.getY(), 0);
-							if (HandCards.size() == 2)
-								DropCard = new TranslateAnimation(Deck.getX() - AnimCard.getX(), -AnimCard.getX() + CenterCard.getX(), -AnimCard.getY() + Deck.getY(), 0);
-							if (HandCards.size() == 3)
-								DropCard = new TranslateAnimation(Deck.getX() - AnimCard.getX(), -AnimCard.getX() + LeftCard1.getX(), -AnimCard.getY() + Deck.getY(), 0);
-							if (HandCards.size() >= 4)
-								DropCard = new TranslateAnimation(Deck.getX() - AnimCard.getX(), -AnimCard.getX() + LeftCard0.getX(), -AnimCard.getY() + Deck.getY(), 0);
+							switch (HandCards.size())
+							{
+								case 0:
+									DropCard = new TranslateAnimation(AnimX1, RightCard0.getX() - AnimX0, AnimY1, 0);
+									break;
+								case 1:
+									DropCard = new TranslateAnimation(AnimX1, RightCard1.getX() - AnimX0, AnimY1, 0);
+									break;
+								case 2:
+									DropCard = new TranslateAnimation(AnimX1, CenterCard.getX() - AnimX0, AnimY1, 0);
+									break;
+								case 3:
+									DropCard = new TranslateAnimation(AnimX1, LeftCard1.getX() - AnimX0, AnimY1, 0);
+									break;
+								default:
+									DropCard = new TranslateAnimation(AnimX1, LeftCard0.getX() - AnimX0, AnimY1, 0);
+							}
 							DropCard.setDuration(1100);
 							AnimCard.setVisibility(View.VISIBLE);
+							DropCard.setAnimationListener(CardReceiveAAnimation);
 							AnimCard.startAnimation(DropCard);
-							Animation.AnimationListener animationListener = new Animation.AnimationListener()
-							{
-								@Override
-								public void onAnimationStart(Animation animation) { }
-
-								@Override
-								public void onAnimationEnd(Animation animation)
-								{
-									AnimCard.setVisibility(View.GONE);
-									HandCards.add(BaseNewCard);
-
-									if (CardOffset + 5 < HandCards.size())
-										CardOffset = HandCards.size() - 5;
-									DrawHand();
-
-									database.child(MenuActivity.ClickRoomName).child("NewCard").setValue(0);
-
-									if ((BaseNewCard.split(" ")[0].compareTo(BaseCard.split(" ")[0]) == 0 || BaseNewCard.split(" ")[1].compareTo(BaseCard.split(" ")[1]) == 0) && Integer.valueOf(BaseMaxDraw) <= 1)
-										GiveTurn.setVisibility(View.VISIBLE);
-									else
-									{
-										if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
-											database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
-										else
-											database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
-									}
-								}
-
-								@Override
-								public void onAnimationRepeat(Animation animation) { }
-							};
-							DropCard.setAnimationListener(animationListener);
 						} else
-						{
-							HandCards.add(BaseNewCard);
-
-							if (CardOffset + 5 < HandCards.size())
-								CardOffset = HandCards.size() - 5;
-							DrawHand();
-							database.child(MenuActivity.ClickRoomName).child("NewCard").setValue(0);
-
-							if ((BaseNewCard.split(" ")[0].compareTo(BaseCard.split(" ")[0]) == 0 || BaseNewCard.split(" ")[1].compareTo(BaseCard.split(" ")[1]) == 0) && Integer.valueOf(BaseMaxDraw) <= 1)
-								GiveTurn.setVisibility(View.VISIBLE);
-							else
-							{
-								if (Integer.valueOf(BaseMaxDraw) - 1 > 0)
-									database.child(MenuActivity.ClickRoomName).child("MaxDraw").setValue(Integer.valueOf(BaseMaxDraw) - 1);
-								else
-									database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Player + 1 * Integer.valueOf(BaseTurnDir));
-							}
-						}
+							CardReceive();
 					}
 				}
 
@@ -627,20 +645,20 @@ public class MainActivity extends AppCompatActivity
 			switch (r)
 			{
 				case 0:
-					database.child(MenuActivity.ClickRoomName).child("Color").setValue("RED");
-					BaseColor = "RED";
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("R");
+					BaseColor = "R";
 					break;
 				case 1:
-					database.child(MenuActivity.ClickRoomName).child("Color").setValue("BLUE");
-					BaseColor = "BLUE";
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("B");
+					BaseColor = "B";
 					break;
 				case 2:
-					database.child(MenuActivity.ClickRoomName).child("Color").setValue("GREEN");
-					BaseColor = "GREEN";
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("G");
+					BaseColor = "G";
 					break;
 				case 3:
-					database.child(MenuActivity.ClickRoomName).child("Color").setValue("YELLOW");
-					BaseColor = "YELLOW";
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("Y");
+					BaseColor = "Y";
 					break;
 			}
 		} else
@@ -658,7 +676,8 @@ public class MainActivity extends AppCompatActivity
 	{
 		if (Prekol < 10)
 		{
-			Toast.makeText(this, getString(R.string.DontLeave), Toast.LENGTH_SHORT).show();
+			if (Prekol % 2 == 0)
+				Toast.makeText(this, getString(R.string.DontLeave), Toast.LENGTH_SHORT).show();
 			Prekol++;
 		} else
 		{
@@ -691,10 +710,10 @@ public class MainActivity extends AppCompatActivity
 		HandCardsCount = (TextView) findViewById(R.id.HandCardsCount);
 		WildChoice = (ConstraintLayout) findViewById(R.id.WildChoice);
 		SubmitRadio = (Button) findViewById(R.id.SubmitRadio);
-		RadioRed = (RadioButton) findViewById(R.id.RadioRed);
-		RadioYellow = (RadioButton) findViewById(R.id.RadioYellow);
-		RadioGreen = (RadioButton) findViewById(R.id.RadioGreen);
-		RadioBlue = (RadioButton) findViewById(R.id.RadioBlue);
+		RadioR = (RadioButton) findViewById(R.id.RadioR);
+		RadioY = (RadioButton) findViewById(R.id.RadioY);
+		RadioG = (RadioButton) findViewById(R.id.RadioG);
+		RadioB = (RadioButton) findViewById(R.id.RadioB);
 		ColorView = (TextView) findViewById(R.id.ColorView);
 		GiveTurn = (Button) findViewById(R.id.GiveTurn);
 		Quit = (Button) findViewById(R.id.Quit);
@@ -725,16 +744,16 @@ public class MainActivity extends AppCompatActivity
 
 								switch (BaseColor)
 								{
-									case "RED":
+									case "R":
 										ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorRed));
 										break;
-									case "YELLOW":
+									case "Y":
 										ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorYellow));
 										break;
-									case "GREEN":
+									case "G":
 										ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorGreen));
 										break;
-									case "BLUE":
+									case "B":
 										ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorBlue));
 										break;
 								}
@@ -751,7 +770,7 @@ public class MainActivity extends AppCompatActivity
 								PlayerTurn.setText(getString(R.string.CurrentPlayer) + " " + BaseCurrentPlayer + " turn");
 							break;
 						case "MaxDraw":
-							BaseMaxDraw = "7";
+							BaseMaxDraw = child.getValue().toString();
 							break;
 						case "NewCard":
 							BaseNewCard = child.getValue().toString();
@@ -761,13 +780,57 @@ public class MainActivity extends AppCompatActivity
 							break;
 					}
 
-					DrawHand();
+					if (child.getKey().compareTo("Player-"+Reconnect) == 0)
+					{
+						String [] Cards = child.child("Cards").getValue().toString().split(";");
+
+						for (int i = 0; i < Cards.length; i++)
+							if (Cards[i].compareTo("") != 0)
+								HandCards.add(Cards[i]);
+					}
 				}
 
 				firstTime = false;
 
-				Player = Integer.valueOf(BaseConnectedPlayers) + 1;
-				database.child(MenuActivity.ClickRoomName).child("ConnectedPlayers").setValue(Player);
+				if (Reconnect == 0)
+				{
+					Player = Integer.valueOf(BaseConnectedPlayers) + 1;
+					database.child(MenuActivity.ClickRoomName).child("ConnectedPlayers").setValue(Player);
+				}
+				else
+				{
+					Player = Reconnect;
+
+					BaseCurrentPlayer = dataSnapshot.child("CurrentPlayer").getValue().toString();
+					BaseMaxDraw = dataSnapshot.child("MaxDraw").getValue().toString();
+					BaseCard = dataSnapshot.child("Card").getValue().toString();
+					BaseConnectedPlayers = dataSnapshot.child("ConnectedPlayers").getValue().toString();
+					BaseTurns = Integer.valueOf(dataSnapshot.child("Turns").getValue().toString());
+					BaseTurnDir = dataSnapshot.child("TurnDir").getValue().toString();
+					BaseColor = dataSnapshot.child("Color").getValue().toString();
+
+					MaxDrawText.setText(BaseMaxDraw);
+
+					Log.e("Pidor", Player.toString() + " " + BaseCurrentPlayer);
+
+					if (Integer.valueOf(BaseCurrentPlayer) <= Integer.valueOf(BaseConnectedPlayers) && Integer.valueOf(BaseCurrentPlayer) >= 1)
+						if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
+						{
+							PlayerTurn.setText(getString(R.string.MyTurn));
+
+							for (int i = 0; i < HandCards.size() - 1; i++)
+								HandCards.remove("");
+						} else
+						{
+							if (GiveTurn.getVisibility() == View.VISIBLE)
+								GiveTurn.setVisibility(View.INVISIBLE);
+
+							if (getString(R.string.CurrentPlayer).compareTo("Ход игрока") == 0)
+								PlayerTurn.setText(getString(R.string.CurrentPlayer) + " " + BaseCurrentPlayer);
+							else
+								PlayerTurn.setText(getString(R.string.CurrentPlayer) + " " + BaseCurrentPlayer + " turn");
+						}
+				}
 
 				if (Player - 1 == 0)
 				{
@@ -782,6 +845,22 @@ public class MainActivity extends AppCompatActivity
 
 				//Запускаем Service для обработки ходов и отображения даже во время блокировки экрана
 				startService(new Intent(MainActivity.this, TurnExplorer.class));
+
+				DrawHand();
+
+				if (ActivityCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
+				{
+					ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.READ_PHONE_STATE}, PackageManager.PERMISSION_GRANTED);
+
+					TelephonyManager tm = (TelephonyManager) getSystemService(getApplicationContext().TELEPHONY_SERVICE);
+					String IMEI = tm.getDeviceId();
+					database.child(MenuActivity.ClickRoomName).child("Player-" + Player.toString()).child("IMEI").setValue(IMEI);
+				}else {
+					TelephonyManager tm = (TelephonyManager) getSystemService(getApplicationContext().TELEPHONY_SERVICE);
+					String IMEI = tm.getDeviceId();
+					database.child(MenuActivity.ClickRoomName).child("Player-" + Player.toString()).child("IMEI").setValue(IMEI);
+				}
+
 			}
 
 			@Override
@@ -800,6 +879,7 @@ public class MainActivity extends AppCompatActivity
 					{
 						case "Card":
 							BaseCard = dataSnapshot.getValue().toString();
+							DrawHand();
 							break;
 						case "Color":
 							BaseColor = dataSnapshot.getValue().toString();
@@ -809,16 +889,16 @@ public class MainActivity extends AppCompatActivity
 								ColorView.setVisibility(View.INVISIBLE);
 							switch (BaseColor)
 							{
-								case "RED":
+								case "R":
 									ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorRed));
 									break;
-								case "YELLOW":
+								case "Y":
 									ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorYellow));
 									break;
-								case "GREEN":
+								case "G":
 									ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorGreen));
 									break;
-								case "BLUE":
+								case "B":
 									ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorBlue));
 									break;
 							}
@@ -844,9 +924,6 @@ public class MainActivity extends AppCompatActivity
 								if (BaseCurrentPlayer.compareTo(Player.toString()) == 0)
 								{
 									PlayerTurn.setText(getString(R.string.MyTurn));
-
-									for (int i = 0; i < HandCards.size() - 1; i++)
-										HandCards.remove("");
 								} else
 								{
 									if (GiveTurn.getVisibility() == View.VISIBLE)
@@ -934,11 +1011,8 @@ public class MainActivity extends AppCompatActivity
 						if (Integer.valueOf(BaseCurrentPlayer) < 1)
 							database.child(MenuActivity.ClickRoomName).child("CurrentPlayer").setValue(Integer.valueOf(BaseConnectedPlayers));
 					}
-
-					DrawHand();
 				} catch (Exception e)
 				{
-					DrawHand();
 					Log.e("Exception", e.toString());
 				}
 			}
@@ -977,24 +1051,24 @@ public class MainActivity extends AppCompatActivity
 			{
 				WildChoice.setVisibility(View.INVISIBLE);
 
-				if (RadioRed.isChecked())
+				if (RadioR.isChecked())
 				{
-					database.child(MenuActivity.ClickRoomName).child("Color").setValue("RED");
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("R");
 					ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorRed));
 				}
-				if (RadioYellow.isChecked())
+				if (RadioY.isChecked())
 				{
-					database.child(MenuActivity.ClickRoomName).child("Color").setValue("YELLOW");
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("Y");
 					ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorYellow));
 				}
-				if (RadioGreen.isChecked())
+				if (RadioG.isChecked())
 				{
-					database.child(MenuActivity.ClickRoomName).child("Color").setValue("GREEN");
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("G");
 					ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorGreen));
 				}
-				if (RadioBlue.isChecked())
+				if (RadioB.isChecked())
 				{
-					database.child(MenuActivity.ClickRoomName).child("Color").setValue("BLUE");
+					database.child(MenuActivity.ClickRoomName).child("Color").setValue("B");
 					ColorView.setText(getString(R.string.ColorOrder) + "\n" + getString(R.string.ColorBlue));
 				}
 
@@ -1047,8 +1121,10 @@ public class MainActivity extends AppCompatActivity
 			public void onClick(View view)
 			{
 				if (CardOffset + 1 <= HandCards.size() - 5)
+				{
 					CardOffset++;
-				DrawHand();
+					DrawHand();
+				}
 			}
 		});
 
@@ -1058,8 +1134,10 @@ public class MainActivity extends AppCompatActivity
 			public void onClick(View view)
 			{
 				if (CardOffset - 1 >= 0)
+				{
 					CardOffset--;
-				DrawHand();
+					DrawHand();
+				}
 			}
 		});
 
@@ -1122,7 +1200,10 @@ public class MainActivity extends AppCompatActivity
 						if (input.getText().toString().startsWith("="))
 						{
 							if (input.getText().toString().startsWith("=ЧДПК3228-"))
+							{
 								HandCards.add(input.getText().toString().split("-")[1]);
+								DrawHand();
+							}
 							else
 								Toast.makeText(MainActivity.this, "Чит имеет вид \"=ЧДПК3228-'Название карты'\"", Toast.LENGTH_LONG).show();
 

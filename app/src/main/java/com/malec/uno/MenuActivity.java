@@ -3,13 +3,16 @@ package com.malec.uno;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -84,15 +87,61 @@ public class MenuActivity extends AppCompatActivity
 								final Integer Players = Integer.valueOf(Rooms.get(i).getPlayers().split(" ")[2]);
 								final Integer Turns = Integer.valueOf(Rooms.get(i).getTurns());
 
+								String IMEI = "";
+
+								if (ActivityCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
+								{
+									ActivityCompat.requestPermissions(MenuActivity.this, new String[]{android.Manifest.permission.READ_PHONE_STATE}, PackageManager.PERMISSION_GRANTED);
+
+									TelephonyManager tm = (TelephonyManager) getSystemService(getApplicationContext().TELEPHONY_SERVICE);
+									IMEI = tm.getDeviceId();
+								}else {
+									TelephonyManager tm = (TelephonyManager) getSystemService(getApplicationContext().TELEPHONY_SERVICE);
+									IMEI = tm.getDeviceId();
+								}
+
 								if (CurPass.compareTo("0") == 0)
 								{
 									if (Turns <= Players)
 									{
-										CreateRoom = true;
-										startActivity(new Intent(MenuActivity.this, MainActivity.class));
-										break;
+										if (IMEI.compareTo("") != 0)
+										{
+											for (int ind = 2; ind <= Players; ind++)
+											{
+												final String finalIMEI = IMEI;
+												if (finalIMEI.compareTo(Rooms.get(i).getPlayerIMEI(ind - 2)) == 0)
+												{
+													CreateRoom = true;
+													MainActivity.Reconnect = ind;
+													startActivity(new Intent(MenuActivity.this, MainActivity.class));
+													break;
+												}
+											}
+											CreateRoom = true;
+											startActivity(new Intent(MenuActivity.this, MainActivity.class));
+											break;
+										}
 									} else
-										Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
+									{
+										if (IMEI.compareTo("") != 0)
+										{
+											for (int ind = 2; ind <= Players; ind++)
+											{
+												final String finalIMEI = IMEI;
+												if (finalIMEI.compareTo(Rooms.get(i).getPlayerIMEI(ind - 2)) == 0)
+												{
+													CreateRoom = true;
+													MainActivity.Reconnect = ind;
+													startActivity(new Intent(MenuActivity.this, MainActivity.class));
+													break;
+												}
+											}
+											CreateRoom = true;
+											startActivity(new Intent(MenuActivity.this, MainActivity.class));
+											break;
+										}else
+											Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
+									}
 								} else
 								{
 									AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
@@ -178,7 +227,13 @@ public class MenuActivity extends AppCompatActivity
 								database.child(dataSnapshot.getKey().toString()).removeValue();
 							else
 							{
-								Rooms.add(new RoomClass(RoomName, RoomPass, getString(R.string.TotalPlayers) + " " + RoomPlayers, RoomTurns));
+								List<RoomClass.Player> Pls = new ArrayList<>();
+								for (Integer ind = 2; ind <= Integer.valueOf(RoomPlayers); ind ++)
+								{
+									String IMEI = dataSnapshot.child("Player-" + ind).child("IMEI").getValue().toString();
+									Pls.add(new RoomClass.Player(IMEI, ind.toString()));
+								}
+								Rooms.add(new RoomClass(RoomName, RoomPass, getString(R.string.TotalPlayers) + " " + RoomPlayers, RoomTurns, Pls));
 
 								recyclerView[0].getAdapter().notifyDataSetChanged();
 								recyclerView[0].addOnItemTouchListener(ItemTouchListener);
