@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
@@ -33,6 +34,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -152,6 +155,8 @@ public class MenuActivity extends AppCompatActivity
 									final EditText input = new EditText(MenuActivity.this);
 									alert.setView(input);
 
+									final String finalIMEI1 = IMEI;
+									final Integer finalI = i;
 									alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
 									{
 										public void onClick(DialogInterface dialog, int whichButton)
@@ -160,10 +165,40 @@ public class MenuActivity extends AppCompatActivity
 											{
 												if (Turns <= Players)
 												{
-													CreateRoom = true;
-													startActivity(new Intent(MenuActivity.this, MainActivity.class));
+													if (finalIMEI1.compareTo("") != 0)
+													{
+														for (int ind = 2; ind <= Players; ind++)
+														{
+															final String finalIMEI = finalIMEI1;
+															if (finalIMEI.compareTo(Rooms.get(finalI).getPlayerIMEI(ind - 2)) == 0)
+															{
+																CreateRoom = true;
+																MainActivity.Reconnect = ind;
+																startActivity(new Intent(MenuActivity.this, MainActivity.class));
+																break;
+															}
+														}
+														CreateRoom = true;
+														startActivity(new Intent(MenuActivity.this, MainActivity.class));
+													}
 												} else
-													Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
+													if (finalIMEI1.compareTo("") != 0)
+													{
+														for (int ind = 2; ind <= Players; ind++)
+														{
+															final String finalIMEI = finalIMEI1;
+															if (finalIMEI.compareTo(Rooms.get(finalI).getPlayerIMEI(ind - 2)) == 0)
+															{
+																CreateRoom = true;
+																MainActivity.Reconnect = ind;
+																startActivity(new Intent(MenuActivity.this, MainActivity.class));
+																break;
+															}
+														}
+														CreateRoom = true;
+														startActivity(new Intent(MenuActivity.this, MainActivity.class));
+													}else
+														Toast.makeText(MenuActivity.this, getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
 											} else
 											{
 												Toast.makeText(MenuActivity.this, getString(R.string.WrongPassword), Toast.LENGTH_SHORT).show();
@@ -339,8 +374,18 @@ public class MenuActivity extends AppCompatActivity
 		if (Version.compareTo(HTMLVersion) != 0)
 		{
 			AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
-			alert.setTitle("New version available").setNegativeButton("Ok",
-					new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int id) { dialog.cancel(); } });
+			alert.setTitle("New version available").setNegativeButton("Ok", new DialogInterface.OnClickListener()
+			{
+				public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
+			}).setPositiveButton("Download", new DialogInterface.OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialogInterface, int i)
+				{
+					Intent browseIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Malez228/UNO/raw/Recycler/app/release/app-release.apk"));
+					startActivity(browseIntent);
+				}
+			});
 			alert.show();
 		}
 		//endregion
