@@ -95,27 +95,12 @@
 
             </android.support.constraint.ConstraintLayout>
 
-            <ScrollView
-                android:id="@+id/RoomsList"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/RoomList"
+                app:layoutManager="LinearLayoutManager"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="4dp"
-                android:layout_marginTop="4dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/CreateRoomLayout"
-                app:layout_constraintVertical_bias="0.0">
+                android:layout_height="match_parent" />
 
-                <LinearLayout
-                    android:id="@+id/RoomListLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                </LinearLayout>
-            </ScrollView>
         </LinearLayout>
     </FrameLayout>
 
