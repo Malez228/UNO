@@ -1,35 +1,35 @@
 {
   "project_info": {
-    "project_number": "961229934127",
-    "firebase_url": "https://uno-project-e34e3.firebaseio.com",
-    "project_id": "uno-project-e34e3",
-    "storage_bucket": "uno-project-e34e3.appspot.com"
+    "project_number": "576928788445",
+    "firebase_url": "https://ino-firebaseproject.firebaseio.com",
+    "project_id": "ino-firebaseproject",
+    "storage_bucket": "ino-firebaseproject.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:961229934127:android:16e08c1d6ac0de31",
+        "mobilesdk_app_id": "1:576928788445:android:48d846d6ecb84427",
         "android_client_info": {
-          "package_name": "com.malec.uno"
+          "package_name": "com.malec.ino"
         }
       },
       "oauth_client": [
         {
-          "client_id": "961229934127-7vvvj6b53nvjii0tg63fe8ujfn0v5809.apps.googleusercontent.com",
+          "client_id": "576928788445-6ucf4dhc268g2jdo85jlr17fglk0bh93.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.malec.uno",
-            "certificate_hash": "f1d15fa922c6a74fd17095c38f628601e7d3bc1b"
+            "package_name": "com.malec.ino",
+            "certificate_hash": "f23e87cea3e4e0fbe4d5e5e9626d465dcc4e2a58"
           }
         },
         {
-          "client_id": "961229934127-voapg14h77c2vdtvise7bcuqnr750tgo.apps.googleusercontent.com",
+          "client_id": "576928788445-muka41e9776tacb6lk43jac5mktnp39c.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBWELNDrz12qg_q8MPvH7GVpQIqEM2c_gI"
+          "current_key": "AIzaSyCicn_gnG52kA_q0VLfiZa-Mk7gHGvtzns"
         }
       ],
       "services": {
@@ -40,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "961229934127-voapg14h77c2vdtvise7bcuqnr750tgo.apps.googleusercontent.com",
+              "client_id": "576928788445-muka41e9776tacb6lk43jac5mktnp39c.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

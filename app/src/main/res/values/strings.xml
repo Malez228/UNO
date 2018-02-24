@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">INO</string>
+    <string name="app_name" translatable="false">INO</string>
 
     <!-- Menu -->
     <string name="CreateRoomLabelText">Create room</string>
@@ -13,19 +12,16 @@
     <string name="FindCreateRoom">Create / Search Room</string>
 
     <!-- Main -->
-    <string name="LeaveGame">Leave game</string>
-    <string name="CloseRoom">Close room</string>
-    <string name="ColorOrder">Ordered</string>
-    <string name="ColorRed">red</string>
-    <string name="ColorGreen">green</string>
-    <string name="ColorBlue">blue</string>
-    <string name="ColorYellow">yellow</string>
-    <string name="ColorSubmitBtnText">Submit</string>
-    <string name="TotalPlayers">Total players</string>
+    <string name="OrderedText">Ordered</string>
+    <string name="RedText">red</string>
+    <string name="GreenText">green</string>
+    <string name="BlueText">blue</string>
+    <string name="YellowText">yellow</string>
+    <string name="ConnectedPlayersText">Total players</string>
     <string name="MyTurn">Your turn</string>
-    <string name="CurrentPlayer">Player\'s</string>
-    <string name="HandSize">Cards in hand</string>
-    <string name="NextTurn">End turn</string>
+    <string name="CurrentPlayerText">Player\'s</string>
+    <string name="HandCardsCountText">Cards in hand</string>
+    <string name="EndTurn">End turn</string>
 
     <string name="DontLeave">You can\'t leave this party</string>
     <string name="RoomAlive"> This room already exists.\nUse the search to connect</string>
@@ -50,5 +46,10 @@
     <string name="BugReportTitle">Message to the developer</string>
     <string name="BugReportLabelText">Help make our application better\nLeave a review or bug report</string>
     <string name="BugReportSendBtnText">Send</string>
-</resources>
+    <string name="title_activity_menu">MenuActivity</string>
 
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+</resources>
