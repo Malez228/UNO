@@ -133,7 +133,10 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
             GameActivity.recyclerView[0].getAdapter().notifyDataSetChanged();
 
             if (GameActivity.player.HandCards.isEmpty())
-                dataBase.child(MenuActivity.RoomName).child("Winner").setValue(MenuActivity.UserName);
+                dataBase.child(MenuActivity.RoomName).child("Winner").setValue("☺" + MenuActivity.UserName);
+
+            if (GameActivity.player.HandCards.size() == 1)
+                dataBase.child(MenuActivity.RoomName).child("Winner").setValue("☻" + MenuActivity.UserName);
 
             dataBase.child(MenuActivity.RoomName).child("Players").child(GameActivity.player.Key).child("Cards").setValue(GameActivity.SyncCards());
         }

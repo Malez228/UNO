@@ -1,9 +1,17 @@
 package com.malec.ino;
 
 import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -227,6 +235,68 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = findViewById(R.id.MenuToolBar);
         setSupportActionBar(toolbar);
         mSettings = getPreferences(MODE_PRIVATE);
+
+        //region Проверка новой версии
+        String HTML = null;
+        InternetRequest htm = new InternetRequest();
+        htm.execute("https://raw.githubusercontent.com/Malez228/UNO/master/app/build.gradle");
+        try { HTML = htm.get().toString(); } catch (Exception e){ }
+        htm.cancel(true);
+        String HTMLVersion = HTML.split("versionName \"")[1].split("\"")[0];
+        String Version = "";
+        try
+        {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+            Version = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) { }
+        if (Version.compareTo(HTMLVersion) != 0)
+        {
+            AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
+            alert.setTitle("New version available").setPositiveButton("Download", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i)
+                {
+                    final long enqueue;
+                    final DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse("https://raw.githubusercontent.com/Malez228/UNO/master/app/release/app-release.apk"));
+                    enqueue = dm.enqueue(request);
+
+                    BroadcastReceiver receiver = new BroadcastReceiver()
+                    {
+                        @Override
+                        public void onReceive(Context context, Intent intent)
+                        {
+                            String action = intent.getAction();
+                            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action))
+                            {
+                                long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
+                                DownloadManager.Query query = new DownloadManager.Query();
+                                query.setFilterById(enqueue);
+                                Cursor c = dm.query(query);
+                                if (c.moveToFirst())
+                                {
+                                    int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
+                                    if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex))
+                                    {
+                                        Intent i = new Intent();
+                                        i.setAction(DownloadManager.ACTION_VIEW_DOWNLOADS);
+                                        startActivity(i);
+                                    }
+                                }
+                            }
+                        }
+                    };
+
+                    registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+                }
+            }).setNegativeButton("Ok", new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
+            });
+            alert.show();
+        }
+        //endregion
 
         final RecyclerView[] recyclerView = new RecyclerView[1];
         final RoomDataAdapter adapter = new RoomDataAdapter(this, SearchRoomsList);

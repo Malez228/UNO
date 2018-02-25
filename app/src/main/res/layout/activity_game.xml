@@ -34,7 +34,7 @@
         android:id="@+id/CurrentCard"
         android:layout_width="@dimen/DeckCardWidth"
         android:layout_height="@dimen/DeckCardHeight"
-        android:layout_marginEnd="100dp"
+        android:layout_marginEnd="24dp"
         android:tag="-1"
         app:layout_constraintEnd_toStartOf="@+id/Deck"
         app:layout_constraintTop_toTopOf="@+id/Deck"

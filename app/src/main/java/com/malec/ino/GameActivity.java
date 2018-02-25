@@ -659,10 +659,19 @@ public class GameActivity extends AppCompatActivity
                         { @Override public void onClick(View view) { } }).show();
                         break;
                     case "Winner":
-                        Toast.makeText(GameActivity.this, dataSnapshot.getValue().toString() + " победил!", Toast.LENGTH_SHORT).show();
-                        //TODO переигровка?
-                        finish();
-                        dataBase.child(MenuActivity.RoomName).removeValue();
+                        String t = dataSnapshot.getValue().toString();
+                        if (t.contains("☺"))
+                        {
+                            t = t.substring(1, t.length());
+                            Toast.makeText(GameActivity.this, t + " " + getString(R.string.PlayerWinLabelText), Toast.LENGTH_SHORT).show();
+                            //TODO переигровка?
+                            finish();
+                            dataBase.child(MenuActivity.RoomName).removeValue();
+                        }else if (t.contains("☻"))
+                        {
+                            t = t.substring(1, t.length());
+                            Toast.makeText(GameActivity.this, getString(R.string.PlayerPreLabelText) + " "+ t + " " + getString(R.string.PlayerPreWinLabelText), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                 }
 
