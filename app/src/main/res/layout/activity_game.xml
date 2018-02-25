@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/BoardLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.malec.ino.GameActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/ToolBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_orange_dark"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextColor="@android:color/white"/>
+
+    <ImageView
+        android:id="@+id/Deck"
+        android:layout_width="@dimen/DeckCardWidth"
+        android:layout_height="@dimen/DeckCardHeight"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ToolBar"
+        app:srcCompat="@drawable/deck"/>
+
+    <ImageView
+        android:id="@+id/CurrentCard"
+        android:layout_width="@dimen/DeckCardWidth"
+        android:layout_height="@dimen/DeckCardHeight"
+        android:layout_marginEnd="24dp"
+        android:tag="-1"
+        app:layout_constraintEnd_toStartOf="@+id/Deck"
+        app:layout_constraintTop_toTopOf="@+id/Deck"
+        app:srcCompat="@drawable/empty_card"/>
+
+    <TextView
+        android:id="@+id/MaxDrawText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:tag="-1"
+        android:text="1"
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="@dimen/DefTextSize"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/CurrentCard"
+        app:layout_constraintStart_toStartOf="@+id/CurrentCard"
+        app:layout_constraintTop_toBottomOf="@+id/CurrentCard"/>
+
+    <LinearLayout
+        android:id="@+id/ColorPicker"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:orientation="horizontal"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/ConnectedPlayersText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/MaxDrawText">
+
+        <ToggleButton
+            android:id="@+id/RedColorPicker"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/red_color_back"
+            android:textOff=" "
+            android:textOn=" "/>
+
+        <ToggleButton
+            android:id="@+id/YellowColorPicker"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/yellow_color_back"
+            android:textOff=" "
+            android:textOn=" "/>
+
+        <ToggleButton
+            android:id="@+id/GreenColorPicker"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/green_color_back"
+            android:textOff=" "
+            android:textOn=" "/>
+
+        <ToggleButton
+            android:id="@+id/BlueColorPicker"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/blue_color_back"
+            android:textOff=" "
+            android:textOn=" "/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/HandCardsCountText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:tag="-1"
+        android:text="Cards in hand N"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/DefTextSize"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/CardsRecycler"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/CurrentPlayerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:tag="-1"
+        android:text="Player's N turn"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/DefTextSize"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/HandCardsCountText"/>
+
+    <TextView
+        android:id="@+id/ConnectedPlayersText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:tag="-1"
+        android:text="Total Players N"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/DefTextSize"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/CurrentPlayerText"
+        app:layout_constraintStart_toStartOf="@+id/CurrentPlayerText"/>
+
+    <TextView
+        android:id="@+id/ColorText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:tag="-1"
+        android:text="Ordered N"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/DefTextSize"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/CurrentCard"
+        app:layout_constraintTop_toTopOf="@+id/CurrentCard"/>
+
+    <Button
+        android:id="@+id/EndTurn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/EndTurn"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/DefTextSize"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/CurrentCard"
+        app:layout_constraintEnd_toStartOf="@+id/CurrentCard"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/CardsRecycler"
+        android:layout_width="0dp"
+        android:layout_height="130dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginStart="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <ImageView
+        android:id="@+id/AnimationCard"
+        android:layout_width="@dimen/DeckCardWidth"
+        android:layout_height="@dimen/DeckCardHeight"
+        android:tag="-1"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/empty_card"/>
+
+</android.support.constraint.ConstraintLayout>

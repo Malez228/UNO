@@ -2,8 +2,12 @@
 <resources>
     <color name="colorPrimary">#9c9c9c</color>
     <color name="colorPrimaryDark">#474747</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="back">#eaeaea</color>
-    <color name="backL">#e0e0e0</color>
+    <color name="colorBack">#eaeaea</color>
+    <color name="colorBackL">#e0e0e0</color>
     <color name="background_material_light">#cccccc</color>
+
+    <color name="ColorRed">#cd3412</color>
+    <color name="ColorYellow">#ffd401</color>
+    <color name="ColorGreen">#137b2b</color>
+    <color name="ColorBlue">#1147b4</color>
 </resources>

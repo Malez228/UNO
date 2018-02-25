@@ -1,0 +1,38 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="300dp"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/ActionText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/CreateRoomLabelText"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimaryDark"/>
+
+    <EditText
+        android:id="@+id/RoomNameField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:ems="10"
+        android:hint="@string/RoomName"
+        android:inputType="textPersonName"
+        android:maxLength="40"
+        android:textColor="@color/colorPrimaryDark"
+        android:textColorHint="@color/colorPrimary"/>
+
+    <EditText
+        android:id="@+id/PassField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Pass"
+        android:inputType="textPersonName"
+        android:maxLength="60"
+        android:textColor="@color/colorPrimaryDark"
+        android:textColorHint="@color/colorPrimary"/>
+
+</LinearLayout>
