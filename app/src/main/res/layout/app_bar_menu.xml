@@ -17,7 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/holo_orange_dark"
-            app:popupTheme="@style/PopupOverlay"/>
+            app:popupTheme="@style/PopupOverlay"
+            app:title="Ino - Card Game"/>
 
     </android.support.design.widget.AppBarLayout>
 

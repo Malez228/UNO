@@ -40,80 +40,6 @@
         app:layout_constraintTop_toTopOf="@+id/Deck"
         app:srcCompat="@drawable/empty_card"/>
 
-    <LinearLayout
-        android:id="@+id/ColorPicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/HandCardsCountText"
-        app:layout_constraintEnd_toEndOf="@+id/Deck"
-        app:layout_constraintTop_toBottomOf="@+id/MaxDrawText">
-
-        <RadioGroup
-            android:id="@+id/ColorGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:layout_editor_absoluteX="184dp"
-            tools:layout_editor_absoluteY="285dp">
-
-            <RadioButton
-                android:id="@+id/RedColorPick"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Red"
-                android:textColor="@color/colorPrimaryDark"
-                android:textColorHint="@color/colorPrimaryDark"
-                android:textSize="12sp"/>
-
-            <RadioButton
-                android:id="@+id/YellowColorPick"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Yellow"
-                android:textColor="@color/colorPrimaryDark"
-                android:textColorHint="@color/colorPrimaryDark"
-                android:textSize="12sp"/>
-
-            <RadioButton
-                android:id="@+id/GreenColorPick"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Green"
-                android:textColor="@color/colorPrimaryDark"
-                android:textColorHint="@color/colorPrimaryDark"
-                android:textSize="12sp"/>
-
-            <RadioButton
-                android:id="@+id/BlueColorPick"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Blue"
-                android:textColor="@color/colorPrimaryDark"
-                android:textColorHint="@color/colorPrimaryDark"
-                android:textSize="12sp"/>
-        </RadioGroup>
-
-        <Button
-            android:id="@+id/ColorPick"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="24dp"
-            android:layout_marginStart="24dp"
-            android:layout_weight="1"
-            android:text="@android:string/ok"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="@dimen/DefTextSize"/>
-
-    </LinearLayout>
-
     <TextView
         android:id="@+id/MaxDrawText"
         android:layout_width="wrap_content"
@@ -127,6 +53,57 @@
         app:layout_constraintEnd_toEndOf="@+id/CurrentCard"
         app:layout_constraintStart_toStartOf="@+id/CurrentCard"
         app:layout_constraintTop_toBottomOf="@+id/CurrentCard"/>
+
+    <LinearLayout
+        android:id="@+id/ColorPicker"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:orientation="horizontal"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/ConnectedPlayersText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/MaxDrawText">
+
+        <ToggleButton
+            android:id="@+id/RedColorPicker"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/ColorRed"
+            android:textOff=" "
+            android:textOn=" "/>
+
+        <ToggleButton
+            android:id="@+id/YellowColorPicker"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/ColorYellow"
+            android:textOff=" "
+            android:textOn=" "/>
+
+        <ToggleButton
+            android:id="@+id/GreenColorPicker"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/ColorGreen"
+            android:textOff=" "
+            android:textOn=" "/>
+
+        <ToggleButton
+            android:id="@+id/BlueColorPicker"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/ColorBlue"
+            android:textOff=" "
+            android:textOn=" "/>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/HandCardsCountText"

@@ -3,13 +3,13 @@
 
     <!-- Menu -->
     <string name="CreateRoomLabelText">Create room</string>
+    <string name="RoomName">Room name</string>
     <string name="CreateRoom">Create</string>
-    <string name="RoomName">Name</string>
     <string name="FindRoomLabelText">Search room</string>
-    <string name="FindRoomBtnText">Search</string>
     <string name="FindRoomDialog">Room not found\nYou can create a new room with this name</string>
     <string name="FindRoomDialogCancel">Cancel</string>
-    <string name="FindCreateRoom">Create / Search Room</string>
+    <string name="EnterPassword">Enter password</string>
+    <string name="EnterRoom">Go</string>
 
     <!-- Main -->
     <string name="OrderedText">Ordered</string>

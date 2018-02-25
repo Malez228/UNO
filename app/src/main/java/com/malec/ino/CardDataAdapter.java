@@ -45,7 +45,7 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
         Integer card = Cards.get(position);
 
         holder.PassImage.setTag(Cards.get(position)+"");
-        holder.PassImage.setImageDrawable(context.getResources().getDrawable(GameActivity.LoadCard(card)));
+        holder.PassImage.setImageDrawable(context.getResources().getDrawable(GameActivity.GetCardResource(card)));
     }
 
     @Override
@@ -68,7 +68,7 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
         return false;
     }
 
-    Boolean CheckColor(int PlayerCard, int BoardCard)
+    Boolean CheckColor(Integer PlayerCard, Integer BoardCard)
     {
         if (PlayerCard == BoardCard)
             return true;
@@ -105,11 +105,10 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
         GameActivity.recyclerView[0].getAdapter().notifyDataSetChanged();
     }
 
-
     Animation.AnimationListener CardSendAnimation = new Animation.AnimationListener()
     {
         @Override
-        public void onAnimationStart(Animation animation) { }
+        public void onAnimationStart(Animation animation) { GameActivity.EndTurn.setVisibility(View.INVISIBLE); }
 
         @Override
         public void onAnimationEnd(Animation animation)
@@ -128,10 +127,6 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
                 GameActivity.ColorPicker.setVisibility(View.VISIBLE);
             } else
                 GiveTurn(GameActivity.board.TurnDir, SkipTurn);
-
-            GameActivity.CardOffset--;
-            if (GameActivity.CardOffset < 0)
-                GameActivity.CardOffset = 0;
 
             GameActivity.board.UpdateBoard();
             GameActivity.recyclerView[0].getAdapter().notifyDataSetChanged();
@@ -160,7 +155,9 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
         @Override
         public void onClick(View view)
         {
-            SentCard = Integer.valueOf(((ConstraintLayout) view).getChildAt(0).getTag().toString());
+            if (GameActivity.board.CurrentPlayer == GameActivity.player.ID)
+            {
+                SentCard = Integer.valueOf(((ConstraintLayout) view).getChildAt(0).getTag().toString());
 
                 if (CheckColor(SentCard, GameActivity.board.Card) || CheckShape(SentCard, GameActivity.board.Card) || (int) (SentCard / 13) == GameActivity.board.Color)
                 {
@@ -199,7 +196,7 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
                     //Анимация
                     if (norm)
                     {
-                        GameActivity.AnimationCard.setImageDrawable(context.getResources().getDrawable(GameActivity.LoadCard(SentCard)));
+                        GameActivity.AnimationCard.setImageDrawable(context.getResources().getDrawable(GameActivity.GetCardResource(SentCard)));
                         GameActivity.AnimationCard.setVisibility(View.VISIBLE);
                         GameActivity.player.HandCards.remove(GameActivity.player.HandCards.indexOf(SentCard));
                         GameActivity.recyclerView[0].getAdapter().notifyDataSetChanged();
@@ -210,6 +207,7 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
                         GameActivity.AnimationCard.startAnimation(DropCard);
                     }
                 }
+            }
         }
     }
 }

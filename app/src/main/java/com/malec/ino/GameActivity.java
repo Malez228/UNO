@@ -14,12 +14,12 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -41,9 +41,8 @@ public class GameActivity extends AppCompatActivity
     TextView ConnectedPlayersText, CurrentPlayerText, MaxDrawText, HandCardsCountText, ColorText;
     ConstraintLayout BoardLayout;
     public static LinearLayout ColorPicker;
-    RadioButton RadioR, RadioY, RadioG, RadioB;
-    RadioGroup ColorGroup;
-    Button SubmitRadio, EndTurn;
+    public static Button EndTurn;
+    public static ToggleButton RedColorPicker, YellowColorPicker, GreenColorPicker, BlueColorPicker;
 
     public static final RecyclerView[] recyclerView = new RecyclerView[1];
 
@@ -53,127 +52,11 @@ public class GameActivity extends AppCompatActivity
     public static Board board;
     public static Player player;
 
-    static Integer CardOffset = 0;
-
     Boolean SERVER = false;
     public static Boolean Reconnect = false;
     int BackPressCounter = 2;
 
     public static MenuActivity.Room ThisRoom;
-
-    //TODO заменить выбор цвета на квадраты с цветами
-
-    void GenerateCards()
-    {
-        for (int i = 0; i < Cards.length - 1; i++)
-        {
-            CardsArray.add(i);
-        }
-    }
-
-    public static int LoadCard(int i)
-    {
-        switch (i)
-        {
-            case 0: return R.drawable.r0;
-            case 1: return R.drawable.r1;
-            case 2: return R.drawable.r2;
-            case 3: return R.drawable.r3;
-            case 4: return R.drawable.r4;
-            case 5: return R.drawable.r5;
-            case 6: return R.drawable.r6;
-            case 7: return R.drawable.r7;
-            case 8: return R.drawable.r8;
-            case 9: return R.drawable.r9;
-            case 10: return R.drawable.r10;
-            case 11: return R.drawable.r11;
-            case 12: return R.drawable.r12;
-
-            case 13: return R.drawable.y0;
-            case 14: return R.drawable.y1;
-            case 15: return R.drawable.y2;
-            case 16: return R.drawable.y3;
-            case 17: return R.drawable.y4;
-            case 18: return R.drawable.y5;
-            case 19: return R.drawable.y6;
-            case 20: return R.drawable.y7;
-            case 21: return R.drawable.y8;
-            case 22: return R.drawable.y9;
-            case 23: return R.drawable.y10;
-            case 24: return R.drawable.y11;
-            case 25: return R.drawable.y12;
-
-            case 26: return R.drawable.g0;
-            case 27: return R.drawable.g1;
-            case 28: return R.drawable.g2;
-            case 29: return R.drawable.g3;
-            case 30: return R.drawable.g4;
-            case 31: return R.drawable.g5;
-            case 32: return R.drawable.g6;
-            case 33: return R.drawable.g7;
-            case 34: return R.drawable.g8;
-            case 35: return R.drawable.g9;
-            case 36: return R.drawable.g10;
-            case 37: return R.drawable.g11;
-            case 38: return R.drawable.g12;
-
-            case 39: return R.drawable.b0;
-            case 40: return R.drawable.b1;
-            case 41: return R.drawable.b2;
-            case 42: return R.drawable.b3;
-            case 43: return R.drawable.b4;
-            case 44: return R.drawable.b5;
-            case 45: return R.drawable.b6;
-            case 46: return R.drawable.b7;
-            case 47: return R.drawable.b8;
-            case 48: return R.drawable.b9;
-            case 49: return R.drawable.b10;
-            case 50: return R.drawable.b11;
-            case 51: return R.drawable.b12;
-
-            case 52: return R.drawable.w0;
-            case 53: return R.drawable.w0;
-            case 54: return R.drawable.w1;
-            case 55: return R.drawable.w1;
-
-            default: return R.drawable.empty_card;
-        }
-    }
-
-    void SetImage(View v, Integer i)
-    {
-        try
-        {
-            ((ImageView) v).setImageDrawable(getResources().getDrawable(LoadCard(i)));
-        } catch (Exception e)
-        {
-            ((ImageView) v).setImageDrawable(getResources().getDrawable(LoadCard(56)));
-        }
-        v.setTag(i.toString());
-    }
-
-    void GiveTurn(int TurnDir, int SkipTurn)
-    {
-        int NewPlayerIndex = player.ID + SkipTurn * TurnDir;
-        if (board.ConnectedPlayers == 1)
-        {
-            NewPlayerIndex = 1;
-        } else
-        {
-            if (NewPlayerIndex - board.ConnectedPlayers == 1)
-                NewPlayerIndex = 1;
-            else if (NewPlayerIndex - board.ConnectedPlayers == 2)
-                NewPlayerIndex = 2;
-            else if (NewPlayerIndex == 0)
-                NewPlayerIndex = board.ConnectedPlayers;
-            else if (NewPlayerIndex == -1)
-                NewPlayerIndex = board.ConnectedPlayers - 1;
-        }
-
-        dataBase.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(NewPlayerIndex);
-        dataBase.child(MenuActivity.RoomName).child("Turns").setValue(board.Turns + 1);
-        recyclerView[0].getAdapter().notifyDataSetChanged();
-    }
 
     public class Board
     {
@@ -266,6 +149,198 @@ public class GameActivity extends AppCompatActivity
         }
     }
 
+    void GenerateCards()
+    {
+        for (int i = 0; i < Cards.length - 1; i++)
+        {
+            CardsArray.add(i);
+        }
+    }
+
+    public static int GetCardResource(int i)
+    {
+        switch (i)
+        {
+            case 0:
+                return R.drawable.r0;
+            case 1:
+                return R.drawable.r1;
+            case 2:
+                return R.drawable.r2;
+            case 3:
+                return R.drawable.r3;
+            case 4:
+                return R.drawable.r4;
+            case 5:
+                return R.drawable.r5;
+            case 6:
+                return R.drawable.r6;
+            case 7:
+                return R.drawable.r7;
+            case 8:
+                return R.drawable.r8;
+            case 9:
+                return R.drawable.r9;
+            case 10:
+                return R.drawable.r10;
+            case 11:
+                return R.drawable.r11;
+            case 12:
+                return R.drawable.r12;
+
+            case 13:
+                return R.drawable.y0;
+            case 14:
+                return R.drawable.y1;
+            case 15:
+                return R.drawable.y2;
+            case 16:
+                return R.drawable.y3;
+            case 17:
+                return R.drawable.y4;
+            case 18:
+                return R.drawable.y5;
+            case 19:
+                return R.drawable.y6;
+            case 20:
+                return R.drawable.y7;
+            case 21:
+                return R.drawable.y8;
+            case 22:
+                return R.drawable.y9;
+            case 23:
+                return R.drawable.y10;
+            case 24:
+                return R.drawable.y11;
+            case 25:
+                return R.drawable.y12;
+
+            case 26:
+                return R.drawable.g0;
+            case 27:
+                return R.drawable.g1;
+            case 28:
+                return R.drawable.g2;
+            case 29:
+                return R.drawable.g3;
+            case 30:
+                return R.drawable.g4;
+            case 31:
+                return R.drawable.g5;
+            case 32:
+                return R.drawable.g6;
+            case 33:
+                return R.drawable.g7;
+            case 34:
+                return R.drawable.g8;
+            case 35:
+                return R.drawable.g9;
+            case 36:
+                return R.drawable.g10;
+            case 37:
+                return R.drawable.g11;
+            case 38:
+                return R.drawable.g12;
+
+            case 39:
+                return R.drawable.b0;
+            case 40:
+                return R.drawable.b1;
+            case 41:
+                return R.drawable.b2;
+            case 42:
+                return R.drawable.b3;
+            case 43:
+                return R.drawable.b4;
+            case 44:
+                return R.drawable.b5;
+            case 45:
+                return R.drawable.b6;
+            case 46:
+                return R.drawable.b7;
+            case 47:
+                return R.drawable.b8;
+            case 48:
+                return R.drawable.b9;
+            case 49:
+                return R.drawable.b10;
+            case 50:
+                return R.drawable.b11;
+            case 51:
+                return R.drawable.b12;
+
+            case 52:
+                return R.drawable.w0;
+            case 53:
+                return R.drawable.w0;
+            case 54:
+                return R.drawable.w1;
+            case 55:
+                return R.drawable.w1;
+
+            default:
+                return R.drawable.empty_card;
+        }
+    }
+
+    void SetImage(View v, Integer i)
+    {
+        try
+        {
+            ((ImageView) v).setImageDrawable(getResources().getDrawable(GetCardResource(i)));
+        } catch (Exception e)
+        {
+            ((ImageView) v).setImageDrawable(getResources().getDrawable(GetCardResource(56)));
+        }
+        v.setTag(i.toString());
+    }
+
+    void GiveTurn(int TurnDir, int SkipTurn)
+    {
+        int NewPlayerIndex = player.ID + SkipTurn * TurnDir;
+        if (board.ConnectedPlayers == 1)
+        {
+            NewPlayerIndex = 1;
+        } else
+        {
+            if (NewPlayerIndex - board.ConnectedPlayers == 1)
+                NewPlayerIndex = 1;
+            else if (NewPlayerIndex - board.ConnectedPlayers == 2)
+                NewPlayerIndex = 2;
+            else if (NewPlayerIndex == 0)
+                NewPlayerIndex = board.ConnectedPlayers;
+            else if (NewPlayerIndex == -1)
+                NewPlayerIndex = board.ConnectedPlayers - 1;
+        }
+
+        dataBase.child(MenuActivity.RoomName).child("CurrentPlayer").setValue(NewPlayerIndex);
+        dataBase.child(MenuActivity.RoomName).child("Turns").setValue(board.Turns + 1);
+    }
+
+    Boolean CheckShape(Integer PlayerCard, Integer BoardCard)
+    {
+        if (PlayerCard == BoardCard)
+            return true;
+
+        if (PlayerCard - 39 == BoardCard || PlayerCard - 26 == BoardCard || PlayerCard - 13 == BoardCard)
+            return true;
+
+        return BoardCard - 39 == PlayerCard || BoardCard - 26 == PlayerCard || BoardCard - 13 == PlayerCard;
+
+    }
+
+    Boolean CheckColor(Integer PlayerCard, Integer BoardCard)
+    {
+        if (PlayerCard == BoardCard)
+            return true;
+
+        if (PlayerCard / 13 >= 4)
+            return true;
+
+        return PlayerCard / 13 == BoardCard / 13;
+
+    }
+
     private boolean DeckTouch = true;
 
     //region DeckTouchListener
@@ -301,7 +376,7 @@ public class GameActivity extends AppCompatActivity
 
                     SetImage(AnimationCard, board.NewCard);
                     TranslateAnimation DropCard = null;
-                    RecyclerView CardsRecycler = (RecyclerView)findViewById(R.id.CardsRecycler);
+                    RecyclerView CardsRecycler = findViewById(R.id.CardsRecycler);
                     DropCard = new TranslateAnimation(AnimX1, CardsRecycler.getX() - AnimX0, AnimY1, 0);
                     DropCard.setDuration(1100);
                     AnimationCard.setVisibility(View.VISIBLE);
@@ -327,10 +402,6 @@ public class GameActivity extends AppCompatActivity
 
             player.HandCards.add(board.NewCard);
 
-            CardOffset = player.HandCards.size() - 5;
-            if (CardOffset < 0)
-                CardOffset = 0;
-
             if (SERVER)
             {
                 if (CardsArray.size() <= 0)
@@ -348,7 +419,11 @@ public class GameActivity extends AppCompatActivity
                     board.MaxDraw = 7;
                 else
                     board.MaxDraw = 1;
-                GiveTurn(board.TurnDir, 1);
+
+                if ((CheckColor(board.NewCard, GameActivity.board.Card) || CheckShape(board.NewCard, GameActivity.board.Card) || board.NewCard / 13 == GameActivity.board.Color) && board.Turns > board.ConnectedPlayers)
+                    EndTurn.setVisibility(View.VISIBLE);
+                else
+                    GiveTurn(board.TurnDir, 1);
             }
             dataBase.child(MenuActivity.RoomName).child("MaxDraw").setValue(board.MaxDraw);
 
@@ -381,7 +456,7 @@ public class GameActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.ToolBar);
+        Toolbar myToolbar = findViewById(R.id.ToolBar);
         setSupportActionBar(myToolbar);
         this.setTitle(getString(R.string.app_name) + " - " + MenuActivity.RoomName);
 
@@ -390,26 +465,26 @@ public class GameActivity extends AppCompatActivity
         player.Name = MenuActivity.UserName;
 
         final CardDataAdapter adapter = new CardDataAdapter(this, player.HandCards);
-        recyclerView[0] = (RecyclerView) findViewById(R.id.CardsRecycler);
+        recyclerView[0] = findViewById(R.id.CardsRecycler);
         recyclerView[0].setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));
         recyclerView[0].setAdapter(adapter);
 
-        Deck = (ImageView) findViewById(R.id.Deck);
-        CurrentCard = (ImageView) findViewById(R.id.CurrentCard);
-        AnimationCard = (ImageView) findViewById(R.id.AnimationCard);
-        ConnectedPlayersText = (TextView) findViewById(R.id.ConnectedPlayersText);
-        CurrentPlayerText = (TextView) findViewById(R.id.CurrentPlayerText);
-        MaxDrawText = (TextView) findViewById(R.id.MaxDrawText);
-        ColorText = (TextView) findViewById(R.id.ColorText);
-        HandCardsCountText = (TextView) findViewById(R.id.HandCardsCountText);
-        BoardLayout = (ConstraintLayout) findViewById(R.id.BoardLayout);
-        ColorPicker = (LinearLayout) findViewById(R.id.ColorPicker);
-        RadioR = (RadioButton) findViewById(R.id.RedColorPick);
-        RadioY = (RadioButton) findViewById(R.id.YellowColorPick);
-        RadioG = (RadioButton) findViewById(R.id.GreenColorPick);
-        RadioB = (RadioButton) findViewById(R.id.BlueColorPick);
-        ColorGroup = (RadioGroup) findViewById(R.id.ColorGroup);
-        SubmitRadio = (Button) findViewById(R.id.ColorPick);
+        Deck = findViewById(R.id.Deck);
+        CurrentCard = findViewById(R.id.CurrentCard);
+        AnimationCard = findViewById(R.id.AnimationCard);
+        ConnectedPlayersText = findViewById(R.id.ConnectedPlayersText);
+        CurrentPlayerText = findViewById(R.id.CurrentPlayerText);
+        MaxDrawText = findViewById(R.id.MaxDrawText);
+        ColorText = findViewById(R.id.ColorText);
+        HandCardsCountText = findViewById(R.id.HandCardsCountText);
+        BoardLayout = findViewById(R.id.BoardLayout);
+        ColorPicker = findViewById(R.id.ColorPicker);
+        RedColorPicker = findViewById(R.id.RedColorPicker);
+        YellowColorPicker = findViewById(R.id.YellowColorPicker);
+        GreenColorPicker = findViewById(R.id.GreenColorPicker);
+        BlueColorPicker = findViewById(R.id.BlueColorPicker);
+
+        EndTurn = findViewById(R.id.EndTurn);
 
         Deck.setOnTouchListener(DeckTouchListener);
 
@@ -455,6 +530,7 @@ public class GameActivity extends AppCompatActivity
                 GameActivity.Player player = new GameActivity.Player();
                 player = player.InitPlayer();
                 player.Key = dataSnapshot.getKey().toString();
+                player.ID = Integer.valueOf(dataSnapshot.child("ID").getValue().toString());
                 player.Name = dataSnapshot.child("Name").getValue().toString();
 
                 ThisRoom.Players.add(player);
@@ -547,23 +623,65 @@ public class GameActivity extends AppCompatActivity
         });
 
         //region Listeners
-        SubmitRadio.setOnClickListener(new View.OnClickListener()
+        RedColorPicker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+            {
+                ColorPicker.setVisibility(View.INVISIBLE);
+                dataBase.child(MenuActivity.RoomName).child("Color").setValue(0);
+                RedColorPicker.setChecked(false);
+                ColorPicker.setVisibility(View.INVISIBLE);
+                GiveTurn(board.TurnDir, 1);
+            }
+        });
+
+        YellowColorPicker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+            {
+                ColorPicker.setVisibility(View.INVISIBLE);
+                dataBase.child(MenuActivity.RoomName).child("Color").setValue(1);
+                YellowColorPicker.setChecked(false);
+                ColorPicker.setVisibility(View.INVISIBLE);
+                GiveTurn(board.TurnDir, 1);
+            }
+        });
+
+        GreenColorPicker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+            {
+                ColorPicker.setVisibility(View.INVISIBLE);
+                dataBase.child(MenuActivity.RoomName).child("Color").setValue(2);
+                GreenColorPicker.setChecked(false);
+                ColorPicker.setVisibility(View.INVISIBLE);
+                GiveTurn(board.TurnDir, 1);
+            }
+        });
+
+        BlueColorPicker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+            {
+                ColorPicker.setVisibility(View.INVISIBLE);
+                dataBase.child(MenuActivity.RoomName).child("Color").setValue(3);
+                BlueColorPicker.setChecked(false);
+                ColorPicker.setVisibility(View.INVISIBLE);
+                GiveTurn(board.TurnDir, 1);
+            }
+        });
+
+        EndTurn.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-                if (RadioR.isChecked())
-                    dataBase.child(MenuActivity.RoomName).child("Color").setValue(0);
-                if (RadioY.isChecked())
-                    dataBase.child(MenuActivity.RoomName).child("Color").setValue(1);
-                if (RadioG.isChecked())
-                    dataBase.child(MenuActivity.RoomName).child("Color").setValue(2);
-                if (RadioB.isChecked())
-                    dataBase.child(MenuActivity.RoomName).child("Color").setValue(3);
-                ColorGroup.clearCheck();
-                ColorPicker.setVisibility(View.INVISIBLE);
-                ColorText.setVisibility(View.VISIBLE);
                 GiveTurn(board.TurnDir, 1);
+                EndTurn.setVisibility(View.INVISIBLE);
             }
         });
         //endregion

@@ -14,33 +14,13 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <LinearLayout
+        <SearchView
+            android:id="@+id/RoomSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorBackL"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <EditText
-                android:id="@+id/RoomNameText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:hint="RoomName"
-                android:inputType="textPersonName"
-                android:textColor="@color/colorPrimaryDark"/>
-
-            <Button
-                android:id="@+id/SearchButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@android:drawable/ic_menu_search"/>
-
-        </LinearLayout>
+            android:layout_marginBottom="4dp"
+            android:background="@color/colorBack"
+            />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/RoomListRec"
