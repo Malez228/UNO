@@ -37,6 +37,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,6 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     Random rnd = new Random();
     DatabaseReference dataBase = FirebaseDatabase.getInstance().getReference();
 
-    EditText RoomNameText;
     public static String RoomName;
     public static String ClickRoomName;
 
@@ -111,7 +111,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                             {
                                 adequate = false;
 
-                                if (ClickRoom.Pass.compareTo("0") == 0)
+                                if (ClickRoom.Pass.compareTo("0") == 0 || ClickRoom.PlayersKeys.contains(PhoneKey))
                                 {
                                     if (ClickRoom.PlayersKeys.contains(PhoneKey))
                                     {
@@ -123,6 +123,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                                         Map newPlayerData = new HashMap();
                                         newPlayerData.put("ID", ClickRoom.ConnectedPlayers);
                                         newPlayerData.put("Name", UserName);
+                                        newPlayerData.put("Cards", "");
                                         dataBase.child(ClickRoomName).child("Players").child(PhoneKey).updateChildren(newPlayerData);
                                         dataBase.child(ClickRoomName).child("ConnectedPlayers").setValue(ClickRoom.ConnectedPlayers);
                                     }
@@ -165,6 +166,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                                                     Map newPlayerData = new HashMap();
                                                     newPlayerData.put("ID", finalClickRoom.ConnectedPlayers);
                                                     newPlayerData.put("Name", UserName);
+                                                    newPlayerData.put("Cards", "");
                                                     dataBase.child(ClickRoomName).child("Players").child(PhoneKey).updateChildren(newPlayerData);
                                                     dataBase.child(ClickRoomName).child("ConnectedPlayers").setValue(finalClickRoom.ConnectedPlayers);
                                                 }
@@ -176,6 +178,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                                             {
                                                 Toast.makeText(MenuActivity.this, R.string.WrongPassword, Toast.LENGTH_SHORT).show();
                                                 dialog.dismiss();
+                                                adequate = true;
                                             }
                                         }
                                     }).setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
@@ -183,6 +186,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                                         public void onClick(DialogInterface dialog, int id)
                                         {
                                             dialog.dismiss();
+                                            adequate = true;
                                         }
                                     });
                                     AlertDialog dialog = builder.create();
@@ -220,9 +224,20 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.MenuToolBar);
+        Toolbar toolbar = findViewById(R.id.MenuToolBar);
         setSupportActionBar(toolbar);
         mSettings = getPreferences(MODE_PRIVATE);
+
+        final RecyclerView[] recyclerView = new RecyclerView[1];
+        final RoomDataAdapter adapter = new RoomDataAdapter(this, SearchRoomsList);
+
+        recyclerView[0] = findViewById(R.id.RoomListRec);
+        recyclerView[0].setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        recyclerView[0].setAdapter(adapter);
+        recyclerView[0].addOnItemTouchListener(ItemTouchListener);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         //region Get PhoneKey
         final SharedPreferences.Editor editor = mSettings.edit();
@@ -248,7 +263,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         //endregion
 
         //region Drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         drawer.addDrawerListener(new DrawerLayout.DrawerListener()
@@ -285,17 +300,6 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
         //endregion
 
-        final RecyclerView[] recyclerView = new RecyclerView[1];
-        final RoomDataAdapter adapter = new RoomDataAdapter(this, SearchRoomsList);
-
-        recyclerView[0] = (RecyclerView) findViewById(R.id.RoomListRec);
-        recyclerView[0].setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerView[0].setAdapter(adapter);
-        recyclerView[0].addOnItemTouchListener(ItemTouchListener);
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
         //region CreateRoomFAB
         FloatingActionButton CreateRoomButton = (FloatingActionButton) findViewById(R.id.fab);
         CreateRoomButton.setOnClickListener(new View.OnClickListener()
@@ -327,6 +331,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
                             adequate = false;
 
+                            Integer mm = Calendar.getInstance().get(Calendar.MINUTE);
                             Map newRoomData = new HashMap();
                             Map newPlayerData = new HashMap();
                             newRoomData.put("Pass", Pass);
@@ -337,10 +342,13 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                             newRoomData.put("MaxDraw", 7);
                             newRoomData.put("TurnDir", 1);
                             newRoomData.put("Winner", "");
+                            newRoomData.put("Msg", "");
                             newRoomData.put("Card", rnd.nextInt(52));
                             newRoomData.put("NewCard", rnd.nextInt(52));
+                            newRoomData.put("Time", mm);
                             newPlayerData.put("ID", 1);
                             newPlayerData.put("Name", UserName);
+                            newPlayerData.put("Cards", "");
                             dataBase.child(RoomName).updateChildren(newRoomData);
                             dataBase.child(RoomName).child("Players").child(PhoneKey).updateChildren(newPlayerData);
 
@@ -379,7 +387,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         });
         //endregion
 
-        SearchView RoomSearch = (SearchView) findViewById(R.id.RoomSearch);
+        SearchView RoomSearch = findViewById(R.id.RoomSearch);
         RoomSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener()
         {
             @Override
@@ -421,33 +429,40 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                 {
                     String roomName = dataSnapshot.getKey().toString();
 
-                    final Room NewRoom = new Room();
-                    NewRoom.Name = roomName;
-                    NewRoom.Players = new ArrayList<>();
-
-                    NewRoom.Pass = dataSnapshot.child("Pass").getValue().toString();
-                    NewRoom.Turns = Integer.valueOf(dataSnapshot.child("Turns").getValue().toString());
-                    for (DataSnapshot Player : dataSnapshot.child("Players").getChildren())
-                    {
-                        GameActivity.Player player = new GameActivity.Player();
-                        player = player.InitPlayer();
-                        player.Key = Player.getKey().toString();
-                        player.ID = Integer.valueOf(Player.child("ID").getValue().toString());
-                        player.Name = Player.child("Name").getValue().toString();
-
-                        NewRoom.Players.add(player);
-                        NewRoom.PlayersKeys.add(player.Key);
-                    }
-                    if (NewRoom.Players.isEmpty())
-                        NewRoom.ConnectedPlayers = 0;
+                    Integer mm = Calendar.getInstance().get(Calendar.MINUTE);
+                    Integer BaseMM = Integer.valueOf(dataSnapshot.child("Time").getValue().toString());
+                    if (mm - Integer.valueOf(BaseMM) >= 10 || (mm - Integer.valueOf(BaseMM) >= -50 && mm - Integer.valueOf(BaseMM) < 0))
+                        dataBase.child(roomName).removeValue();
                     else
-                        NewRoom.ConnectedPlayers = NewRoom.Players.size();
+                    {
+                        final Room NewRoom = new Room();
+                        NewRoom.Name = roomName;
+                        NewRoom.Players = new ArrayList<>();
 
-                    RoomsList.add(NewRoom);
-                    SearchRoomsList.add(NewRoom);
-                    SearchRoomsNameList.add(NewRoom.Name);
-                    RoomsNameList.add(NewRoom.Name);
-                    recyclerView[0].getAdapter().notifyDataSetChanged();
+                        NewRoom.Pass = dataSnapshot.child("Pass").getValue().toString();
+                        NewRoom.Turns = Integer.valueOf(dataSnapshot.child("Turns").getValue().toString());
+                        for (DataSnapshot Player : dataSnapshot.child("Players").getChildren())
+                        {
+                            GameActivity.Player player = new GameActivity.Player();
+                            player = player.InitPlayer();
+                            player.Key = Player.getKey().toString();
+                            player.ID = Integer.valueOf(Player.child("ID").getValue().toString());
+                            player.Name = Player.child("Name").getValue().toString();
+
+                            NewRoom.Players.add(player);
+                            NewRoom.PlayersKeys.add(player.Key);
+                        }
+                        if (NewRoom.Players.isEmpty())
+                            NewRoom.ConnectedPlayers = 0;
+                        else
+                            NewRoom.ConnectedPlayers = NewRoom.Players.size();
+
+                        RoomsList.add(NewRoom);
+                        SearchRoomsList.add(NewRoom);
+                        SearchRoomsNameList.add(NewRoom.Name);
+                        RoomsNameList.add(NewRoom.Name);
+                        recyclerView[0].getAdapter().notifyDataSetChanged();
+                    }
                 }
             }
 
@@ -509,7 +524,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onBackPressed()
     {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START))
         {
             drawer.closeDrawer(GravityCompat.START);

@@ -1,20 +1,28 @@
 package com.malec.ino;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -29,7 +37,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class GameActivity extends AppCompatActivity
@@ -52,9 +63,11 @@ public class GameActivity extends AppCompatActivity
     public static Board board;
     public static Player player;
 
-    Boolean SERVER = false;
+    Boolean SERVER = false, NormClose = true;
     public static Boolean Reconnect = false;
     int BackPressCounter = 2;
+
+    Menu menu = null;
 
     public static MenuActivity.Room ThisRoom;
 
@@ -121,6 +134,9 @@ public class GameActivity extends AppCompatActivity
                     ColorText.setVisibility(View.INVISIBLE);
                     break;
             }
+
+            Integer mm = Calendar.getInstance().get(Calendar.MINUTE);
+            dataBase.child(MenuActivity.RoomName).child("Time").setValue(mm);
         }
     }
 
@@ -427,12 +443,27 @@ public class GameActivity extends AppCompatActivity
             }
             dataBase.child(MenuActivity.RoomName).child("MaxDraw").setValue(board.MaxDraw);
 
+            dataBase.child(MenuActivity.RoomName).child("Players").child(GameActivity.player.Key).child("Cards").setValue(GameActivity.SyncCards());
+
             recyclerView[0].getAdapter().notifyDataSetChanged();
         }
 
         @Override
         public void onAnimationRepeat(Animation animation) { }
     };
+
+    public static String SyncCards()
+    {
+        String Cards = "";
+        try
+        {
+            for (Integer C : GameActivity.player.HandCards)
+                Cards += C + ";";
+            Cards = Cards.substring(0, Cards.length() - 1);
+        } catch (Exception e) { }
+
+        return Cards;
+    }
 
     @Override
     public void onBackPressed()
@@ -463,6 +494,7 @@ public class GameActivity extends AppCompatActivity
         player = new Player();
         board = new Board();
         player.Name = MenuActivity.UserName;
+        player.Key = MenuActivity.PhoneKey;
 
         final CardDataAdapter adapter = new CardDataAdapter(this, player.HandCards);
         recyclerView[0] = findViewById(R.id.CardsRecycler);
@@ -504,10 +536,34 @@ public class GameActivity extends AppCompatActivity
 
                 player.ID = board.ConnectedPlayers;
 
+                if (Reconnect)
+                {
+                    try
+                    {
+                        String CardsArray = dataSnapshot.child("Players").child(player.Key).child("Cards").getValue().toString();
+                        String[] Cp = CardsArray.split(";");
+                        for (String C : Cp)
+                            player.HandCards.add(Integer.valueOf(C));
+                    } catch (Exception e) {}
+
+                    player.ID = Integer.valueOf(dataSnapshot.child("Players").child(player.Key).child("ID").getValue().toString());
+                }
+
                 if (player.ID == 1)
                 {
                     SERVER = true;
                     GenerateCards();
+
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            if (menu != null)
+                                menu.getItem(0).setVisible(true);
+                        }
+                    }, 100);
                 }
 
                 MaxDrawText.setVisibility(View.VISIBLE);
@@ -598,6 +654,10 @@ public class GameActivity extends AppCompatActivity
                         board.Color = Integer.valueOf(dataSnapshot.getValue().toString());
                         ColorText.setVisibility(View.VISIBLE);
                         break;
+                    case "Msg":
+                        Snackbar.make(BoardLayout, dataSnapshot.getValue().toString(), Snackbar.LENGTH_INDEFINITE) .setAction("Ok", new View.OnClickListener()
+                        { @Override public void onClick(View view) { } }).show();
+                        break;
                     case "Winner":
                         Toast.makeText(GameActivity.this, dataSnapshot.getValue().toString() + " победил!", Toast.LENGTH_SHORT).show();
                         //TODO переигровка?
@@ -613,7 +673,15 @@ public class GameActivity extends AppCompatActivity
             public void onChildAdded(DataSnapshot dataSnapshot, String s) { }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            public void onChildRemoved(DataSnapshot dataSnapshot)
+            {
+                if (NormClose)
+                {
+                    NormClose = false;
+                    Toast.makeText(GameActivity.this, getString(R.string.RoomRemove), Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
@@ -685,5 +753,74 @@ public class GameActivity extends AppCompatActivity
             }
         });
         //endregion
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        this.menu = menu;
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.CloseRoom:
+                dataBase.child(ThisRoom.Name).removeValue();
+
+                return true;
+
+            case R.id.mes:
+                AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
+                LayoutInflater inflater = GameActivity.this.getLayoutInflater();
+                final View Field = inflater.inflate(R.layout.room_creator_layout, null);
+
+                EditText RoomNameField = Field.findViewById(R.id.RoomNameField);
+                TextView ActionText = Field.findViewById(R.id.ActionText);
+                final EditText TextField = Field.findViewById(R.id.PassField);
+
+                RoomNameField.setVisibility(View.GONE);
+                ActionText.setText(R.string.EnterMessage);
+                TextField.setHint(R.string.EMessage);
+
+                builder.setView(Field).setPositiveButton(getString(R.string.SMessage), new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        String Text = TextField.getText().toString();
+
+                        if (!Text.isEmpty() || Text.compareTo("") == 0)
+                        {
+                            if (Text.startsWith("=ЧДПК"))
+                            {
+                                player.HandCards.add(53);
+                                recyclerView[0].getAdapter().notifyDataSetChanged();
+                            } else
+                                dataBase.child(ThisRoom.Name).child("Msg").setValue(player.Name + ": " + Text);
+                        } else
+                        {
+                            dialog.dismiss();
+                        }
+                    }
+                }).setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

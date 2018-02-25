@@ -72,8 +72,9 @@
             android:id="@+id/RedColorPicker"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
+            android:layout_margin="8dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/ColorRed"
+            android:background="@drawable/red_color_back"
             android:textOff=" "
             android:textOn=" "/>
 
@@ -81,8 +82,9 @@
             android:id="@+id/YellowColorPicker"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
+            android:layout_margin="8dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/ColorYellow"
+            android:background="@drawable/yellow_color_back"
             android:textOff=" "
             android:textOn=" "/>
 
@@ -90,8 +92,9 @@
             android:id="@+id/GreenColorPicker"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
+            android:layout_margin="8dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/ColorGreen"
+            android:background="@drawable/green_color_back"
             android:textOff=" "
             android:textOn=" "/>
 
@@ -99,8 +102,9 @@
             android:id="@+id/BlueColorPicker"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
+            android:layout_margin="8dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/ColorBlue"
+            android:background="@drawable/blue_color_back"
             android:textOff=" "
             android:textOn=" "/>
     </LinearLayout>
@@ -163,7 +167,7 @@
         android:id="@+id/EndTurn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="End turn"
+        android:text="@string/EndTurn"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="@dimen/DefTextSize"
         android:visibility="invisible"

@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHolder>
@@ -133,6 +134,8 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
 
             if (GameActivity.player.HandCards.isEmpty())
                 dataBase.child(MenuActivity.RoomName).child("Winner").setValue(MenuActivity.UserName);
+
+            dataBase.child(MenuActivity.RoomName).child("Players").child(GameActivity.player.Key).child("Cards").setValue(GameActivity.SyncCards());
         }
 
         @Override

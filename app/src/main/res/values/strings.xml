@@ -27,6 +27,8 @@
     <string name="RoomAlive"> This room already exists.\nUse the search to connect</string>
     <string name="RoomRemove">Server removed this room</string>
     <string name="EnterMessage">Enter message</string>
+    <string name="EMessage">Message</string>
+    <string name="SMessage">Send</string>
     <string name="EnterPass">Enter password</string>
     <string name="GameIsRunning">The game is running</string>
     <string name="WrongPassword">Wrong password</string>

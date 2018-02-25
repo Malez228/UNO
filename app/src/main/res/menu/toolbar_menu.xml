@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/CloseRoom"
+        android:icon="@drawable/close_room"
+        android:title="close"
+        android:visible="false"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/mes"
+        android:icon="@drawable/stat_notify_chat"
+        android:title="Messages"
+        app:showAsAction="always"/>
+</menu>
