@@ -41,6 +41,8 @@
     <string name="RoomLabelText">Room</string>
     <string name="RoomDelLabelText">removed</string>
 
+    <string name="ProgressRevenge">Would you like to continue?</string>
+
     <string name="PlayerPreLabelText">Player</string>
     <string name="PlayerPreWinLabelText">has one card left</string>
 

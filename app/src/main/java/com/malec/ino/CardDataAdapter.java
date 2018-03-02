@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.Calendar;
 import java.util.List;
 
 public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHolder>
@@ -207,7 +206,7 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
                         GameActivity.player.HandCards.remove(GameActivity.player.HandCards.indexOf(SentCard));
                         GameActivity.recyclerView[0].getAdapter().notifyDataSetChanged();
 
-                        final TranslateAnimation DropCard = new TranslateAnimation(GameActivity.recyclerView[0].getX() - GameActivity.AnimationCard.getX(), GameActivity.CurrentCard.getX() - GameActivity.AnimationCard.getX(), 0, GameActivity.CurrentCard.getY() - GameActivity.AnimationCard.getY());
+                        final TranslateAnimation DropCard = new TranslateAnimation(view.getX() - GameActivity.AnimationCard.getX(), GameActivity.CurrentCard.getX() - GameActivity.AnimationCard.getX(), 0, GameActivity.CurrentCard.getY() - GameActivity.AnimationCard.getY());
                         DropCard.setDuration(800);
                         DropCard.setAnimationListener(CardSendAnimation);
                         GameActivity.AnimationCard.startAnimation(DropCard);

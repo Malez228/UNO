@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,9 +39,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 public class GameActivity extends AppCompatActivity
@@ -63,9 +62,10 @@ public class GameActivity extends AppCompatActivity
     public static Board board;
     public static Player player;
 
-    Boolean SERVER = false, NormClose = true;
-    public static Boolean Reconnect = false;
+    public static Boolean SERVER = false, NormClose = true, Reconnect = false;
     int BackPressCounter = 2;
+
+    public static Integer ReadyPlayers = 0;
 
     Menu menu = null;
 
@@ -299,6 +299,19 @@ public class GameActivity extends AppCompatActivity
         }
     }
 
+    public static String SyncCards()
+    {
+        String Cards = "";
+        try
+        {
+            for (Integer C : GameActivity.player.HandCards)
+                Cards += C + ";";
+            Cards = Cards.substring(0, Cards.length() - 1);
+        } catch (Exception e) { }
+
+        return Cards;
+    }
+
     void SetImage(View v, Integer i)
     {
         try
@@ -357,6 +370,11 @@ public class GameActivity extends AppCompatActivity
 
     }
 
+    float DpToPx(float dp)
+    {
+        return dp * getApplicationContext().getResources().getDisplayMetrics().density;
+    }
+
     private boolean DeckTouch = true;
 
     //region DeckTouchListener
@@ -381,9 +399,14 @@ public class GameActivity extends AppCompatActivity
                     }
                 }).start();
 
+                EndTurn.setVisibility(View.INVISIBLE);
+
                 //Анимация
                 if (true)
                 {
+                    for (int i = 0; i < recyclerView[0].getChildCount(); i++)
+                        Log.e("GAVNO", recyclerView[0].getChildAt(i).getX() + "");
+
                     //Штуки для анимации
                     Float AnimX0, AnimX1, AnimY1;
                     AnimX0 = AnimationCard.getX();
@@ -392,8 +415,11 @@ public class GameActivity extends AppCompatActivity
 
                     SetImage(AnimationCard, board.NewCard);
                     TranslateAnimation DropCard = null;
-                    RecyclerView CardsRecycler = findViewById(R.id.CardsRecycler);
-                    DropCard = new TranslateAnimation(AnimX1, CardsRecycler.getX() - AnimX0, AnimY1, 0);
+                    if (player.HandCards.isEmpty())
+                        DropCard = new TranslateAnimation(AnimX1, AnimX0 - DpToPx(4), AnimY1, 0);
+                    else
+                        DropCard = new TranslateAnimation(AnimX1, recyclerView[0].getChildAt(recyclerView[0].getChildCount() - 1).getX() - AnimX0 - DpToPx(86), AnimY1, 0);
+
                     DropCard.setDuration(1100);
                     AnimationCard.setVisibility(View.VISIBLE);
                     DropCard.setAnimationListener(CardReceiveAnimation);
@@ -452,19 +478,6 @@ public class GameActivity extends AppCompatActivity
         public void onAnimationRepeat(Animation animation) { }
     };
 
-    public static String SyncCards()
-    {
-        String Cards = "";
-        try
-        {
-            for (Integer C : GameActivity.player.HandCards)
-                Cards += C + ";";
-            Cards = Cards.substring(0, Cards.length() - 1);
-        } catch (Exception e) { }
-
-        return Cards;
-    }
-
     @Override
     public void onBackPressed()
     {
@@ -519,6 +532,8 @@ public class GameActivity extends AppCompatActivity
         EndTurn = findViewById(R.id.EndTurn);
 
         Deck.setOnTouchListener(DeckTouchListener);
+
+        startService(new Intent(GameActivity.this, TurnExplorer.class));
 
         dataBase.child(MenuActivity.RoomName).addListenerForSingleValueEvent(new ValueEventListener()
         {
@@ -658,15 +673,76 @@ public class GameActivity extends AppCompatActivity
                         Snackbar.make(BoardLayout, dataSnapshot.getValue().toString(), Snackbar.LENGTH_INDEFINITE) .setAction("Ok", new View.OnClickListener()
                         { @Override public void onClick(View view) { } }).show();
                         break;
+                    /*case "Ready":
+                        Intent i = getIntent();
+                        finish();
+                        startActivity(i);
+                        break;*/
                     case "Winner":
                         String t = dataSnapshot.getValue().toString();
                         if (t.contains("☺"))
                         {
                             t = t.substring(1, t.length());
                             Toast.makeText(GameActivity.this, t + " " + getString(R.string.PlayerWinLabelText), Toast.LENGTH_SHORT).show();
-                            //TODO переигровка?
+
+                            stopService(new Intent(GameActivity.this, TurnExplorer.class));
                             finish();
-                            dataBase.child(MenuActivity.RoomName).removeValue();
+
+                            /*
+                            AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
+                            LayoutInflater inflater = GameActivity.this.getLayoutInflater();
+                            final View Field = inflater.inflate(R.layout.room_creator_layout, null);
+
+                            EditText RoomNameField = Field.findViewById(R.id.RoomNameField);
+                            EditText PassField = Field.findViewById(R.id.PassField);
+                            TextView ActionText = Field.findViewById(R.id.ActionText);
+                            ActionText.setTextSize(18);
+
+                            PassField.setVisibility(View.GONE);
+                            RoomNameField.setVisibility(View.GONE);
+                            ActionText.setText(R.string.ProgressRevenge);
+                            builder.setView(Field).setPositiveButton("OK", new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                    if (SERVER)
+                                    {
+                                        Integer mm = Calendar.getInstance().get(Calendar.MINUTE);
+                                        Map newRoomData = new HashMap();
+                                        newRoomData.put("Turns", 1);
+                                        newRoomData.put("Color", -1);
+                                        newRoomData.put("CurrentPlayer", 1);
+                                        newRoomData.put("ConnectedPlayers", 1);
+                                        newRoomData.put("MaxDraw", 7);
+                                        newRoomData.put("TurnDir", 1);
+                                        newRoomData.put("Winner", "");
+                                        newRoomData.put("Card", rnd.nextInt(52));
+                                        newRoomData.put("NewCard", rnd.nextInt(52));
+                                        newRoomData.put("Time", mm);
+                                        newRoomData.put("Ready", 1);
+                                        dataBase.child(GameActivity.ThisRoom.Name).updateChildren(newRoomData);
+                                    }
+
+                                    dataBase.child(ThisRoom.Name).child("Players").child(player.Key).removeValue();
+                                    player.HandCards.clear();
+                                    GameActivity.recyclerView[0].getAdapter().notifyDataSetChanged();
+                                }
+                            }).setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                    dataBase.child(ThisRoom.Name).child("Players").child(player.Key).removeValue();
+                                    if (SERVER)
+                                        dataBase.child(GameActivity.ThisRoom.Name).removeValue();
+                                    dialog.dismiss();
+                                    stopService(new Intent(GameActivity.this, TurnExplorer.class));
+                                    finish();
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                            */
                         }else if (t.contains("☻"))
                         {
                             t = t.substring(1, t.length());
@@ -765,6 +841,14 @@ public class GameActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+
+        stopService(new Intent(GameActivity.this, TurnExplorer.class));
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(final Menu menu)
     {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
@@ -807,7 +891,7 @@ public class GameActivity extends AppCompatActivity
                         {
                             if (Text.startsWith("=ЧДПК"))
                             {
-                                player.HandCards.add(53);
+                                player.HandCards.add(54);
                                 recyclerView[0].getAdapter().notifyDataSetChanged();
                             } else
                                 dataBase.child(ThisRoom.Name).child("Msg").setValue(player.Name + ": " + Text);
