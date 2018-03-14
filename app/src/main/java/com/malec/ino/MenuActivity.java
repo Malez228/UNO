@@ -1,6 +1,6 @@
 package com.malec.ino;
 
-import android.*;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -13,12 +13,12 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
@@ -45,12 +45,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -69,6 +63,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
     boolean adequate = true;
 
+    String HTMLVersion = "";
     public static String PhoneKey = "";
     public static String UserName = "Name";
     public static final String APP_PREFERENCES_PhoneKey = "";
@@ -236,6 +231,45 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0]== PackageManager.PERMISSION_GRANTED)
+            DownloadNewVersion();
+    }
+
+    public void DownloadNewVersion()
+    {
+        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File file = new File(dir, "INO " + HTMLVersion + ".apk");
+        if (file.exists()) file.delete();
+
+        Uri uri = Uri.parse("https://raw.githubusercontent.com/Malez228/UNO/master/app/release/INO.apk");
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).mkdirs();
+        final DownloadManager mgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        final long lastDownload = mgr.enqueue(new DownloadManager.Request(uri).setTitle("INO").setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED).setDescription("v " + HTMLVersion).setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "INO " + HTMLVersion + ".apk"));
+
+        BroadcastReceiver receiver = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                String action = intent.getAction();
+                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action))
+                {
+                    DownloadManager.Query query = new DownloadManager.Query();
+                    query.setFilterById(lastDownload);
+                    Cursor c = mgr.query(query);
+                    if (c.moveToFirst() && DownloadManager.STATUS_SUCCESSFUL == c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)))
+                        Toast.makeText(context, "Откройте приложение вручную, используя диспетчер файлов", Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+
+        registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -251,7 +285,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         htm.execute("https://raw.githubusercontent.com/Malez228/UNO/master/app/build.gradle");
         try { HTML = htm.get().toString(); } catch (Exception e){ }
         htm.cancel(true);
-        final String HTMLVersion = HTML.split("versionName \"")[1].split("\"")[0];
+        HTMLVersion = HTML.split("versionName \"")[1].split("\"")[0];
         String Version = "";
         try
         {
@@ -266,42 +300,10 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i)
                 {
-                    final long enqueue;
-                    final DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse("https://raw.githubusercontent.com/Malez228/UNO/master/app/release/INO.apk"));
-                    request.setDescription("Downloading new " + HTMLVersion + " version");
-                    request.setTitle("INO_" + HTMLVersion + ".apk");
-                    request.allowScanningByMediaScanner();
-                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-
-                    enqueue = dm.enqueue(request);
-
-                    BroadcastReceiver receiver = new BroadcastReceiver()
-                    {
-                        @Override
-                        public void onReceive(Context context, Intent intent)
-                        {
-                            String action = intent.getAction();
-                            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action))
-                            {
-                                DownloadManager.Query query = new DownloadManager.Query();
-                                query.setFilterById(enqueue);
-                                Cursor c = dm.query(query);
-                                if (c.moveToFirst())
-                                {
-                                    int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
-                                    if (DownloadManager.STATUS_SUCCESSFUL == c.getInt(columnIndex))
-                                    {
-                                        Intent i = new Intent();
-                                        i.setAction(DownloadManager.ACTION_VIEW_DOWNLOADS);
-                                        startActivity(i);
-                                    }
-                                }
-                            }
-                        }
-                    };
-
-                    registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+                    if (ContextCompat.checkSelfPermission(MenuActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                        ActivityCompat.requestPermissions(MenuActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                    else
+                        DownloadNewVersion();
                 }
             }).setNegativeButton("Ok", new DialogInterface.OnClickListener()
             {
