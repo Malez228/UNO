@@ -1,5 +1,6 @@
 package com.malec.ino;
 
+import android.*;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -12,9 +13,12 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
@@ -40,6 +44,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -49,6 +60,7 @@ import java.util.Random;
 
 public class MenuActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
+    private static Context context;
     Random rnd = new Random();
     DatabaseReference dataBase = FirebaseDatabase.getInstance().getReference();
 
@@ -231,6 +243,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = findViewById(R.id.MenuToolBar);
         setSupportActionBar(toolbar);
         mSettings = getPreferences(MODE_PRIVATE);
+        context = getApplicationContext();
 
         //region Проверка новой версии
         String HTML = null;
@@ -238,7 +251,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         htm.execute("https://raw.githubusercontent.com/Malez228/UNO/master/app/build.gradle");
         try { HTML = htm.get().toString(); } catch (Exception e){ }
         htm.cancel(true);
-        String HTMLVersion = HTML.split("versionName \"")[1].split("\"")[0];
+        final String HTMLVersion = HTML.split("versionName \"")[1].split("\"")[0];
         String Version = "";
         try
         {
@@ -255,7 +268,12 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                 {
                     final long enqueue;
                     final DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse("https://raw.githubusercontent.com/Malez228/UNO/master/app/release/app-release.apk"));
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse("https://raw.githubusercontent.com/Malez228/UNO/master/app/release/INO.apk"));
+                    request.setDescription("Downloading new " + HTMLVersion + " version");
+                    request.setTitle("INO_" + HTMLVersion + ".apk");
+                    request.allowScanningByMediaScanner();
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
                     enqueue = dm.enqueue(request);
 
                     BroadcastReceiver receiver = new BroadcastReceiver()
@@ -266,7 +284,6 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                             String action = intent.getAction();
                             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action))
                             {
-                                long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
                                 DownloadManager.Query query = new DownloadManager.Query();
                                 query.setFilterById(enqueue);
                                 Cursor c = dm.query(query);
