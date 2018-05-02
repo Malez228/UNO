@@ -3,23 +3,31 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group
+        android:checkableBehavior="single"
+        >
         <item
             android:id="@+id/nav_info"
+            android:checkable="false"
+            android:checked="false"
             android:icon="@android:drawable/ic_dialog_info"
-            android:title="Info"/>
+            android:title="@string/InfoT"/>
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools"/>
+            android:id="@+id/nav_vers"
+            android:checkable="false"
+            android:checked="false"
+            android:icon="@android:drawable/ic_popup_sync"
+            android:title="@string/CheckVersion"/>
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="@string/CommunicateT">
         <menu>
             <item
                 android:id="@+id/nav_send"
+                android:checkable="false"
+                android:checked="false"
                 android:icon="@drawable/ic_menu_send"
-                android:title="Send Report"/>
+                android:title="@string/SendReport"/>
         </menu>
     </item>
 

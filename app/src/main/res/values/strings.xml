@@ -47,6 +47,11 @@
     <string name="PlayerPreWinLabelText">has one card left</string>
 
     <!-- BugReport -->
+    <string name="SendReport">Send Report</string>
+    <string name="InfoT">Info</string>
+    <string name="ToolsT">Tools</string>
+    <string name="CommunicateT">Communicate</string>
+    <string name="CheckVersion">Check update</string>
     <string name="BugReportTitle">Message to the developer</string>
     <string name="BugReportLabelText">Help make our application better\nLeave a review or bug report</string>
     <string name="BugReportSendBtnText">Send</string>

@@ -76,6 +76,44 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
     private SharedPreferences mSettings;
 
+    final RecyclerView[] recyclerView = new RecyclerView[1];
+    final RoomDataAdapter adapter = null;
+
+    public void CheckVersion()
+    {
+        String HTML = null;
+        InternetRequest htm = new InternetRequest();
+        htm.execute("https://raw.githubusercontent.com/Malez228/UNO/master/app/build.gradle");
+        try { HTML = htm.get().toString(); } catch (Exception e){ }
+        htm.cancel(true);
+        HTMLVersion = HTML.split("versionName \"")[1].split("\"")[0];
+        String Version = "";
+        try
+        {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+            Version = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) { }
+        if (Version.compareTo(HTMLVersion) != 0)
+        {
+            AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
+            alert.setTitle("New version available").setPositiveButton("Download", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i)
+                {
+                    if (ContextCompat.checkSelfPermission(MenuActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                        ActivityCompat.requestPermissions(MenuActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                    else
+                        DownloadNewVersion();
+                }
+            }).setNegativeButton("Ok", new DialogInterface.OnClickListener()
+            {
+                public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
+            });
+            alert.show();
+        }
+    }
+
     public static class Room
     {
         String Name, Pass;
@@ -116,95 +154,93 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                             return;
                         }
 
-                        if (ClickRoom.Turns <= ClickRoom.ConnectedPlayers || ClickRoom.PlayersKeys.contains(PhoneKey))
+                        if ((ClickRoom.Turns <= ClickRoom.ConnectedPlayers || ClickRoom.PlayersKeys.contains(PhoneKey)) && adequate)
                         {
-                            if (adequate)
+                            adequate = false;
+
+                            if (ClickRoom.Pass.compareTo("0") == 0 || ClickRoom.PlayersKeys.contains(PhoneKey))
                             {
-                                adequate = false;
-
-                                if (ClickRoom.Pass.compareTo("0") == 0 || ClickRoom.PlayersKeys.contains(PhoneKey))
+                                if (ClickRoom.PlayersKeys.contains(PhoneKey))
                                 {
-                                    if (ClickRoom.PlayersKeys.contains(PhoneKey))
-                                    {
-                                        dataBase.child(ClickRoomName).child("Players").child(PhoneKey).child("Name").setValue(UserName);
-                                        GameActivity.Reconnect = true;
-                                    } else
-                                    {
-                                        ClickRoom.ConnectedPlayers++;
-                                        Map newPlayerData = new HashMap();
-                                        newPlayerData.put("ID", ClickRoom.ConnectedPlayers);
-                                        newPlayerData.put("Name", UserName);
-                                        newPlayerData.put("Cards", "");
-                                        dataBase.child(ClickRoomName).child("Players").child(PhoneKey).updateChildren(newPlayerData);
-                                        dataBase.child(ClickRoomName).child("ConnectedPlayers").setValue(ClickRoom.ConnectedPlayers);
-                                    }
-
-                                    RoomName = ClickRoomName;
-                                    GameActivity.ThisRoom = ClickRoom;
-                                    startActivity(new Intent(MenuActivity.this, GameActivity.class));
-                                }else
+                                    dataBase.child(ClickRoomName).child("Players").child(PhoneKey).child("Name").setValue(UserName);
+                                    GameActivity.Reconnect = true;
+                                } else
                                 {
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this);
-                                    LayoutInflater inflater = MenuActivity.this.getLayoutInflater();
-                                    final View Field = inflater.inflate(R.layout.room_creator_layout, null);
+                                    ClickRoom.ConnectedPlayers++;
+                                    Map newPlayerData = new HashMap();
+                                    newPlayerData.put("ID", ClickRoom.ConnectedPlayers);
+                                    newPlayerData.put("Name", UserName);
+                                    newPlayerData.put("Cards", "");
+                                    dataBase.child(ClickRoomName).child("Players").child(PhoneKey).updateChildren(newPlayerData);
+                                    dataBase.child(ClickRoomName).child("ConnectedPlayers").setValue(ClickRoom.ConnectedPlayers);
+                                }
 
-                                    final Room finalClickRoom = ClickRoom;
-                                    final Room finalClickRoom1 = ClickRoom;
+                                RoomName = ClickRoomName;
+                                GameActivity.ThisRoom = ClickRoom;
+                                startActivity(new Intent(MenuActivity.this, GameActivity.class));
+                            } else
+                            {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this);
+                                LayoutInflater inflater = MenuActivity.this.getLayoutInflater();
+                                final View Field = inflater.inflate(R.layout.room_creator_layout, null);
 
-                                    EditText RoomNameField = (EditText) Field.findViewById(R.id.RoomNameField);
-                                    TextView ActionText = (TextView) Field.findViewById(R.id.ActionText);
+                                final Room finalClickRoom = ClickRoom;
+                                final Room finalClickRoom1 = ClickRoom;
 
-                                    RoomNameField.setVisibility(View.GONE);
-                                    ActionText.setText(R.string.EnterPassword);
+                                EditText RoomNameField = (EditText) Field.findViewById(R.id.RoomNameField);
+                                TextView ActionText = (TextView) Field.findViewById(R.id.ActionText);
 
-                                    builder.setView(Field).setPositiveButton(getString(R.string.EnterRoom), new DialogInterface.OnClickListener()
+                                RoomNameField.setVisibility(View.GONE);
+                                ActionText.setText(R.string.EnterPassword);
+
+                                builder.setView(Field).setPositiveButton(getString(R.string.EnterRoom), new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int id)
                                     {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int id)
+                                        EditText PassField = (EditText) Field.findViewById(R.id.PassField);
+                                        String Pass = PassField.getText().toString();
+
+                                        if (Pass.compareTo(finalClickRoom.Pass) == 0)
                                         {
-                                            EditText PassField = (EditText) Field.findViewById(R.id.PassField);
-                                            String Pass = PassField.getText().toString();
-
-                                            if (Pass.compareTo(finalClickRoom.Pass) == 0)
+                                            if (finalClickRoom.PlayersKeys.contains(PhoneKey))
                                             {
-                                                if (finalClickRoom.PlayersKeys.contains(PhoneKey))
-                                                {
-                                                    dataBase.child(ClickRoomName).child("Players").child(PhoneKey).child("Name").setValue(UserName);
-                                                    GameActivity.Reconnect = true;
-                                                } else
-                                                {
-                                                    finalClickRoom.ConnectedPlayers++;
-                                                    Map newPlayerData = new HashMap();
-                                                    newPlayerData.put("ID", finalClickRoom.ConnectedPlayers);
-                                                    newPlayerData.put("Name", UserName);
-                                                    newPlayerData.put("Cards", "");
-                                                    dataBase.child(ClickRoomName).child("Players").child(PhoneKey).updateChildren(newPlayerData);
-                                                    dataBase.child(ClickRoomName).child("ConnectedPlayers").setValue(finalClickRoom.ConnectedPlayers);
-                                                }
-
-                                                RoomName = ClickRoomName;
-                                                GameActivity.ThisRoom = finalClickRoom1;
-                                                startActivity(new Intent(MenuActivity.this, GameActivity.class));
+                                                dataBase.child(ClickRoomName).child("Players").child(PhoneKey).child("Name").setValue(UserName);
+                                                GameActivity.Reconnect = true;
                                             } else
                                             {
-                                                Toast.makeText(MenuActivity.this, R.string.WrongPassword, Toast.LENGTH_SHORT).show();
-                                                dialog.dismiss();
-                                                adequate = true;
+                                                finalClickRoom.ConnectedPlayers++;
+                                                Map newPlayerData = new HashMap();
+                                                newPlayerData.put("ID", finalClickRoom.ConnectedPlayers);
+                                                newPlayerData.put("Name", UserName);
+                                                newPlayerData.put("Cards", "");
+                                                dataBase.child(ClickRoomName).child("Players").child(PhoneKey).updateChildren(newPlayerData);
+                                                dataBase.child(ClickRoomName).child("ConnectedPlayers").setValue(finalClickRoom.ConnectedPlayers);
                                             }
-                                        }
-                                    }).setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
-                                    {
-                                        public void onClick(DialogInterface dialog, int id)
+
+                                            RoomName = ClickRoomName;
+                                            GameActivity.ThisRoom = finalClickRoom1;
+                                            startActivity(new Intent(MenuActivity.this, GameActivity.class));
+                                        } else
                                         {
+                                            Toast.makeText(MenuActivity.this, R.string.WrongPassword, Toast.LENGTH_SHORT).show();
                                             dialog.dismiss();
                                             adequate = true;
                                         }
-                                    });
-                                    AlertDialog dialog = builder.create();
-                                    dialog.show();
-                                }
+                                    }
+                                }).setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
+                                {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        dialog.dismiss();
+                                        adequate = true;
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
                             }
-                        }
+                        }else if (ClickRoom.Turns > ClickRoom.ConnectedPlayers && !ClickRoom.PlayersKeys.contains(PhoneKey))
+                            Toast.makeText(MenuActivity.this, ""+getString(R.string.GameIsRunning), Toast.LENGTH_SHORT).show();
                     }
                 }, 100);
             }
@@ -218,25 +254,6 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         @Override
         public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
     };
-
-    @Override
-    protected void onPause()
-    {
-        super.onPause();
-
-        SharedPreferences.Editor editor = mSettings.edit();
-        editor.putString(APP_PREFERENCES_PhoneKey, PhoneKey);
-        editor.putString(APP_PREFERENCES_UserName, UserName);
-        editor.apply();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults[0]== PackageManager.PERMISSION_GRANTED)
-            DownloadNewVersion();
-    }
 
     public void DownloadNewVersion()
     {
@@ -270,208 +287,27 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    protected void onPause()
     {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_menu);
-        Toolbar toolbar = findViewById(R.id.MenuToolBar);
-        setSupportActionBar(toolbar);
-        mSettings = getPreferences(MODE_PRIVATE);
-        context = getApplicationContext();
+        super.onPause();
 
-        //region Проверка новой версии
-        String HTML = null;
-        InternetRequest htm = new InternetRequest();
-        htm.execute("https://raw.githubusercontent.com/Malez228/UNO/master/app/build.gradle");
-        try { HTML = htm.get().toString(); } catch (Exception e){ }
-        htm.cancel(true);
-        HTMLVersion = HTML.split("versionName \"")[1].split("\"")[0];
-        String Version = "";
-        try
-        {
-            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
-            Version = pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) { }
-        if (Version.compareTo(HTMLVersion) != 0)
-        {
-            AlertDialog.Builder alert = new AlertDialog.Builder(MenuActivity.this);
-            alert.setTitle("New version available").setPositiveButton("Download", new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i)
-                {
-                    if (ContextCompat.checkSelfPermission(MenuActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-                        ActivityCompat.requestPermissions(MenuActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                    else
-                        DownloadNewVersion();
-                }
-            }).setNegativeButton("Ok", new DialogInterface.OnClickListener()
-            {
-                public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
-            });
-            alert.show();
-        }
-        //endregion
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putString(APP_PREFERENCES_PhoneKey, PhoneKey);
+        editor.putString(APP_PREFERENCES_UserName, UserName);
+        editor.apply();
 
-        final RecyclerView[] recyclerView = new RecyclerView[1];
-        final RoomDataAdapter adapter = new RoomDataAdapter(this, SearchRoomsList);
+        recyclerView[0].removeOnItemTouchListener(ItemTouchListener);
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
 
         recyclerView[0] = findViewById(R.id.RoomListRec);
         recyclerView[0].setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView[0].setAdapter(adapter);
         recyclerView[0].addOnItemTouchListener(ItemTouchListener);
-
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        //region Get PhoneKey
-        final SharedPreferences.Editor editor = mSettings.edit();
-        String savedText = mSettings.getString(APP_PREFERENCES_PhoneKey, "");
-        if (savedText.isEmpty())
-        {
-            TelephonyManager tm = (TelephonyManager) getSystemService(getApplicationContext().TELEPHONY_SERVICE);
-            DisplayMetrics dm = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(dm);
-            PhoneKey = tm.getNetworkOperatorName() + "☺" + tm.getSimCountryIso() + "☺" + Runtime.getRuntime().maxMemory() + "☺" + dm.widthPixels + "☺" + dm.heightPixels + "☺" + dm.densityDpi + "☺" + android.os.Build.MODEL.replace('.', '☻').replace('#', '☻').replace('$', '☻').replace('[', '☻').replace(']', '☻') + "☺" + android.os.Build.VERSION.RELEASE.replace('.', '☻').replace('#', '☻').replace('$', '☻').replace('[', '☻').replace(']', '☻');
-        } else
-            PhoneKey = savedText;
-        editor.putString(APP_PREFERENCES_PhoneKey, PhoneKey);
-        editor.apply();
-        //endregion
-
-        //region Get UserName
-        savedText = mSettings.getString(APP_PREFERENCES_UserName, "");
-        if (savedText.isEmpty())
-            UserName = "User_" + Integer.valueOf(rnd.nextInt()).toString().replace("-", "").substring(0, 4);
-        else
-            UserName = savedText;
-        //endregion
-
-        //region Drawer
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        drawer.addDrawerListener(new DrawerLayout.DrawerListener()
-        {
-            @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) { }
-
-            @Override
-            public void onDrawerOpened(View drawerView)
-            {
-                EditText UserNameText = (EditText) findViewById(R.id.UserNameText);
-                UserNameText.setText(UserName);
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView)
-            {
-                EditText UserNameText = (EditText) findViewById(R.id.UserNameText);
-                if (UserNameText.getText().toString().isEmpty())
-                    UserNameText.setText("User_" + Integer.valueOf(rnd.nextInt()).toString().replace("-", "").substring(0, 4));
-                //шоб сильно умных не было
-                if (UserNameText.getText().toString().length() > 20)
-                    UserName = UserNameText.getText().toString().substring(0, 20);
-                else
-                    UserName = UserNameText.getText().toString();
-
-                editor.putString(APP_PREFERENCES_UserName, UserName);
-                editor.apply();
-            }
-
-            @Override
-            public void onDrawerStateChanged(int newState) { }
-        });
-        toggle.syncState();
-        //endregion
-
-        //region CreateRoomFAB
-        FloatingActionButton CreateRoomButton = (FloatingActionButton) findViewById(R.id.fab);
-        CreateRoomButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this);
-                LayoutInflater inflater = MenuActivity.this.getLayoutInflater();
-                final View Field = inflater.inflate(R.layout.room_creator_layout, null);
-
-                builder.setView(Field).setPositiveButton(getString(R.string.CreateRoom), new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        EditText RoomNameField = (EditText) Field.findViewById(R.id.RoomNameField);
-                        EditText PassField = (EditText) Field.findViewById(R.id.PassField);
-
-                        RoomName = RoomNameField.getText().toString();
-                        if (RoomName.isEmpty())
-                            RoomName = "Room_" + Integer.valueOf(rnd.nextInt()).toString().replace("-", "").substring(0, 4);
-                        String Pass = PassField.getText().toString();
-                        if (Pass.isEmpty())
-                            Pass = "0";
-
-                        if (!RoomsNameList.contains(RoomName))
-                        {
-
-                            adequate = false;
-
-                            Integer mm = Calendar.getInstance().get(Calendar.MINUTE);
-                            Map newRoomData = new HashMap();
-                            Map newPlayerData = new HashMap();
-                            newRoomData.put("Pass", Pass);
-                            newRoomData.put("Turns", 1);
-                            newRoomData.put("ConnectedPlayers", 1);
-                            newRoomData.put("Color", -1);
-                            newRoomData.put("CurrentPlayer", 1);
-                            newRoomData.put("MaxDraw", 7);
-                            newRoomData.put("TurnDir", 1);
-                            newRoomData.put("Winner", "");
-                            newRoomData.put("Msg", "");
-                            newRoomData.put("Card", rnd.nextInt(52));
-                            newRoomData.put("NewCard", rnd.nextInt(52));
-                            newRoomData.put("Time", mm);
-                            newRoomData.put("Ready", 0);
-                            newPlayerData.put("ID", 1);
-                            newPlayerData.put("Name", UserName);
-                            newPlayerData.put("Cards", "");
-                            dataBase.child(RoomName).updateChildren(newRoomData);
-                            dataBase.child(RoomName).child("Players").child(PhoneKey).updateChildren(newPlayerData);
-
-                            final Room NewRoom = new Room();
-                            NewRoom.Name = RoomName;
-                            NewRoom.Pass = Pass;
-                            NewRoom.Turns = 1;
-                            GameActivity.Player thisPlayer = new GameActivity.Player();
-                            thisPlayer.Key = PhoneKey;
-                            thisPlayer.Name = UserName;
-                            thisPlayer.ID = 1;
-                            NewRoom.Players.add(thisPlayer);
-                            NewRoom.PlayersKeys.add(thisPlayer.Key);
-                            NewRoom.ConnectedPlayers = 1;
-
-                            RoomsList.add(NewRoom);
-                            RoomsNameList.add(NewRoom.Name);
-                            recyclerView[0].getAdapter().notifyDataSetChanged();
-
-                            GameActivity.ThisRoom = NewRoom;
-
-                            startActivity(new Intent(MenuActivity.this, GameActivity.class));
-                        } else
-                            Toast.makeText(MenuActivity.this, "Комната уже существует", Toast.LENGTH_SHORT).show();
-                    }
-                }).setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                        dialog.dismiss();
-                    }
-                });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
-        //endregion
 
         SearchView RoomSearch = findViewById(R.id.RoomSearch);
         RoomSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener()
@@ -608,6 +444,181 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0]== PackageManager.PERMISSION_GRANTED)
+            DownloadNewVersion();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_menu);
+        Toolbar toolbar = findViewById(R.id.MenuToolBar);
+        setSupportActionBar(toolbar);
+        mSettings = getPreferences(MODE_PRIVATE);
+        context = getApplicationContext();
+
+        recyclerView[0] = findViewById(R.id.RoomListRec);
+        recyclerView[0].setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        recyclerView[0].setAdapter(adapter);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        //region Get PhoneKey
+        final SharedPreferences.Editor editor = mSettings.edit();
+        String savedText = mSettings.getString(APP_PREFERENCES_PhoneKey, "");
+        if (savedText.isEmpty())
+        {
+            TelephonyManager tm = (TelephonyManager) getSystemService(getApplicationContext().TELEPHONY_SERVICE);
+            DisplayMetrics dm = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(dm);
+            PhoneKey = tm.getNetworkOperatorName() + "☺" + tm.getSimCountryIso() + "☺" + Runtime.getRuntime().maxMemory() + "☺" + dm.widthPixels + "☺" + dm.heightPixels + "☺" + dm.densityDpi + "☺" + android.os.Build.MODEL.replace('.', '☻').replace('#', '☻').replace('$', '☻').replace('[', '☻').replace(']', '☻') + "☺" + android.os.Build.VERSION.RELEASE.replace('.', '☻').replace('#', '☻').replace('$', '☻').replace('[', '☻').replace(']', '☻');
+        } else
+            PhoneKey = savedText;
+        editor.putString(APP_PREFERENCES_PhoneKey, PhoneKey);
+        editor.apply();
+        //endregion
+
+        //region Get UserName
+        savedText = mSettings.getString(APP_PREFERENCES_UserName, "");
+        if (savedText.isEmpty())
+            UserName = "User_" + Integer.valueOf(rnd.nextInt()).toString().replace("-", "").substring(0, 4);
+        else
+            UserName = savedText;
+        //endregion
+
+        //region Drawer
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        drawer.addDrawerListener(new DrawerLayout.DrawerListener()
+        {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) { }
+
+            @Override
+            public void onDrawerOpened(View drawerView)
+            {
+                EditText UserNameText = (EditText) findViewById(R.id.UserNameText);
+                UserNameText.setText(UserName);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView)
+            {
+                EditText UserNameText = (EditText) findViewById(R.id.UserNameText);
+                if (UserNameText.getText().toString().isEmpty())
+                    UserNameText.setText("User_" + Integer.valueOf(rnd.nextInt()).toString().replace("-", "").substring(0, 4));
+                //шоб сильно умных не было
+                if (UserNameText.getText().toString().length() > 20)
+                    UserName = UserNameText.getText().toString().substring(0, 20);
+                else
+                    UserName = UserNameText.getText().toString();
+
+                editor.putString(APP_PREFERENCES_UserName, UserName);
+                editor.apply();
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) { }
+        });
+        toggle.syncState();
+        //endregion
+
+        //region CreateRoomFAB
+        FloatingActionButton CreateRoomButton = (FloatingActionButton) findViewById(R.id.fab);
+        CreateRoomButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this);
+                LayoutInflater inflater = MenuActivity.this.getLayoutInflater();
+                final View Field = inflater.inflate(R.layout.room_creator_layout, null);
+
+                builder.setView(Field).setPositiveButton(getString(R.string.CreateRoom), new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        EditText RoomNameField = (EditText) Field.findViewById(R.id.RoomNameField);
+                        EditText PassField = (EditText) Field.findViewById(R.id.PassField);
+
+                        RoomName = RoomNameField.getText().toString();
+                        if (RoomName.isEmpty())
+                            RoomName = "Room_" + Integer.valueOf(rnd.nextInt()).toString().replace("-", "").substring(0, 4);
+                        String Pass = PassField.getText().toString();
+                        if (Pass.isEmpty())
+                            Pass = "0";
+
+                        if (!RoomsNameList.contains(RoomName))
+                        {
+
+                            adequate = false;
+
+                            Integer mm = Calendar.getInstance().get(Calendar.MINUTE);
+                            Map newRoomData = new HashMap();
+                            Map newPlayerData = new HashMap();
+                            newRoomData.put("Pass", Pass);
+                            newRoomData.put("Turns", 1);
+                            newRoomData.put("ConnectedPlayers", 1);
+                            newRoomData.put("Color", -1);
+                            newRoomData.put("CurrentPlayer", 1);
+                            newRoomData.put("MaxDraw", 7);
+                            newRoomData.put("TurnDir", 1);
+                            newRoomData.put("Winner", "");
+                            newRoomData.put("Msg", "");
+                            newRoomData.put("Card", rnd.nextInt(52));
+                            newRoomData.put("NewCard", rnd.nextInt(52));
+                            newRoomData.put("Time", mm);
+                            newRoomData.put("Ready", 0);
+                            newPlayerData.put("ID", 1);
+                            newPlayerData.put("Name", UserName);
+                            newPlayerData.put("Cards", "");
+                            dataBase.child(RoomName).updateChildren(newRoomData);
+                            dataBase.child(RoomName).child("Players").child(PhoneKey).updateChildren(newPlayerData);
+
+                            final Room NewRoom = new Room();
+                            NewRoom.Name = RoomName;
+                            NewRoom.Pass = Pass;
+                            NewRoom.Turns = 1;
+                            GameActivity.Player thisPlayer = new GameActivity.Player();
+                            thisPlayer.Key = PhoneKey;
+                            thisPlayer.Name = UserName;
+                            thisPlayer.ID = 1;
+                            NewRoom.Players.add(thisPlayer);
+                            NewRoom.PlayersKeys.add(thisPlayer.Key);
+                            NewRoom.ConnectedPlayers = 1;
+
+                            RoomsList.add(NewRoom);
+                            RoomsNameList.add(NewRoom.Name);
+                            //recyclerView[0].getAdapter().notifyDataSetChanged();
+
+                            GameActivity.ThisRoom = NewRoom;
+
+                            startActivity(new Intent(MenuActivity.this, GameActivity.class));
+                        } else
+                            Toast.makeText(MenuActivity.this, "Комната уже существует", Toast.LENGTH_SHORT).show();
+                    }
+                }).setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        //endregion
+    }
+
+    @Override
     public void onBackPressed()
     {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -624,20 +635,21 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(MenuItem item)
     {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         int id = item.getItemId();
 
         if (id == R.id.nav_info)
         {
-
-        } else if (id == R.id.nav_manage)
+            Toast.makeText(context, "хренакнуть суда текст", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.nav_vers)
         {
+            CheckVersion();
 
         } else if (id == R.id.nav_send)
         {
 
         }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

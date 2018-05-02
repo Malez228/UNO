@@ -11,6 +11,6 @@
     <item
         android:id="@+id/mes"
         android:icon="@drawable/stat_notify_chat"
-        android:title="Messages"
+        android:title="1"
         app:showAsAction="always"/>
 </menu>

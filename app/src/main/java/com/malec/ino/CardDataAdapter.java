@@ -160,7 +160,7 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
         @Override
         public void onClick(View view)
         {
-            if (GameActivity.board.CurrentPlayer == GameActivity.player.ID)
+            if (GameActivity.board.CurrentPlayer == GameActivity.player.ID && GameActivity.board.Turns > GameActivity.board.ConnectedPlayers)
             {
                 SentCard = Integer.valueOf(((ConstraintLayout) view).getChildAt(0).getTag().toString());
 

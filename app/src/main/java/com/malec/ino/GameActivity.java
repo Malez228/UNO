@@ -383,7 +383,7 @@ public class GameActivity extends AppCompatActivity
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent)
         {
-            if (board.CurrentPlayer == player.ID && board.MaxDraw >= 1 && board.NewCard != -1 && DeckTouch)
+            if (board.CurrentPlayer == player.ID && board.MaxDraw >= 1 && board.NewCard != -1 && DeckTouch && ColorPicker.getVisibility() != View.VISIBLE)
             {
                 DeckTouch = false;
                 new Thread(new Runnable()
@@ -685,9 +685,17 @@ public class GameActivity extends AppCompatActivity
                             t = t.substring(1, t.length());
                             Toast.makeText(GameActivity.this, t + " " + getString(R.string.PlayerWinLabelText), Toast.LENGTH_SHORT).show();
 
-                            stopService(new Intent(GameActivity.this, TurnExplorer.class));
-                            finish();
+                            try
+                            {
+                                dataBase.child(ThisRoom.Name).getKey();
 
+                                if (SERVER)
+                                    dataBase.child(ThisRoom.Name).removeValue();
+                            }catch (Exception e)
+                            {
+                                NormClose = false;
+                                finish();
+                            }
                             /*
                             AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
                             LayoutInflater inflater = GameActivity.this.getLayoutInflater();
@@ -863,7 +871,16 @@ public class GameActivity extends AppCompatActivity
         switch (item.getItemId())
         {
             case R.id.CloseRoom:
-                dataBase.child(ThisRoom.Name).removeValue();
+                try
+                {
+                    dataBase.child(ThisRoom.Name).getKey();
+
+                    dataBase.child(ThisRoom.Name).removeValue();
+                }catch (Exception e)
+                {
+                    NormClose = false;
+                    finish();
+                }
 
                 return true;
 

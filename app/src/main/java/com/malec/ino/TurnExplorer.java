@@ -35,16 +35,17 @@ public class TurnExplorer extends Service
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
-                if (Integer.valueOf(dataSnapshot.getValue().toString()) == GameActivity.player.ID)
-                {
-                    KeyguardManager myKM = (KeyguardManager) getSystemService(GameActivity.KEYGUARD_SERVICE);
-                    if(myKM.inKeyguardRestrictedInputMode())
+                if (dataSnapshot.exists())
+                    if (Integer.valueOf(dataSnapshot.getValue().toString()) == GameActivity.player.ID)
                     {
-                        long mills = 500L;
-                        Vibrator vibrator = (Vibrator) getSystemService(GameActivity.VIBRATOR_SERVICE);
-                        vibrator.vibrate(mills);
+                        KeyguardManager myKM = (KeyguardManager) getSystemService(GameActivity.KEYGUARD_SERVICE);
+                        if (myKM.inKeyguardRestrictedInputMode())
+                        {
+                            long mills = 500L;
+                            Vibrator vibrator = (Vibrator) getSystemService(GameActivity.VIBRATOR_SERVICE);
+                            vibrator.vibrate(mills);
+                        }
                     }
-                }
             }
 
             @Override
