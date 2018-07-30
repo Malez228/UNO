@@ -23,6 +23,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -63,6 +64,8 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
     boolean adequate = true;
 
+    public static String Data = "";
+
     String HTMLVersion = "";
     public static String PhoneKey = "";
     public static String UserName = "Name";
@@ -77,7 +80,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     private SharedPreferences mSettings;
 
     final RecyclerView[] recyclerView = new RecyclerView[1];
-    final RoomDataAdapter adapter = null;
+    RoomDataAdapter adapter = null;
 
     public void CheckVersion()
     {
@@ -111,6 +114,9 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                 public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
             });
             alert.show();
+        } else
+        {
+            Toast.makeText(context, "This is the latest version", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -295,19 +301,12 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         editor.putString(APP_PREFERENCES_PhoneKey, PhoneKey);
         editor.putString(APP_PREFERENCES_UserName, UserName);
         editor.apply();
-
-        recyclerView[0].removeOnItemTouchListener(ItemTouchListener);
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-
-        recyclerView[0] = findViewById(R.id.RoomListRec);
-        recyclerView[0].setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerView[0].setAdapter(adapter);
-        recyclerView[0].addOnItemTouchListener(ItemTouchListener);
 
         SearchView RoomSearch = findViewById(R.id.RoomSearch);
         RoomSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener()
@@ -342,105 +341,11 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        dataBase.addChildEventListener(new ChildEventListener()
+        if (!Data.isEmpty())
         {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
-                if (adequate)
-                {
-                    String roomName = dataSnapshot.getKey().toString();
-
-                    Integer mm = Calendar.getInstance().get(Calendar.MINUTE);
-                    Integer BaseMM = Integer.valueOf(dataSnapshot.child("Time").getValue().toString());
-                    if (mm - Integer.valueOf(BaseMM) >= 10 || (mm - Integer.valueOf(BaseMM) >= -50 && mm - Integer.valueOf(BaseMM) < 0))
-                        dataBase.child(roomName).removeValue();
-                    else
-                    {
-                        final Room NewRoom = new Room();
-                        NewRoom.Name = roomName;
-                        NewRoom.Players = new ArrayList<>();
-
-                        NewRoom.Pass = dataSnapshot.child("Pass").getValue().toString();
-                        NewRoom.Turns = Integer.valueOf(dataSnapshot.child("Turns").getValue().toString());
-                        for (DataSnapshot Player : dataSnapshot.child("Players").getChildren())
-                        {
-                            GameActivity.Player player = new GameActivity.Player();
-                            player = player.InitPlayer();
-                            player.Key = Player.getKey().toString();
-                            player.ID = Integer.valueOf(Player.child("ID").getValue().toString());
-                            player.Name = Player.child("Name").getValue().toString();
-
-                            NewRoom.Players.add(player);
-                            NewRoom.PlayersKeys.add(player.Key);
-                        }
-                        if (NewRoom.Players.isEmpty())
-                            NewRoom.ConnectedPlayers = 0;
-                        else
-                            NewRoom.ConnectedPlayers = NewRoom.Players.size();
-
-                        RoomsList.add(NewRoom);
-                        SearchRoomsList.add(NewRoom);
-                        SearchRoomsNameList.add(NewRoom.Name);
-                        RoomsNameList.add(NewRoom.Name);
-                        recyclerView[0].getAdapter().notifyDataSetChanged();
-                    }
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
-                if (adequate)
-                {
-                    String roomName = dataSnapshot.getKey().toString();
-
-                    Room UpdRoom = new Room();
-                    UpdRoom.Name = roomName;
-                    UpdRoom.Players = new ArrayList<>();
-
-                    UpdRoom.Pass = dataSnapshot.child("Pass").getValue().toString();
-                    UpdRoom.Turns = Integer.valueOf(dataSnapshot.child("Turns").getValue().toString());
-                    for (DataSnapshot Player : dataSnapshot.child("Players").getChildren())
-                    {
-                        GameActivity.Player player = new GameActivity.Player();
-                        player = player.InitPlayer();
-                        player.Key = Player.getKey().toString();
-                        player.Name = Player.child("Name").getValue().toString();
-
-                        UpdRoom.Players.add(player);
-                        UpdRoom.PlayersKeys.add(player.Key);
-                    }
-                    if (UpdRoom.Players.isEmpty())
-                        UpdRoom.ConnectedPlayers = 0;
-                    else
-                        UpdRoom.ConnectedPlayers = UpdRoom.Players.size();
-
-                    RoomsList.set(RoomsNameList.indexOf(roomName), UpdRoom);
-                    SearchRoomsList.set(RoomsNameList.indexOf(roomName), UpdRoom);
-                    recyclerView[0].getAdapter().notifyDataSetChanged();
-                }
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
-                try
-                {
-                    String roomName = dataSnapshot.getKey().toString();
-                    RoomsList.remove(RoomsNameList.indexOf(roomName));
-                    SearchRoomsList.remove(SearchRoomsNameList.indexOf(roomName));
-                } catch (Exception e) { }
-
-                recyclerView[0].getAdapter().notifyDataSetChanged();
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) { }
-        });
+            Data = "";
+            recreate();
+        }
     }
 
     @Override
@@ -461,9 +366,11 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         mSettings = getPreferences(MODE_PRIVATE);
         context = getApplicationContext();
 
+        adapter = new RoomDataAdapter(this, SearchRoomsList);
         recyclerView[0] = findViewById(R.id.RoomListRec);
         recyclerView[0].setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView[0].setAdapter(adapter);
+        recyclerView[0].addOnItemTouchListener(ItemTouchListener);
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -557,7 +464,6 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
                         if (!RoomsNameList.contains(RoomName))
                         {
-
                             adequate = false;
 
                             Integer mm = Calendar.getInstance().get(Calendar.MINUTE);
@@ -616,6 +522,116 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         //endregion
+
+        dataBase.addChildEventListener(new ChildEventListener()
+        {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
+                if (adequate)
+                {
+                    String roomName = dataSnapshot.getKey().toString();
+
+                    Integer mm = Calendar.getInstance().get(Calendar.MINUTE);
+                    Integer BaseMM;
+                    try
+                    {
+                        BaseMM = Integer.valueOf(dataSnapshot.child("Time").getValue().toString());
+                        if (mm - Integer.valueOf(BaseMM) >= 10 || (mm - Integer.valueOf(BaseMM) >= -50 && mm - Integer.valueOf(BaseMM) < 0))
+                            dataBase.child(roomName).removeValue();
+                        else
+                        {
+                            final Room NewRoom = new Room();
+                            NewRoom.Name = roomName;
+                            NewRoom.Players = new ArrayList<>();
+
+                            NewRoom.Pass = dataSnapshot.child("Pass").getValue().toString();
+                            NewRoom.Turns = Integer.valueOf(dataSnapshot.child("Turns").getValue().toString());
+                            for (DataSnapshot Player : dataSnapshot.child("Players").getChildren())
+                            {
+                                GameActivity.Player player = new GameActivity.Player();
+                                player = player.InitPlayer();
+                                player.Key = Player.getKey().toString();
+                                player.ID = Integer.valueOf(Player.child("ID").getValue().toString());
+                                player.Name = Player.child("Name").getValue().toString();
+
+                                NewRoom.Players.add(player);
+                                NewRoom.PlayersKeys.add(player.Key);
+                            }
+                            if (NewRoom.Players.isEmpty())
+                                NewRoom.ConnectedPlayers = 0;
+                            else
+                                NewRoom.ConnectedPlayers = NewRoom.Players.size();
+
+                            RoomsList.add(NewRoom);
+                            SearchRoomsList.add(NewRoom);
+                            SearchRoomsNameList.add(NewRoom.Name);
+                            RoomsNameList.add(NewRoom.Name);
+                            recyclerView[0].getAdapter().notifyDataSetChanged();
+                        }
+                    } catch (Exception e)
+                    {
+                        dataBase.child(roomName).removeValue();
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s)
+            {
+                if (adequate)
+                {
+                    String roomName = dataSnapshot.getKey().toString();
+
+                    Room UpdRoom = new Room();
+                    UpdRoom.Name = roomName;
+                    UpdRoom.Players = new ArrayList<>();
+
+                    UpdRoom.Pass = dataSnapshot.child("Pass").getValue().toString();
+                    UpdRoom.Turns = Integer.valueOf(dataSnapshot.child("Turns").getValue().toString());
+                    for (DataSnapshot Player : dataSnapshot.child("Players").getChildren())
+                    {
+                        GameActivity.Player player = new GameActivity.Player();
+                        player = player.InitPlayer();
+                        player.Key = Player.getKey().toString();
+                        player.Name = Player.child("Name").getValue().toString();
+
+                        UpdRoom.Players.add(player);
+                        UpdRoom.PlayersKeys.add(player.Key);
+                    }
+                    if (UpdRoom.Players.isEmpty())
+                        UpdRoom.ConnectedPlayers = 0;
+                    else
+                        UpdRoom.ConnectedPlayers = UpdRoom.Players.size();
+
+                    RoomsList.set(RoomsNameList.indexOf(roomName), UpdRoom);
+                    SearchRoomsList.set(RoomsNameList.indexOf(roomName), UpdRoom);
+                    recyclerView[0].getAdapter().notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot)
+            {
+                try
+                {
+                    String roomName = dataSnapshot.getKey().toString();
+                    RoomsList.remove(RoomsNameList.indexOf(roomName));
+                    RoomsNameList.remove(roomName);
+                    SearchRoomsList.remove(SearchRoomsNameList.indexOf(roomName));
+                    SearchRoomsNameList.remove(roomName);
+                } catch (Exception e) { }
+
+                recyclerView[0].getAdapter().notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
     }
 
     @Override

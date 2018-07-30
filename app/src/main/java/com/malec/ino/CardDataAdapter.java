@@ -20,6 +20,7 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
     private LayoutInflater inflater;
     private List<Integer> Cards;
     private Context context;
+    private Boolean Patch = false;
 
     Integer SentCard, SkipTurn;
 
@@ -108,7 +109,11 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
     Animation.AnimationListener CardSendAnimation = new Animation.AnimationListener()
     {
         @Override
-        public void onAnimationStart(Animation animation) { GameActivity.EndTurn.setVisibility(View.INVISIBLE); }
+        public void onAnimationStart(Animation animation)
+        {
+            Patch = true;
+            GameActivity.EndTurn.setVisibility(View.INVISIBLE);
+        }
 
         @Override
         public void onAnimationEnd(Animation animation)
@@ -138,6 +143,8 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
                 dataBase.child(MenuActivity.RoomName).child("Winner").setValue("☻" + MenuActivity.UserName);
 
             dataBase.child(MenuActivity.RoomName).child("Players").child(GameActivity.player.Key).child("Cards").setValue(GameActivity.SyncCards());
+
+            Patch = false;
         }
 
         @Override
@@ -151,6 +158,7 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
         {
             super(view);
 
+            Patch = false;
             view.setOnClickListener(this);
 
             PassImage = (ImageView)view.findViewById(R.id.CardImage);
@@ -160,7 +168,7 @@ public class CardDataAdapter extends RecyclerView.Adapter<CardDataAdapter.ViewHo
         @Override
         public void onClick(View view)
         {
-            if (GameActivity.board.CurrentPlayer == GameActivity.player.ID && GameActivity.board.Turns > GameActivity.board.ConnectedPlayers)
+            if (GameActivity.board.CurrentPlayer == GameActivity.player.ID && GameActivity.board.Turns > GameActivity.board.ConnectedPlayers && GameActivity.ColorPicker.getVisibility() == View.INVISIBLE && !Patch)
             {
                 SentCard = Integer.valueOf(((ConstraintLayout) view).getChildAt(0).getTag().toString());
 

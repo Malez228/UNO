@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -351,9 +352,6 @@ public class GameActivity extends AppCompatActivity
         if (PlayerCard == BoardCard)
             return true;
 
-        if (PlayerCard - 39 == BoardCard || PlayerCard - 26 == BoardCard || PlayerCard - 13 == BoardCard)
-            return true;
-
         return BoardCard - 39 == PlayerCard || BoardCard - 26 == PlayerCard || BoardCard - 13 == PlayerCard;
 
     }
@@ -386,18 +384,6 @@ public class GameActivity extends AppCompatActivity
             if (board.CurrentPlayer == player.ID && board.MaxDraw >= 1 && board.NewCard != -1 && DeckTouch && ColorPicker.getVisibility() != View.VISIBLE)
             {
                 DeckTouch = false;
-                new Thread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try
-                        {
-                            Thread.sleep(1100);
-                            DeckTouch = true;
-                        } catch (InterruptedException e) { e.printStackTrace(); }
-                    }
-                }).start();
 
                 EndTurn.setVisibility(View.INVISIBLE);
 
@@ -472,6 +458,8 @@ public class GameActivity extends AppCompatActivity
             dataBase.child(MenuActivity.RoomName).child("Players").child(GameActivity.player.Key).child("Cards").setValue(GameActivity.SyncCards());
 
             recyclerView[0].getAdapter().notifyDataSetChanged();
+
+            DeckTouch = true;
         }
 
         @Override
@@ -481,16 +469,16 @@ public class GameActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-        if (BackPressCounter < 10)
+        if (BackPressCounter <= 10)
         {
             if (BackPressCounter % 2 == 0)
                 Toast.makeText(this, getString(R.string.DontLeave), Toast.LENGTH_SHORT).show();
             BackPressCounter++;
         } else
         {
-            Intent browseIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://goo.gl/VnGSsL"));
-            startActivity(browseIntent);
-            BackPressCounter = 0;
+            //Intent browseIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://goo.gl/VnGSsL"));
+            //startActivity(browseIntent);
+            BackPressCounter = 1;
         }
     }
 
@@ -504,6 +492,7 @@ public class GameActivity extends AppCompatActivity
         setSupportActionBar(myToolbar);
         this.setTitle(getString(R.string.app_name) + " - " + MenuActivity.RoomName);
 
+        NormClose = true;
         player = new Player();
         board = new Board();
         player.Name = MenuActivity.UserName;
@@ -673,11 +662,6 @@ public class GameActivity extends AppCompatActivity
                         Snackbar.make(BoardLayout, dataSnapshot.getValue().toString(), Snackbar.LENGTH_INDEFINITE) .setAction("Ok", new View.OnClickListener()
                         { @Override public void onClick(View view) { } }).show();
                         break;
-                    /*case "Ready":
-                        Intent i = getIntent();
-                        finish();
-                        startActivity(i);
-                        break;*/
                     case "Winner":
                         String t = dataSnapshot.getValue().toString();
                         if (t.contains("☺"))
@@ -695,62 +679,8 @@ public class GameActivity extends AppCompatActivity
                             {
                                 NormClose = false;
                                 finish();
+                                MenuActivity.Data = "test 2";
                             }
-                            /*
-                            AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
-                            LayoutInflater inflater = GameActivity.this.getLayoutInflater();
-                            final View Field = inflater.inflate(R.layout.room_creator_layout, null);
-
-                            EditText RoomNameField = Field.findViewById(R.id.RoomNameField);
-                            EditText PassField = Field.findViewById(R.id.PassField);
-                            TextView ActionText = Field.findViewById(R.id.ActionText);
-                            ActionText.setTextSize(18);
-
-                            PassField.setVisibility(View.GONE);
-                            RoomNameField.setVisibility(View.GONE);
-                            ActionText.setText(R.string.ProgressRevenge);
-                            builder.setView(Field).setPositiveButton("OK", new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    if (SERVER)
-                                    {
-                                        Integer mm = Calendar.getInstance().get(Calendar.MINUTE);
-                                        Map newRoomData = new HashMap();
-                                        newRoomData.put("Turns", 1);
-                                        newRoomData.put("Color", -1);
-                                        newRoomData.put("CurrentPlayer", 1);
-                                        newRoomData.put("ConnectedPlayers", 1);
-                                        newRoomData.put("MaxDraw", 7);
-                                        newRoomData.put("TurnDir", 1);
-                                        newRoomData.put("Winner", "");
-                                        newRoomData.put("Card", rnd.nextInt(52));
-                                        newRoomData.put("NewCard", rnd.nextInt(52));
-                                        newRoomData.put("Time", mm);
-                                        newRoomData.put("Ready", 1);
-                                        dataBase.child(GameActivity.ThisRoom.Name).updateChildren(newRoomData);
-                                    }
-
-                                    dataBase.child(ThisRoom.Name).child("Players").child(player.Key).removeValue();
-                                    player.HandCards.clear();
-                                    GameActivity.recyclerView[0].getAdapter().notifyDataSetChanged();
-                                }
-                            }).setNegativeButton(getString(R.string.FindRoomDialogCancel), new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    dataBase.child(ThisRoom.Name).child("Players").child(player.Key).removeValue();
-                                    if (SERVER)
-                                        dataBase.child(GameActivity.ThisRoom.Name).removeValue();
-                                    dialog.dismiss();
-                                    stopService(new Intent(GameActivity.this, TurnExplorer.class));
-                                    finish();
-                                }
-                            });
-                            AlertDialog dialog = builder.create();
-                            dialog.show();
-                            */
                         }else if (t.contains("☻"))
                         {
                             t = t.substring(1, t.length());
@@ -771,9 +701,12 @@ public class GameActivity extends AppCompatActivity
                 if (NormClose)
                 {
                     NormClose = false;
-                    Toast.makeText(GameActivity.this, getString(R.string.RoomRemove), Toast.LENGTH_LONG).show();
-                    finish();
+                    Toast.makeText(GameActivity.this, getString(R.string.RoomRemove), Toast.LENGTH_SHORT).show();
                 }
+
+                MenuActivity.Data = "Close";
+
+                finish();
             }
 
             @Override
@@ -873,13 +806,11 @@ public class GameActivity extends AppCompatActivity
             case R.id.CloseRoom:
                 try
                 {
-                    dataBase.child(ThisRoom.Name).getKey();
-
                     dataBase.child(ThisRoom.Name).removeValue();
                 }catch (Exception e)
                 {
-                    NormClose = false;
-                    finish();
+                    //NormClose = false;
+                    //finish();
                 }
 
                 return true;
@@ -896,6 +827,8 @@ public class GameActivity extends AppCompatActivity
                 RoomNameField.setVisibility(View.GONE);
                 ActionText.setText(R.string.EnterMessage);
                 TextField.setHint(R.string.EMessage);
+                TextField.setText("");
+                TextField.setFilters(new InputFilter[] { new InputFilter.LengthFilter(55 - player.Name.length() - 2) });
 
                 builder.setView(Field).setPositiveButton(getString(R.string.SMessage), new DialogInterface.OnClickListener()
                 {
@@ -904,7 +837,7 @@ public class GameActivity extends AppCompatActivity
                     {
                         String Text = TextField.getText().toString();
 
-                        if (!Text.isEmpty() || Text.compareTo("") == 0)
+                        if (!Text.isEmpty() || Text.compareTo("") != 0)
                         {
                             if (Text.startsWith("=ЧДПК"))
                             {

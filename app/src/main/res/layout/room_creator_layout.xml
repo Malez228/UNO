@@ -31,7 +31,7 @@
         android:ems="10"
         android:hint="Pass"
         android:inputType="textPersonName"
-        android:maxLength="60"
+        android:maxLength="35"
         android:textColor="@color/colorPrimaryDark"
         android:textColorHint="@color/colorPrimary"/>
 
