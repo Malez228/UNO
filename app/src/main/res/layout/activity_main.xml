@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.game.MainActivity">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_orange_dark"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:titleTextColor="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/deckImage"
+            android:layout_width="@dimen/DeckCardWidth"
+            android:layout_height="@dimen/DeckCardHeight"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginRight="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolBar"
+            app:srcCompat="@drawable/deck" />
+
+        <ImageView
+            android:id="@+id/cardImage"
+            android:layout_width="@dimen/CardWidth"
+            android:layout_height="@dimen/CardHeight"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
+            app:layout_constraintBottom_toBottomOf="@+id/deckImage"
+            app:layout_constraintEnd_toStartOf="@+id/deckImage"
+            app:layout_constraintTop_toTopOf="@+id/deckImage"
+            app:srcCompat="@drawable/empty_card" />
+
+        <TextView
+            android:id="@+id/maxDrawText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:textColor="@android:color/holo_orange_dark"
+            android:textSize="@dimen/DefTextSize"
+            app:layout_constraintEnd_toEndOf="@+id/deckImage"
+            app:layout_constraintStart_toStartOf="@+id/deckImage"
+            app:layout_constraintTop_toBottomOf="@+id/deckImage"
+            tools:text="7" />
+
+        <TextView
+            android:id="@+id/handSizeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:tag="-1"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/DefTextSize"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/handRecycler"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="0" />
+
+        <TextView
+            android:id="@+id/currentPlayerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:tag="-1"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/DefTextSize"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/handSizeText"
+            tools:text="0" />
+
+        <TextView
+            android:id="@+id/connectedPlayersText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:tag="-1"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/DefTextSize"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/currentPlayerText"
+            app:layout_constraintStart_toStartOf="@+id/currentPlayerText"
+            tools:text="0" />
+
+        <TextView
+            android:id="@+id/colorText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:gravity="center_horizontal"
+            android:tag="-1"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/DefTextSize"
+            app:layout_constraintEnd_toStartOf="@+id/cardImage"
+            app:layout_constraintTop_toTopOf="@+id/cardImage"
+            tools:text="0" />
+
+        <Button
+            android:id="@+id/endTurnButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/EndTurn"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="@dimen/DefTextSize"
+            app:layout_constraintBottom_toBottomOf="@+id/cardImage"
+            app:layout_constraintEnd_toStartOf="@+id/cardImage"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/handRecycler"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/DeckCardHeight"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:listitem="@layout/item_card" />
+
+        <ImageView
+            android:id="@+id/animCardImage"
+            android:layout_width="@dimen/DeckCardWidth"
+            android:layout_height="@dimen/DeckCardHeight"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            app:srcCompat="@drawable/empty_card" />
+
+        <View
+            android:id="@+id/firstCardView"
+            android:layout_width="85dp"
+            android:layout_height="1dp"
+            android:layout_marginEnd="-1dp"
+            android:layout_marginRight="-1dp"
+            android:layout_marginBottom="-1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/colorPicker"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="32dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/redColorPicker"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_margin="8dp"
+                    android:onClick="onColorClick"
+                    android:tag="0"
+                    app:cardBackgroundColor="@color/ColorRed"
+                    app:cardCornerRadius="10dp" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/yellowColorPicker"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_margin="8dp"
+                    android:onClick="onColorClick"
+                    android:tag="1"
+                    app:cardBackgroundColor="@color/ColorYellow"
+                    app:cardCornerRadius="10dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/greenColorPicker"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_margin="8dp"
+                    android:onClick="onColorClick"
+                    android:tag="2"
+                    app:cardBackgroundColor="@color/ColorGreen"
+                    app:cardCornerRadius="10dp" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/blueColorPicker"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_margin="8dp"
+                    android:onClick="onColorClick"
+                    android:tag="3"
+                    app:cardBackgroundColor="@color/ColorBlue"
+                    app:cardCornerRadius="10dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

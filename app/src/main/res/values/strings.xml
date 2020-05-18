@@ -3,62 +3,85 @@
 
     <!-- Menu -->
     <string name="CreateRoomLabelText">Create room</string>
-    <string name="RoomName">Room name</string>
+    <string name="RoomName" translatable="false">Room name</string>
+    <string name="RoomPass" translatable="false">Room password</string>
+    <string name="RoomMaxPlayers" translatable="false">Maximum players</string>
     <string name="CreateRoom">Create</string>
-    <string name="FindRoomLabelText">Search room</string>
-    <string name="FindRoomDialog">Room not found\nYou can create a new room with this name</string>
-    <string name="FindRoomDialogCancel">Cancel</string>
-    <string name="EnterPassword">Enter password</string>
-    <string name="EnterRoom">Go</string>
+    <string name="FindRoomLabelText" translatable="false">Search room</string>
+    <string name="FindRoomDialog" translatable="false">Room not found\nYou can create a new room with this name</string>
+    <string name="FindRoomDialogCancel" translatable="false">Cancel</string>
+    <string name="EnterPassword" translatable="false">Enter password</string>
+    <string name="EnterRoom" translatable="false">Go</string>
+    <string name="StatGames" translatable="false">Games</string>
+    <string name="StatWins" translatable="false">Wins</string>
+    <string name="StatLoses" translatable="false">Loses</string>
+    <string name="StatWinRate" translatable="false">Win rate</string>
+    <string name="StatSave" translatable="false">Save</string>
+    <string name="StatMaxSize" translatable="false">Maximum of 25 characters</string>
+    <string name="StatNameError" translatable="false">Allowed only letters, numbers, spaces, - and _</string>
+    <string name="RoomSizeError" translatable="false">Range from 1 to 6</string>
+    <string name="ConnectedPlayersMenu" translatable="false">Total players %1$s/%2$s</string>
 
     <!-- Main -->
-    <string name="OrderedText">Ordered</string>
-    <string name="RedText">red</string>
-    <string name="GreenText">green</string>
+    <string name="OrderedText" translatable="false">Ordered %s</string>
+    <string name="RedText" translatable="false">red</string>
+    <string name="GreenText" translatable="false">green</string>
     <string name="BlueText">blue</string>
-    <string name="YellowText">yellow</string>
-    <string name="ConnectedPlayersText">Total players</string>
-    <string name="MyTurn">Your turn</string>
-    <string name="CurrentPlayerText">Player\'s</string>
-    <string name="HandCardsCountText">Cards in hand</string>
+    <string name="YellowText" translatable="false">yellow</string>
+    <string name="ConnectedPlayersText">Total players %s</string>
+    <string name="MyTurn" translatable="false">Your turn</string>
+    <string name="CurrentPlayerText">Player\'s %s turn</string>
+    <string name="HandCardsCountText" translatable="false">Cards in hand %s</string>
     <string name="EndTurn">End turn</string>
 
-    <string name="DontLeave">You can\'t leave this party</string>
-    <string name="RoomAlive"> This room already exists.\nUse the search to connect</string>
-    <string name="RoomRemove">Server removed this room</string>
+    <string name="DontLeave" translatable="false">You can\'t leave this party</string>
+    <string name="RoomAlive" translatable="false"> This room already exists.\nUse the search to connect</string>
+    <string name="RoomRemove" translatable="false">Server removed this room</string>
     <string name="EnterMessage">Enter message</string>
     <string name="EMessage">Message</string>
-    <string name="SMessage">Send</string>
-    <string name="EnterPass">Enter password</string>
-    <string name="GameIsRunning">The game is running</string>
-    <string name="WrongPassword">Wrong password</string>
-    <string name="SizePassword">It must be longer than three symbols</string>
+    <string name="SMessage" translatable="false">Send</string>
+    <string name="GameIsRunning" translatable="false">The game is running</string>
+    <string name="WrongPassword" translatable="false">Wrong password</string>
+    <string name="SizePassword" translatable="false">It must be longer than three symbols</string>
 
-    <string name="PlayerLabelText">Player</string>
-    <string name="PlayerConnectLabelText">connected</string>
-    <string name="PlayerWinLabelText">won!</string>
+    <string name="PlayerLabelText" translatable="false">Player</string>
+    <string name="PlayerConnectLabelText" translatable="false">connected</string>
+    <string name="PlayerWinLabelText" translatable="false">won!</string>
 
-    <string name="RoomLabelText">Room</string>
-    <string name="RoomDelLabelText">removed</string>
+    <string name="RoomLabelText" translatable="false">Room</string>
+    <string name="RoomDelLabelText" translatable="false">removed</string>
 
-    <string name="ProgressRevenge">Would you like to continue?</string>
+    <string name="ProgressRevenge" translatable="false">Would you like to continue?</string>
 
-    <string name="PlayerPreLabelText">Player</string>
-    <string name="PlayerPreWinLabelText">has one card left</string>
+    <string name="PlayerPreLabelText" translatable="false">Player</string>
+    <string name="PlayerPreWinLabelText" translatable="false">has one card left</string>
 
     <!-- BugReport -->
-    <string name="SendReport">Send Report</string>
-    <string name="InfoT">Info</string>
-    <string name="ToolsT">Tools</string>
-    <string name="CommunicateT">Communicate</string>
+    <string name="SendReport" translatable="false">Send Report</string>
+    <string name="InfoT" translatable="false">Info</string>
+    <string name="ToolsT" translatable="false">Tools</string>
+    <string name="CommunicateT" translatable="false">Communicate</string>
     <string name="CheckVersion">Check update</string>
     <string name="BugReportTitle">Message to the developer</string>
     <string name="BugReportLabelText">Help make our application better\nLeave a review or bug report</string>
     <string name="BugReportSendBtnText">Send</string>
-    <string name="title_activity_menu">MenuActivity</string>
+    <string name="title_activity_menu" translatable="false">MenuActivity</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="action_settings" translatable="false">Settings</string>
+
+    <!-- Menu -->
+    <string name="MenuRooms" translatable="false">Rooms</string>
+    <string name="MenuNewRoom" translatable="false">New Room</string>
+    <string name="MenuStats" translatable="false">Stats</string>
+
+    <!-- VersionControl -->
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_changes">Changes in</string>
+    <string name="dialog_message">New version available</string>
+    <string name="dialog_title">Update required</string>
+    <string name="dialog_update">Update</string>
+    <string name="download_description">Downloading new version</string>
 </resources>

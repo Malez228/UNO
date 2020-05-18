@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="DeckCardWidth">85dp</dimen>
-    <dimen name="DeckCardHeight">135dp</dimen>
+    <dimen name="CardWidth">85dp</dimen>
+    <dimen name="CardHeight">135dp</dimen>
+
+    <dimen name="DeckCardWidth">90dp</dimen>
+    <dimen name="DeckCardHeight">140dp</dimen>
 
     <dimen name="HandCardWidth">50dp</dimen>
     <dimen name="HandCardHeight">120dp</dimen>

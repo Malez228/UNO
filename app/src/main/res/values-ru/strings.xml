@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="BlueText">Синий</string>
+    <string name="BugReportLabelText">Помогите улучшить приложение</string>
+    <string name="BugReportSendBtnText">Отправить</string>
+    <string name="BugReportTitle">Сообщение разработчику</string>
+    <string name="CheckVersion">Проверить обновления</string>
+    <string name="ConnectedPlayersText">Игроков</string>
+    <string name="CreateRoom">Создать</string>
+    <string name="CreateRoomLabelText">Новая комната</string>
+    <string name="CurrentPlayerText">Ход игрока</string>
+    <string name="EMessage">Сообщение</string>
+    <string name="EndTurn">Закончить</string>
+    <string name="EnterMessage">Введите сообщение</string>
+    <!-- <string name="EnterPass">Введите пароль</string> -->
+
+
+    <!-- VersionControl -->
+    <string name="download_description">Скачивание новой версии</string>
+    <string name="dialog_title">Рекомендуется обновление</string>
+    <string name="dialog_message">Доступна новая версия</string>
+    <string name="dialog_update">Обновить</string>
+    <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_changes">Изменения в</string>
+</resources>
