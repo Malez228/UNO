@@ -13,8 +13,10 @@ import com.malec.ino.R
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 class MenuActivity: AppCompatActivity(), HasAndroidInjector {
 	@Inject
 	lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>

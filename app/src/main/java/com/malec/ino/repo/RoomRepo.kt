@@ -1,7 +1,7 @@
 package com.malec.ino.repo
 
-import com.malec.ino.service.localDb.RoomsDao
+import com.malec.ino.service.network.RoomsApi
 
-class RoomRepo(private val dao: RoomsDao) {
-	fun getAll() = dao.getAll()
+class RoomRepo(private val api: RoomsApi) {
+	fun next() = api.getRooms()
 }

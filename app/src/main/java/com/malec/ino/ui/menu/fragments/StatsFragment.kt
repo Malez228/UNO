@@ -10,8 +10,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.malec.ino.R
 import com.malec.ino.di.Injectable
 import com.malec.ino.ui.menu.MenuViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 class StatsFragment: Fragment(), Injectable {
 	@Inject
 	lateinit var viewModelFactory: ViewModelProvider.Factory
