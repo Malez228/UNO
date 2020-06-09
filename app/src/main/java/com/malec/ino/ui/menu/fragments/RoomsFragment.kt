@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.malec.ino.R
 import com.malec.ino.di.Injectable
-import com.malec.ino.service.network.RoomAction
 import com.malec.ino.ui.menu.MenuViewModel
 import kotlinx.android.synthetic.main.fragment_rooms.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,17 +37,8 @@ class RoomsFragment: Fragment(), Injectable {
 		roomRecycler.adapter = adapter
 		roomRecycler.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
-		viewModel.room.observe(viewLifecycleOwner, Observer {result ->
-			val list = adapter.currentList.toMutableList()
-			when (result.action) {
-				RoomAction.ADD    -> list.add(result.room)
-				RoomAction.UPDATE -> {
-					val i = list.indexOfFirst {it.name == result.room.name}
-					list[i] = result.room
-				}
-				RoomAction.REMOVE -> list.removeAll {it.name == result.room.name}
-			}
-			adapter.submitList(list)
+		viewModel.rooms.observe(viewLifecycleOwner, Observer {
+			adapter.submitList(it.toList())
 		})
 	}
 }
