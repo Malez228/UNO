@@ -12,12 +12,13 @@
     <string name="FindRoomDialogCancel" translatable="false">Cancel</string>
     <string name="EnterPassword" translatable="false">Enter password</string>
     <string name="EnterRoom" translatable="false">Go</string>
-    <string name="StatGames" translatable="false">Games</string>
-    <string name="StatWins" translatable="false">Wins</string>
-    <string name="StatLoses" translatable="false">Loses</string>
-    <string name="StatWinRate" translatable="false">Win rate</string>
+    <string name="StatGames" translatable="false">Games: %s</string>
+    <string name="StatWins" translatable="false">Wins: %s</string>
+    <string name="StatLoses" translatable="false">Loses: %s</string>
+    <string name="StatWinRate" translatable="false">Win rate: %s%%</string>
     <string name="StatSave" translatable="false">Save</string>
-    <string name="StatMaxSize" translatable="false">Maximum of 25 characters</string>
+    <string name="StatNameSaved" translatable="false">New name saved</string>
+    <string name="StatMinSize" translatable="false">Minimum 5 characters</string>
     <string name="StatNameError" translatable="false">Allowed only letters, numbers, spaces, - and _</string>
     <string name="RoomSizeError" translatable="false">Range from 1 to 6</string>
     <string name="ConnectedPlayersMenu" translatable="false">Total players %1$s/%2$s</string>

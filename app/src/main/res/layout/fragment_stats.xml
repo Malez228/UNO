@@ -4,13 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:orientation="vertical"
     tools:context=".ui.menu.fragments.StatsFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/userNameLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:counterEnabled="true"
+        app:counterMaxLength="25">
 
         <EditText
             android:id="@+id/userNameEditText"
@@ -18,8 +21,10 @@
             android:layout_height="wrap_content"
             android:layout_margin="12dp"
             android:ems="10"
+            android:imeOptions="actionDone"
             android:inputType="textPersonName"
-            android:maxLength="25" />
+            android:maxLength="25"
+            android:maxLines="1" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -32,10 +37,9 @@
         android:visibility="gone">
 
         <TextView
-            android:id="@+id/textView4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/StatMaxSize"
+            android:text="@string/StatMinSize"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/saveButton"
             app:layout_constraintStart_toStartOf="parent"
