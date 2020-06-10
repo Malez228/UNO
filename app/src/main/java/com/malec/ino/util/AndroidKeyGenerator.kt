@@ -7,8 +7,8 @@ import android.telephony.TelephonyManager
 import android.util.DisplayMetrics
 
 class AndroidKeyGenerator(private val activity: Activity): KeyGenerator {
-	override fun generate(): String {
-		return getTelephonyData() + "☺" + getDeviceData()
+	override fun generate(): Int {
+		return (getTelephonyData() + "☺" + getDeviceData()).hashCode()
 	}
 
 	private fun getTelephonyData(): String {

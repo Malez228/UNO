@@ -4,6 +4,7 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.malec.ino.model.Room
 import com.malec.ino.model.RoomD
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -39,7 +40,11 @@ class FirebaseRoomsApi(private val db: DatabaseReference): RoomsApi {
 
 			db.addChildEventListener(listener)
 
-			awaitClose {db.removeEventListener(listener)}
+			awaitClose { db.removeEventListener(listener) }
 		}
+	}
+
+	override fun createRoom(room: Room) {
+		db.child(room.name).setValue(room.toMap())
 	}
 }

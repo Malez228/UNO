@@ -33,6 +33,9 @@ class MenuActivity: AppCompatActivity(), HasAndroidInjector {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_menu)
+
+		viewModel.initUser(this)
+
 		val navView: BottomNavigationView = findViewById(R.id.bottomNavView)
 
 		val navController = findNavController(R.id.nav_host_fragment)

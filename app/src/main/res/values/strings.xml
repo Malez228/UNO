@@ -12,6 +12,7 @@
     <string name="FindRoomDialogCancel" translatable="false">Cancel</string>
     <string name="EnterPassword" translatable="false">Enter password</string>
     <string name="EnterRoom" translatable="false">Go</string>
+    <string name="RoomCreated" translatable="false">Room created</string>
     <string name="StatGames" translatable="false">Games: %s</string>
     <string name="StatWins" translatable="false">Wins: %s</string>
     <string name="StatLoses" translatable="false">Loses: %s</string>
@@ -21,6 +22,7 @@
     <string name="StatMinSize" translatable="false">Minimum 5 characters</string>
     <string name="StatNameError" translatable="false">Allowed only letters, numbers, spaces, - and _</string>
     <string name="RoomSizeError" translatable="false">Range from 1 to 6</string>
+    <string name="RoomNameMinSize" translatable="false">Minimum 3 characters</string>
     <string name="ConnectedPlayersMenu" translatable="false">Total players %1$s/%2$s</string>
 
     <!-- Main -->
@@ -36,7 +38,7 @@
     <string name="EndTurn">End turn</string>
 
     <string name="DontLeave" translatable="false">You can\'t leave this party</string>
-    <string name="RoomAlive" translatable="false"> This room already exists.\nUse the search to connect</string>
+    <string name="RoomAlive" translatable="false">This room already exists.\nUse the search to connect</string>
     <string name="RoomRemove" translatable="false">Server removed this room</string>
     <string name="EnterMessage">Enter message</string>
     <string name="EMessage">Message</string>
@@ -85,4 +87,13 @@
     <string name="dialog_title">Update required</string>
     <string name="dialog_update">Update</string>
     <string name="download_description">Downloading new version</string>
+
+    <string-array name="room_size">
+        <item>"1"</item>
+        <item>"2"</item>
+        <item>"3"</item>
+        <item>"4"</item>
+        <item>"5"</item>
+        <item>"6"</item>
+    </string-array>
 </resources>

@@ -39,7 +39,7 @@ class RoomAdapter(): ListAdapter<Room, RoomAdapter.RoomItemViewHolder>(diffUtilC
 		val binding: ItemRoomBinding? = DataBindingUtil.bind(view)
 
 		init {
-			binding?.mainLayout?.setOnClickListener {v ->
+			binding?.mainLayout?.setOnClickListener { v ->
 				binding.room?.let {
 					//TODO click
 				}

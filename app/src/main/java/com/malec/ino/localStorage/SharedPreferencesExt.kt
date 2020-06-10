@@ -15,10 +15,10 @@ inline operator fun <reified T: Any> SharedPreferences.get(key: String): T {
 
 operator fun SharedPreferences.set(key: String, value: Any) {
 	when (value) {
-		is Int     -> edit {it.putInt(key, value)}
-		is String  -> edit {it.putString(key, value)}
-		is Long    -> edit {it.putLong(key, value)}
-		is Boolean -> edit {it.putBoolean(key, value)}
+		is Int     -> edit { it.putInt(key, value) }
+		is String  -> edit { it.putString(key, value) }
+		is Long    -> edit { it.putLong(key, value) }
+		is Boolean -> edit { it.putBoolean(key, value) }
 
 		else       -> throw UnsupportedOperationException("Not yet implemented")
 	}
@@ -31,5 +31,5 @@ private inline fun SharedPreferences.edit(operation: (SharedPreferences.Editor) 
 }
 
 fun SharedPreferences.clear() {
-	edit {it.clear()}
+	edit { it.clear() }
 }

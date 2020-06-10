@@ -35,8 +35,6 @@ class StatsFragment: Fragment(), Injectable {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 
-		viewModel.initUser(requireActivity())
-
 		initViewModelListeners()
 		initViewListeners()
 	}
@@ -46,12 +44,12 @@ class StatsFragment: Fragment(), Injectable {
 			showUserStats(it)
 		})
 
-		viewModel.isSaveNameBtnVisible.observe(viewLifecycleOwner, Observer {isVisible ->
+		viewModel.isSaveNameBtnVisible.observe(viewLifecycleOwner, Observer { isVisible ->
 			if (isVisible) saveLayout.visibility = View.VISIBLE
 			else saveLayout.visibility = View.GONE
 		})
 
-		viewModel.nameSaveResult.observe(viewLifecycleOwner, Observer {result ->
+		viewModel.nameSaveResult.observe(viewLifecycleOwner, Observer { result ->
 			when (result) {
 				MenuViewModel.UserNameSaveResult.SUCCESS -> {
 					viewModel.nameSaveResult.value = MenuViewModel.UserNameSaveResult.NONE
@@ -75,7 +73,7 @@ class StatsFragment: Fragment(), Injectable {
 			viewModel.onUserNameChange(it?.toString())
 		}
 
-		userNameEditText.setOnEditorActionListener {_, actionId, _ ->
+		userNameEditText.setOnEditorActionListener { _, actionId, _ ->
 			return@setOnEditorActionListener if (actionId == EditorInfo.IME_ACTION_DONE) {
 				viewModel.onSaveNameClick()
 				true

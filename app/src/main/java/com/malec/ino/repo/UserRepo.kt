@@ -11,7 +11,7 @@ class UserRepo(private val userStorage: UserStorage) {
 
 	fun authorizeUser(keyGenerator: KeyGenerator) {
 		val user = User(
-			keyGenerator.generate(), generateName(), 0, 0, 0
+			keyGenerator.generate().toString(), generateName(), 0, 0, 0
 		)
 		saveUser(user)
 	}
