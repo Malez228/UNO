@@ -1,11 +1,9 @@
 package com.malec.ino.service.network
 
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.*
 import com.malec.ino.model.Room
 import com.malec.ino.model.RoomD
+import com.malec.ino.model.User
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -44,7 +42,26 @@ class FirebaseRoomsApi(private val db: DatabaseReference): RoomsApi {
 		}
 	}
 
+	override fun removeRoom(room: Room) {
+		db.child(room.name).removeValue()
+	}
+
 	override fun createRoom(room: Room) {
 		db.child(room.name).setValue(room.toMap())
+	}
+
+	override fun enterRoom(room: Room, user: User) {
+		db.child(room.name).runTransaction(object: Transaction.Handler {
+			override fun onComplete(p0: DatabaseError?, p1: Boolean, p2: DataSnapshot?) {
+
+			}
+
+			override fun doTransaction(data: MutableData): Transaction.Result {
+				data.child("connectedPlayers").value = room.connectedPlayers + 1
+				data.child("playersKeys").value = room.playersKeys.joinToString(";") + ";" + user.key
+
+				return Transaction.success(data)
+			}
+		})
 	}
 }

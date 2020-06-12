@@ -30,6 +30,8 @@ class MenuViewModel @Inject constructor(private val roomRepo: RoomRepo,
 	private var roomPass: String = ""
 	private var roomSize: Int = 1
 
+	private val nameRegex = Regex("^[А-Яа-яA-Za-z0-9 _-]*$")
+
 	private val _rooms = MutableLiveData<List<Room>>()
 	val rooms: LiveData<List<Room>>
 		get() = _rooms
@@ -46,7 +48,7 @@ class MenuViewModel @Inject constructor(private val roomRepo: RoomRepo,
 	val roomCreateResult = MutableLiveData<RoomCreateResult>()
 
 	override fun prepareEnter(room: Room) {
-
+		roomRepo.enter(room, userRepo.getUser())
 	}
 
 	init {
@@ -79,13 +81,12 @@ class MenuViewModel @Inject constructor(private val roomRepo: RoomRepo,
 	}
 
 	private fun isRoomValid(): RoomCreateResult {
-		val re = Regex("^[А-Яа-яA-Za-z0-9 _-]*$")
 
 		return when {
-			!roomName.matches(re)                         -> RoomCreateResult.ERROR_NAME
+			!roomName.matches(nameRegex)                  -> RoomCreateResult.ERROR_NAME
 			!(roomName.length >= 3 || roomName.isEmpty()) -> RoomCreateResult.ERROR_NAME_SHORT
 			!list.none { it.name == roomName }            -> RoomCreateResult.ERROR_NAME_DUPLICATE
-			!roomPass.matches(re)                         -> RoomCreateResult.ERROR_PASS
+			!roomPass.matches(nameRegex)                  -> RoomCreateResult.ERROR_PASS
 
 			else                                          -> RoomCreateResult.SUCCESS
 		}
@@ -94,17 +95,25 @@ class MenuViewModel @Inject constructor(private val roomRepo: RoomRepo,
 	private fun updateRooms() {
 		viewModelScope.launch(Dispatchers.IO) {
 			roomRepo.next().collect { result ->
-				when (result.action) {
-					RoomAction.ADD    -> list.add(result.room)
-					RoomAction.UPDATE -> {
-						val i = list.indexOfFirst { it.name == result.room.name }
-						list[i] = result.room
+				val room = result.room
+				if (canEnter(room)) {
+					when (result.action) {
+						RoomAction.ADD    -> list.add(room)
+						RoomAction.UPDATE -> {
+							val i = list.indexOfFirst { it.name == room.name }
+							if (i == -1) list.add(room)
+							else list[i] = room
+						}
+						RoomAction.REMOVE -> list.removeAll { it.name == room.name }
 					}
-					RoomAction.REMOVE -> list.removeAll { it.name == result.room.name }
-				}
+				} else list.removeAll { it.name == room.name }
 				_rooms.postValue(list)
 			}
 		}
+	}
+
+	private fun canEnter(room: Room): Boolean {
+		return (room.connectedPlayers == room.maxPlayers && room.playersKeys.contains(userRepo.getUser().key)) || room.connectedPlayers < room.maxPlayers
 	}
 
 	fun initUser(activity: Activity) {
@@ -123,8 +132,7 @@ class MenuViewModel @Inject constructor(private val roomRepo: RoomRepo,
 
 	fun onSaveNameClick() {
 		userNameChanged?.let {
-			val re = Regex("^[А-Яа-яA-Za-z0-9 _-]*$")
-			nameSaveResult.value = if (it.length > 4 && it.matches(re)) {
+			nameSaveResult.value = if (it.length > 4 && it.matches(nameRegex)) {
 				userRepo.updateName(it)
 				userName = it
 				onUserNameChange(it)

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.malec.ino.databinding.ItemRoomBinding
 import com.malec.ino.model.Room
 
-class RoomAdapter(): ListAdapter<Room, RoomAdapter.RoomItemViewHolder>(diffUtilCallback) {
+class RoomAdapter(private val vm: EnterRoom): ListAdapter<Room, RoomAdapter.RoomItemViewHolder>(diffUtilCallback) {
 	companion object {
 		private val diffUtilCallback = object: DiffUtil.ItemCallback<Room>() {
 			override fun areItemsTheSame(oldItem: Room, newItem: Room): Boolean {
@@ -41,7 +41,7 @@ class RoomAdapter(): ListAdapter<Room, RoomAdapter.RoomItemViewHolder>(diffUtilC
 		init {
 			binding?.mainLayout?.setOnClickListener { v ->
 				binding.room?.let {
-					//TODO click
+					vm.prepareEnter(it)
 				}
 			}
 		}

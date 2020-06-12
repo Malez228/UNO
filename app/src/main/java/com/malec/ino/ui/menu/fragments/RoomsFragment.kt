@@ -25,7 +25,7 @@ class RoomsFragment: Fragment(), Injectable {
 		viewModelFactory
 	}
 
-	private val adapter = RoomAdapter()
+	private lateinit var adapter: RoomAdapter
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return inflater.inflate(R.layout.fragment_rooms, container, false)
@@ -34,6 +34,7 @@ class RoomsFragment: Fragment(), Injectable {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 
+		adapter = RoomAdapter(viewModel)
 		roomRecycler.adapter = adapter
 		roomRecycler.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
